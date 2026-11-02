@@ -1,0 +1,128 @@
+.footer {
+  margin-top: 80px;
+  border-top: 1px solid var(--border);
+  background: rgba(8, 14, 27, 0.75);
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-top: 64px;
+  padding-bottom: 56px;
+}
+
+.footer-brand {
+  max-width: 310px;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.footer-logo-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  font-size: 21px;
+}
+
+.footer-logo-dot {
+  color: var(--accent);
+}
+
+.footer-brand p {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.footer-column h3 {
+  margin: 5px 0 8px;
+  font-size: 15px;
+}
+
+.footer-column a {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+  color: #93c5fd;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border);
+}
+
+.footer-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 72px;
+}
+
+.footer-bottom p,
+.footer-bottom span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media (max-width: 850px) {
+  .footer-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px;
+  }
+
+  .footer-brand {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 520px) {
+  .footer {
+    margin-top: 55px;
+  }
+
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 20px;
+    padding-top: 42px;
+    padding-bottom: 38px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-bottom-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding-block: 18px;
+  }
+}
