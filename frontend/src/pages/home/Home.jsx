@@ -153,8 +153,8 @@ function Home() {
         <div className="hm-hero-visual">
           <div className="hm-photo">
             <img
-              src="/images/fade.png"
-              srcSet="/images/fade-640.webp 640w, /images/fade-1200.webp 1200w"
+              src={`${import.meta.env.BASE_URL}images/fade.png`}
+              srcSet={`${import.meta.env.BASE_URL}images/fade-640.webp 640w, ${import.meta.env.BASE_URL}images/fade-1200.webp 1200w`}
               sizes="(min-width: 900px) 520px, 100vw"
               width="1200"
               height="800"
