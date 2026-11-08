@@ -911,3 +911,8 @@ textarea.bx-input { resize: vertical; min-height: 80px; }
   .bp-address-editor .bp-search { flex-direction: column; }
   .bx-location-head > button { width: 100%; }
 }
+
+/* Keep profile actions in the page flow so they never cover map controls. */
+.bx-profile > .bx-savebar { position: static; padding-top: 4px; }
+.bp-map-box { isolation: isolate; }
+.bp-picker > .bp-gps { position: static; width: 100%; min-height: 48px; z-index: auto; box-shadow: none; }

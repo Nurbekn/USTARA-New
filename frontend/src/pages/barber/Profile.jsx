@@ -81,7 +81,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="bx-page">
+    <div className="bx-page bx-profile">
       <PageHeader title="Profil" />
 
       <section className="bx-card bx-hero">

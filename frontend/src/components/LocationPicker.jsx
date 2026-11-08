@@ -248,8 +248,9 @@ export default function LocationPicker({
           )}
         </MapContainer>
         </div>
+      </div>
 
-        {editable && <button
+      {editable && <button
           type="button"
           className="bp-btn bp-gps"
           onClick={detectLocation}
@@ -257,7 +258,6 @@ export default function LocationPicker({
         >
           {locating ? "Aniqlanmoqda..." : "Mening joylashuvim"}
         </button>}
-      </div>
 
       {resolving && editable && <p className="bp-note" role="status">Nuqta belgilandi. Manzil aniqlanmoqda…</p>}
       {problem ? (
