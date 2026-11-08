@@ -84,7 +84,7 @@ function Navbar() {
             </Link>
 
             <Link to="/signup" className="navbar-signup navbar-signup--menu" onClick={closeMenu}>
-              Boshlash <span aria-hidden="true">↗</span>
+              Boshlash 
             </Link>
           </div>
         </div>

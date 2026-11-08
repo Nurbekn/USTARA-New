@@ -57,16 +57,17 @@ const DEFAULT_HOURS = [1, 2, 3, 4, 5, 6, 0].map((day) => ({
 }));
 
 const DEFAULT_PROFILE = {
-  firstName: "Nurbek",
-  lastName: "Karimov",
-  phone: "+998 90 123 45 67",
-  telegram: "nurbek_barber",
-  salonName: "Nurbek Barber",
-  address: "Toshkent, Chilonzor",
-  location: { lat: 41.2754, lng: 69.2043 },
-  experience: 3,
-  about: "Professional sartarosh. Fade, klassik soch olish va soqol dizayni.",
-  avatar: 1, // id of one of the built-in avatars (see avatars.jsx)
+  firstName: "",
+  lastName: "",
+  phone: "",
+  telegram: "",
+  username: "",
+  salonName: "",
+  address: "",
+  location: null,
+  experience: null,
+  about: "",
+  avatar: null, // id of one of the built-in avatars (see avatars.jsx)
   isAvailable: true,
   services: [
     { id: 1, name: "Soch olish", price: 50000, duration: 45 },

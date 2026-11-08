@@ -6,9 +6,8 @@ import "./auth-ui.css";
 
 const SPECIALTIES = [
   { value: "barber", label: "Sartarosh" },
-  { value: "beard", label: "Soqol ustasi" },
+  { value: "cosmetolog", label: "Kosmetolog" },
   { value: "stylist", label: "Stilist" },
-  { value: "massage", label: "Massajchi" },
 ];
 
 // Barber sign-up: avatar + name + phone + specialty -> OTP code.
@@ -21,7 +20,8 @@ export default function UstaSignup() {
   const [specialty, setSpecialty] = useState("barber");
   const [errors, setErrors] = useState({});
 
-  const clear = (field) => setErrors((previous) => ({ ...previous, [field]: "" }));
+  const clear = (field) =>
+    setErrors((previous) => ({ ...previous, [field]: "" }));
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,7 +29,8 @@ export default function UstaSignup() {
     const next = {};
 
     if (name.trim().length < 3) next.name = "Ism va familiyangizni kiriting";
-    if (digits.length !== 9) next.phone = "Telefon raqamni to'liq kiriting (9 ta raqam)";
+    if (digits.length !== 9)
+      next.phone = "Telefon raqamni to'liq kiriting (9 ta raqam)";
 
     setErrors(next);
     if (Object.keys(next).length > 0) return;
@@ -47,21 +48,33 @@ export default function UstaSignup() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout wide>
       <RoleSwitch role="barber" />
 
-      <h1 className="au-title">Usta sifatida qo'shiling</h1>
-      <p className="au-sub">Ishlaringizni ko'rsating va mijozlarni o'zingizga jalb qiling.</p>
+      <h1 className="au-title">Sartarosh sifatida qo'shiling</h1>
+      <p className="au-sub">
+        Ishlaringizni ko'rsating va mijozlarni o'zingizga jalb qiling.
+      </p>
 
       <form className="au-form" onSubmit={handleSubmit} noValidate>
         {/* Avatar */}
         <div className="au-field">
           <span className="au-label">Avatar</span>
           <div className="au-avatar-top">
-            <Avatar id={avatar} size={84} name="Tanlangan avatar" className="au-avatar-big" />
+            <Avatar
+              id={avatar}
+              size={84}
+              name="Tanlangan avatar"
+              className="au-avatar-big"
+            />
             <small>Sizga yoqqanini tanlang</small>
           </div>
-          <AvatarPicker value={avatar} onChange={setAvatar} size={46} className="au-avatars" />
+          <AvatarPicker
+            value={avatar}
+            onChange={setAvatar}
+            size={46}
+            className="au-avatars"
+          />
         </div>
 
         <div className="au-field">
@@ -115,8 +128,8 @@ export default function UstaSignup() {
         </div>
 
         <p className="au-info">
-          Keyingi qadamda joylashuv va ish vaqtini kiritasiz. Xizmat va narxlarni
-          keyinroq o'zingiz qo'shasiz.
+          Keyingi qadamda joylashuv va ish vaqtini kiritasiz. Xizmat va
+          narxlarni keyinroq o'zingiz qo'shasiz.
         </p>
 
         <button type="submit" className="au-btn">

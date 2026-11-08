@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -7,24 +7,35 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
-
 import "leaflet/dist/leaflet.css";
 
 const TASHKENT = [41.2995, 69.2401];
 
 const markerIcon = L.divIcon({
-  className: "barber-marker-wrapper",
-  html: '<div class="barber-map-marker">Ish joyi</div>',
-  iconSize: [80, 35],
-  iconAnchor: [40, 35],
+  className: "bp-marker-wrap",
+  html: '<div class="bp-marker">Ish joyi</div>',
+  iconSize: [84, 44],
+  iconAnchor: [42, 44],
 });
 
+// Xarita ko'rinishini to'g'rilaydi va nuqta ekrandan chiqib ketsa, uni markazga oladi.
 function MapCenter({ value }) {
   const map = useMap();
 
+  // Konteyner o'lchami keyin o'zgarsa ham xarita to'liq chizilishi uchun.
   useEffect(() => {
-    if (value) {
-      map.setView([value.lat, value.lng], Math.max(map.getZoom(), 15));
+    const timer = setTimeout(() => map.invalidateSize(), 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+
+  useEffect(() => {
+    if (!value) return;
+
+    const target = [value.lat, value.lng];
+    const visible = map.getBounds().pad(-0.2).contains(target);
+
+    if (!visible || map.getZoom() < 15) {
+      map.setView(target, Math.max(map.getZoom(), 15), { animate: true });
     }
   }, [value, map]);
 
@@ -34,28 +45,104 @@ function MapCenter({ value }) {
 function MapClick({ onChange }) {
   useMapEvents({
     click(event) {
-      onChange({
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
-      });
+      onChange({ lat: event.latlng.lat, lng: event.latlng.lng });
     },
   });
 
   return null;
 }
 
-export default function LocationPicker({ value, onChange }) {
-  const [mapError, setMapError] = useState("");
-  const [address, setAddress] = useState("");
+export default function LocationPicker({
+  value,
+  onChange,
+  address = "",
+  onAddressChange,
+  error,
+}) {
+  const [message, setMessage] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [locating, setLocating] = useState(false);
 
-  useEffect(() => {
-    if (!value) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAddress("");
+  // Manzil qidiruvdan kelgan koordinata uchun teskari qidiruvni o'tkazib yuboradi,
+  // aks holda foydalanuvchi yozgan manzil o'zgarib ketadi.
+  const skipReverse = useRef(false);
+
+  // Manzil -> koordinata
+  const searchAddress = async () => {
+    const query = address.trim();
+
+    if (!query) {
+      setMessage("Avval manzilni yozing.");
       return;
     }
 
-    setAddress("");
+    setSearching(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(
+          query + ", Uzbekistan",
+        )}&limit=1&accept-language=uz`,
+      );
+
+      if (!response.ok) throw new Error("search failed");
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        setMessage("Bu manzil topilmadi. Xaritadan o'zingiz belgilang.");
+        return;
+      }
+
+      const next = { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+
+      if (!value || value.lat !== next.lat || value.lng !== next.lng) {
+        skipReverse.current = true;
+      }
+
+      onChange(next);
+    } catch {
+      setMessage("Qidirishda xatolik. Internetni tekshiring.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // GPS orqali aniqlash
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      setMessage("Brauzeringiz GPS ni qo'llab-quvvatlamaydi.");
+      return;
+    }
+
+    setLocating(true);
+    setMessage("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocating(false);
+        onChange({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      () => {
+        setLocating(false);
+        setMessage("Joylashuvni aniqlab bo'lmadi. GPS ruxsatini tekshiring.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  // Koordinata -> manzil
+  useEffect(() => {
+    if (!value) return;
+
+    if (skipReverse.current) {
+      skipReverse.current = false;
+      return;
+    }
 
     const controller = new AbortController();
 
@@ -66,113 +153,114 @@ export default function LocationPicker({ value, onChange }) {
           { signal: controller.signal },
         );
 
-        if (!response.ok) {
-          throw new Error("Manzilni aniqlab bo'lmadi");
-        }
+        if (!response.ok) throw new Error("reverse failed");
 
         const data = await response.json();
         const a = data.address || {};
 
         const street = [a.road, a.house_number].filter(Boolean).join(" ");
+        const area = a.suburb || a.neighbourhood || a.city_district;
+        const city = a.city || a.town || a.village;
 
-        const area = a.suburb || a.neighbourhood || a.city_district || a.city;
+        const result = [street, area, city]
+          .filter(Boolean)
+          .filter((item, index, array) => array.indexOf(item) === index)
+          .join(", ");
 
-        setAddress(
-          [street, area].filter(Boolean).join(", ") || data.display_name || "",
-        );
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          setAddress("");
+        onAddressChange?.(result || data.display_name || "");
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Reverse geocoding:", err);
         }
       }
-    }, 600);
+    }, 700);
 
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [value]);
+  }, [value, onAddressChange]);
 
-  const detectGps = () => {
-    if (!navigator.geolocation) {
-      setMapError("Brauzeringiz GPS ni qo'llab-quvvatlamaydi");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setMapError("");
-
-        onChange({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      },
-      () => {
-        setMapError("Joylashuvni aniqlab bo'lmadi");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-      },
-    );
-  };
+  const problem = error || message;
 
   return (
-    <div className="location-picker">
-      <button type="button" className="add-btn" onClick={detectGps}>
-        GPS orqali aniqlash
-      </button>
-
-      {mapError && <p className="error">{mapError}</p>}
-
-      <MapContainer
-        center={value ? [value.lat, value.lng] : TASHKENT}
-        zoom={13}
-        className="map"
-        scrollWheelZoom
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <div className="bp-picker">
+      <div className="bp-search">
+        <input
+          type="text"
+          className="bp-input"
+          placeholder="Manzilni yozing: Chilonzor, 9-kvartal"
+          value={address}
+          onChange={(event) => onAddressChange?.(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              searchAddress();
+            }
+          }}
+          aria-label="Manzil"
         />
 
-        <MapCenter value={value} />
-        <MapClick onChange={onChange} />
+        <button
+          type="button"
+          className="bp-btn bp-btn-primary"
+          onClick={searchAddress}
+          disabled={searching}
+        >
+          {searching ? "Qidirilmoqda..." : "Qidirish"}
+        </button>
+      </div>
 
-        {value && (
-          <Marker
-            position={[value.lat, value.lng]}
-            icon={markerIcon}
-            draggable
-            eventHandlers={{
-              dragend(event) {
-                const position = event.target.getLatLng();
-
-                onChange({
-                  lat: position.lat,
-                  lng: position.lng,
-                });
-              },
-            }}
+      <div className="bp-map-box">
+        <MapContainer
+          center={value ? [value.lat, value.lng] : TASHKENT}
+          zoom={value ? 15 : 12}
+          className="bp-map"
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-        )}
-      </MapContainer>
 
-      <p className={`location-hint ${value ? "is-set" : ""}`}>
-        {value ? "Joylashuvingiz belgilandi" : "Xaritada ish joyingizni bosing"}
-      </p>
+          <MapCenter value={value} />
+          <MapClick onChange={onChange} />
 
-      {value && (
-        <>
-          <p className="location-address">
-            {address || "Manzil aniqlanmoqda..."}
-          </p>
+          {value && (
+            <Marker
+              position={[value.lat, value.lng]}
+              icon={markerIcon}
+              draggable
+              eventHandlers={{
+                dragend(event) {
+                  const position = event.target.getLatLng();
+                  onChange({ lat: position.lat, lng: position.lng });
+                },
+              }}
+            />
+          )}
+        </MapContainer>
 
-          <p className="location-coordinates">
-            {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
-          </p>
-        </>
+        <button
+          type="button"
+          className="bp-btn bp-gps"
+          onClick={detectLocation}
+          disabled={locating}
+        >
+          {locating ? "Aniqlanmoqda..." : "Mening joylashuvim"}
+        </button>
+      </div>
+
+      {problem ? (
+        <p className="bp-note is-error" role="alert">
+          {problem}
+        </p>
+      ) : (
+        <p className={`bp-note ${value ? "is-ok" : ""}`}>
+          {value
+            ? "Joylashuv belgilandi. Nuqtani sudrab aniqlashtirishingiz mumkin."
+            : "Xaritaga bosing, manzilni qidiring yoki GPS dan foydalaning."}
+        </p>
       )}
     </div>
   );

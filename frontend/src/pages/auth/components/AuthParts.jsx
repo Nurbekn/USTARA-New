@@ -26,7 +26,7 @@ export function RoleSwitch({ role }) {
         Mijoz
       </Link>
       <Link to="/signup/usta" className={role === "barber" ? "is-active" : ""} aria-current={role === "barber" ? "page" : undefined}>
-        Usta
+        Sartarosh
       </Link>
     </nav>
   );

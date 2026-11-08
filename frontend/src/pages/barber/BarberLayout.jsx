@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import AvailabilityBadge from "./components/AvailabilityBadge";
 import { Avatar } from "./data/avatars";
 import { STATUS, useBarber } from "./data/store";
 import "./barber.css";
@@ -97,11 +98,9 @@ export default function BarberLayout() {
           USTARA<span>.</span>
         </Link>
         <div className="bx-top-right">
-          <span className={`bx-status ${profile.isAvailable ? "is-open" : ""}`}>
-            {profile.isAvailable ? "Ochiq" : "Yopiq"}
-          </span>
+          <AvailabilityBadge profile={profile} />
           <Link to="/barber/profile" aria-label="Profil">
-            <Avatar id={profile.avatar} name={profile.firstName} size={36} />
+            <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={36} />
           </Link>
         </div>
       </header>
