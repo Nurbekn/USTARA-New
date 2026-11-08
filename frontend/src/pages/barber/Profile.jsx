@@ -4,6 +4,7 @@ import LocationPicker from "../../components/LocationPicker";
 import { clearSession } from "../auth/utils/session";
 import PageHeader from "./components/PageHeader";
 import Sheet from "./components/Sheet";
+import MediaPicker from "./components/MediaPicker";
 import Stars from "./components/Stars";
 import { useToast } from "./components/Toast";
 import { Avatar, AvatarPicker } from "./data/avatars";
@@ -20,7 +21,6 @@ export default function Profile() {
 
   const [form, setForm] = useState(() => Object.fromEntries(FIELDS.map((k) => [k, profile[k] ?? (k === "location" ? null : "")])));
   const [pickingAvatar, setPickingAvatar] = useState(false);
-  const photoInput = useRef(null);
   const photoBusyRef = useRef(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
@@ -34,7 +34,7 @@ export default function Profile() {
 
   const changePhoto = async (event) => {
     const file = event.target.files?.[0];
-    event.target.value = "";
+    const input = event.currentTarget;
     if (!file || photoBusyRef.current) return;
     photoBusyRef.current = true;
     setPhotoBusy(true);
@@ -50,6 +50,7 @@ export default function Profile() {
     } catch (error) {
       setPhotoError(error.message);
     } finally {
+      input.value = "";
       photoBusyRef.current = false;
       setPhotoBusy(false);
     }
@@ -180,10 +181,9 @@ export default function Profile() {
 
       <Sheet open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
         <div className="bx-form" aria-busy={photoBusy}>
-          <input ref={photoInput} type="file" accept="image/*" className="bx-file-input" tabIndex={-1} onChange={changePhoto} />
-          <button type="button" className="bx-btn bx-btn-primary bx-btn-block" disabled={photoBusy} onClick={() => photoInput.current.click()}>
+          <MediaPicker accept="image/*" onChange={changePhoto} disabled={photoBusy} className="bx-btn bx-btn-primary bx-btn-block" label="Profil uchun rasm tanlash">
             {photoBusy ? "Rasm tayyorlanmoqda..." : "O'z rasmimni yuklash"}
-          </button>
+          </MediaPicker>
           <p className="bx-muted">Rasm · 25 MB gacha. Rasm markazdan kvadrat kesilib, kichraytirib saqlanadi.</p>
           {photoBusy && <p role="status" className="bx-muted">Rasm yuklanmoqda...</p>}
           {photoError && <p className="bx-error" role="alert">{photoError}</p>}

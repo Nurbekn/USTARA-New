@@ -6,6 +6,7 @@ import PortfolioVideo from "./components/PortfolioVideo";
 import { mediaError } from "./data/portfolioMedia";
 import { publishPortfolioPost, deletePortfolioPost } from "./data/portfolioPosts";
 import Sheet from "./components/Sheet";
+import MediaPicker from "./components/MediaPicker";
 import { useToast } from "./components/Toast";
 import { useBarber } from "./data/store";
 import { longDate } from "./data/format";
@@ -25,7 +26,6 @@ export default function Portfolio() {
     : "";
   const [activeTab, setActiveTab] = useState("all");
   const visiblePosts = activeTab === "video" ? posts.filter((post) => post.mediaType === "video") : posts;
-  const fileRef = useRef(null);
 
   const [adding, setAdding] = useState(false);
   const [image, setImage] = useState("");
@@ -69,14 +69,14 @@ export default function Portfolio() {
 
   const pickFile = async (event) => {
     const file = event.target.files?.[0];
-    event.target.value = ""; // allow picking the same file again
+    const input = event.currentTarget;
     if (!file || operationRef.current) return;
     const isVideo = isVideoFile(file);
     if (!isVideo && !isImageFile(file)) {
-      return show("JPG, PNG, WEBP rasm yoki MP4, WEBM video tanlang");
+      return setSaveError("Rasm yoki video faylini tanlang.");
     }
     if (file.size > (isVideo ? MAX_VIDEO : MAX_FILE)) {
-      return show(isVideo ? "Video 50 MB dan oshmasin" : "Rasm 25 MB dan oshmasin");
+      return setSaveError(isVideo ? "Video 50 MB dan oshmasin" : "Rasm 25 MB dan oshmasin");
     }
 
     const selection = ++selectionRef.current;
@@ -94,6 +94,7 @@ export default function Portfolio() {
     } catch (error) {
       if (selection === selectionRef.current) setSaveError(error.message || "Faylni o'qib bo'lmadi");
     } finally {
+      input.value = "";
       if (selection === selectionRef.current) setBusy(false);
     }
   };
@@ -236,32 +237,33 @@ export default function Portfolio() {
       {/* Add a new post */}
       <Sheet open={adding} title="Yangi post" onClose={() => { if (operationRef.current) return; clearPreview(); setVideoFile(null); selectionRef.current += 1; setBusy(false); setAdding(false); setImage(""); }}>
         <div className="bx-form">
-          <input ref={fileRef} type="file" accept="image/*,video/*" className="bx-file-input" tabIndex={-1} onChange={pickFile} />
 
           {mediaType === "video" && image && (
             <video className="bx-post-full" src={image} controls playsInline preload="metadata" aria-label="Tanlangan video" />
           )}
-          {!(mediaType === "video" && image) && <button
-            type="button"
+          {!(mediaType === "video" && image) && <MediaPicker
+            accept="image/*,video/*"
+            onChange={pickFile}
+            label="Post uchun rasm yoki video tanlash"
             className={`bx-drop ${image ? "has-image" : ""}`}
-            onClick={() => fileRef.current.click()}
             disabled={busy || saving}
           >
             {image ? (
-              mediaType === "video" ? <strong>Boshqa fayl tanlash</strong> : <img src={image} alt="Tanlangan rasm" />
+              mediaType === "video" ? <strong>Boshqa fayl tanlash</strong> : <img src={image} alt="Tanlangan rasm" onError={() => setSaveError("Rasmni ko‘rsatib bo‘lmadi. Boshqa JPG yoki PNG rasm tanlang.")} />
             ) : (
               <>
                 <strong>{busy ? "Yuklanmoqda..." : "Rasm yoki video tanlash"}</strong>
                 <span>Kameradan yoki galereyadan</span>
               </>
             )}
-          </button>}
+          </MediaPicker>}
           {image && (
-            <button type="button" className="bx-btn bx-btn-sm bx-btn-ghost" disabled={busy || saving} onClick={() => fileRef.current.click()}>
+            <MediaPicker accept="image/*,video/*" onChange={pickFile} label="Boshqa rasm yoki video tanlash" className="bx-btn bx-btn-sm bx-btn-ghost" disabled={busy || saving}>
               Faylni almashtirish
-            </button>
+            </MediaPicker>
           )}
 
+          {busy && <p role="status" className="bx-muted">Tanlangan rasm tayyorlanmoqda...</p>}
           <p className="bx-muted">Rasm: 25 MB gacha. Video: 50 MB gacha. Saqlash imkoniyati brauzer xotirasidagi bo'sh joyga bog'liq.</p>
           {saving && <p role="status" className="bx-muted">{mediaType === "video" ? "Video saqlanmoqda..." : "Post saqlanmoqda..."}</p>}
           {saveError && <p className="bx-error" role="alert">{saveError}</p>}
