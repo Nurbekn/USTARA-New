@@ -875,3 +875,7 @@ textarea.bx-input { resize: vertical; min-height: 80px; }
 .bx-media-picker.is-disabled > input { cursor: default; }
 .bx-drop.has-image { min-height: 200px; }
 .bx-drop.has-image > img { display: block; width: 100%; height: auto; max-height: 340px; object-fit: contain; flex: none; }
+.bx-native-picker { display: grid; gap: 6px; width: 100%; min-width: 0; text-align: left; font-size: 13px; }
+.bx-native-picker > input[type="file"] { display: block; width: 100%; min-width: 0; min-height: 48px; color: inherit; font: inherit; }
+.bx-native-picker > input::file-selector-button { min-height: 44px; margin-right: 8px; padding: 8px 12px; border: 0; border-radius: 8px; background: #e2e8f0; color: #0b1120; font: inherit; }
+.bx-picker-status { width: 100%; color: #bfdbfe; overflow-wrap: anywhere; text-align: left; line-height: 1.5; font-size: 12px; }

@@ -255,7 +255,7 @@ export default function Portfolio() {
               </>
             )}
           </MediaPicker>}
-          {image && (
+          {image && mediaType === "video" && (
             <MediaPicker accept="image/*,video/*" onChange={pickFile} label="Boshqa rasm yoki video tanlash" className="bx-btn bx-btn-sm bx-btn-ghost" disabled={busy || saving}>
               Faylni almashtirish
             </MediaPicker>
