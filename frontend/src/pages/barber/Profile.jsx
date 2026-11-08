@@ -22,6 +22,7 @@ export default function Profile() {
   const [form, setForm] = useState(() => Object.fromEntries(FIELDS.map((k) => [k, profile[k] ?? (k === "location" ? null : "")])));
   const [pickingAvatar, setPickingAvatar] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [editingLocation, setEditingLocation] = useState(false);
   const photoBusyRef = useRef(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
@@ -71,6 +72,7 @@ export default function Profile() {
       experience: form.experience === "" ? null : Math.max(0, Number(form.experience) || 0),
     });
     if (!saved) return setError("Profil saqlanmadi. Brauzer xotirasi to‘lgan yoki saqlash bloklangan. Qayta urinib ko‘ring.");
+    setEditingLocation(false);
     show("Profil saqlandi");
   };
 
@@ -152,12 +154,19 @@ export default function Profile() {
       </section>
 
       <section className="bx-card bx-form bx-map">
-        <h3>Manzil</h3>
+        <div className="bx-location-head">
+          <h3>Manzil</h3>
+          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm" aria-pressed={editingLocation} aria-controls="profile-location-map" onClick={() => setEditingLocation((previous) => !previous)}>
+            {editingLocation ? "Tayyor" : "Joylashuvni o‘zgartirish"}
+          </button>
+        </div>
         <label className="bx-field">
           Manzil (matn)
           <input className="bx-input" value={form.address} onChange={(e) => set({ address: e.target.value })} />
         </label>
         <LocationPicker
+          id="profile-location-map"
+          editable={editingLocation}
           value={form.location}
           onChange={(location) => set({ location })}
         />

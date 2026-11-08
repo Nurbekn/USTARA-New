@@ -42,10 +42,20 @@ function MapCenter({ value }) {
   return null;
 }
 
-function MapClick({ onChange }) {
+function MapInteraction({ editable }) {
+  const map = useMap();
+  useEffect(() => {
+    for (const name of ["dragging", "touchZoom", "doubleClickZoom", "scrollWheelZoom", "keyboard", "boxZoom", "tapHold"]) {
+      map[name]?.[editable ? "enable" : "disable"]();
+    }
+  }, [map, editable]);
+  return null;
+}
+
+function MapClick({ onChange, editable }) {
   useMapEvents({
     click(event) {
-      onChange({ lat: event.latlng.lat, lng: event.latlng.lng });
+      if (editable) onChange({ lat: event.latlng.lat, lng: event.latlng.lng });
     },
   });
 
@@ -58,6 +68,8 @@ export default function LocationPicker({
   address = "",
   onAddressChange,
   error,
+  editable = true,
+  id,
 }) {
   const [message, setMessage] = useState("");
   const [searching, setSearching] = useState(false);
@@ -185,7 +197,7 @@ export default function LocationPicker({
 
   return (
     <div className="bp-picker">
-      <div className="bp-search">
+      {editable && onAddressChange && <div className="bp-search">
         <input
           type="text"
           className="bp-input"
@@ -209,9 +221,10 @@ export default function LocationPicker({
         >
           {searching ? "Qidirilmoqda..." : "Qidirish"}
         </button>
-      </div>
+      </div>}
 
-      <div className="bp-map-box">
+      <div id={id} className={`bp-map-box ${editable ? "is-editable" : "is-locked"}`}>
+        <div className="bp-map-surface" inert={!editable}>
         <MapContainer
           center={value ? [value.lat, value.lng] : TASHKENT}
           zoom={value ? 15 : 12}
@@ -224,31 +237,33 @@ export default function LocationPicker({
           />
 
           <MapCenter value={value} />
-          <MapClick onChange={onChange} />
+          <MapInteraction editable={editable} />
+          <MapClick onChange={onChange} editable={editable} />
 
           {value && (
             <Marker
               position={[value.lat, value.lng]}
               icon={markerIcon}
-              draggable
+              draggable={editable}
               eventHandlers={{
                 dragend(event) {
                   const position = event.target.getLatLng();
-                  onChange({ lat: position.lat, lng: position.lng });
+                  if (editable) onChange({ lat: position.lat, lng: position.lng });
                 },
               }}
             />
           )}
         </MapContainer>
+        </div>
 
-        <button
+        {editable && <button
           type="button"
           className="bp-btn bp-gps"
           onClick={detectLocation}
           disabled={locating}
         >
           {locating ? "Aniqlanmoqda..." : "Mening joylashuvim"}
-        </button>
+        </button>}
       </div>
 
       {problem ? (
@@ -257,7 +272,9 @@ export default function LocationPicker({
         </p>
       ) : (
         <p className={`bp-note ${value ? "is-ok" : ""}`}>
-          {value
+          {!editable
+            ? "Xarita qulflangan. Joyni almashtirish uchun «Joylashuvni o‘zgartirish»ni bosing."
+            : value
             ? "Joylashuv belgilandi. Nuqtani sudrab aniqlashtirishingiz mumkin."
             : "Xaritaga bosing, manzilni qidiring yoki GPS dan foydalaning."}
         </p>
