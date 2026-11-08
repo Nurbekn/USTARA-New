@@ -293,3 +293,6 @@
 @media (prefers-reduced-motion: reduce) {
   .au-card, .au-pending-icon span, .au-input.has-error, .au-phone.has-error, .au-otp.is-error input { animation: none; }
 }
+
+/* Validation messages should be easy to spot on small screens. */
+.au-error { padding: 10px 12px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 10px; background: #ef44440d; color: #fca5a5; line-height: 1.5; overflow-wrap: anywhere; }

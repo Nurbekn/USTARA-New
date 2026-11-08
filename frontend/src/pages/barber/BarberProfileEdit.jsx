@@ -76,8 +76,8 @@ export default function BarberProfileEdit() {
         <section className="bp-card" aria-label="Ish joyingiz">
           <div className="bp-card-head">
             <h2><span className="bp-step">1</span> Ish joyingiz</h2>
-            <span className={`bp-badge ${location ? "is-ok" : ""}`}>
-              {location ? "Belgilandi" : "Belgilanmagan"}
+            <span className={`bp-badge ${isValidLocation(location) ? "is-ok" : "is-warning"}`}>
+              {isValidLocation(location) ? "Belgilandi" : "Tanlash kerak"}
             </span>
           </div>
 
@@ -96,7 +96,7 @@ export default function BarberProfileEdit() {
         <section className="bp-card">
           <div className="bp-card-head">
             <h2><span className="bp-step">2</span> Ish vaqti</h2>
-            <span className="bp-badge">{workingCount} kun ishlaydi</span>
+            <span className={`bp-badge ${workingCount === 0 ? "is-warning" : ""}`}>{workingCount === 0 ? "Ish kunini tanlang" : `${workingCount} kun ishlaydi`}</span>
           </div>
 
           <WorkingHours value={hours} onChange={(value) => {

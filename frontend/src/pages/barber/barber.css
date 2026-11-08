@@ -916,3 +916,16 @@ textarea.bx-input { resize: vertical; min-height: 80px; }
 .bx-profile > .bx-savebar { position: static; padding-top: 4px; }
 .bp-map-box { isolation: isolate; }
 .bp-picker > .bp-gps { position: static; width: 100%; min-height: 48px; z-index: auto; box-shadow: none; }
+
+/* Attention states: text and symbols remain readable without color alone. */
+.bx-status.is-closed { color: #fca5a5; background: #ef44441a; border-color: #f8717159; }
+.bx-status.is-closed .bx-status-dot { width: 7px; height: 7px; box-shadow: 0 0 0 3px #ef444414; }
+.bp-badge.is-warning { display: inline-flex; align-items: center; gap: 6px; color: #fca5a5; background: #ef444414; border: 1px solid #f871714d; }
+.bp-badge.is-warning::before { content: "!"; display: inline-grid; place-items: center; width: 15px; height: 15px; border: 1px solid currentColor; border-radius: 50%; font-size: 11px; line-height: 1; }
+.bp-location-summary.is-missing { border-color: #f8717159; background: #ef44440d; }
+.bp-location-summary.is-missing strong { color: #fca5a5; }
+.bp-location-summary.is-missing p { color: #fecaca; }
+.bp-location-summary.is-missing .bp-location-pin { color: #fca5a5; background: #ef44441a; font-weight: 800; font-size: 21px; }
+.bx-error, .bp-note.is-error { margin: 0; padding: 12px 14px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 12px; background: #ef44440d; color: #fca5a5; line-height: 1.6; overflow-wrap: anywhere; }
+.bp-address-editor .bp-input[aria-invalid="true"] { border-color: #f87171; background: #ef444408; }
+.bx-portfolio-media-message[role="alert"] { color: #fca5a5; background: #351c27; }

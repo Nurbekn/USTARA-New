@@ -192,8 +192,8 @@ export default function LocationPicker({
 
   return (
     <div className="bp-picker">
-      <div className={`bp-location-summary ${valid ? "is-set" : ""}`}>
-        <span className="bp-location-pin" aria-hidden="true">⌖</span>
+      <div className={`bp-location-summary ${valid ? "is-set" : "is-missing"}`}>
+        <span className="bp-location-pin" aria-hidden="true">{valid ? "⌖" : "!"}</span>
         <div>
           <strong>{valid ? "Tanlangan joylashuv" : "Joylashuv tanlanmagan"}</strong>
           <p>{valid ? (address || "Xaritada tanlangan nuqta") : "Manzilni qidiring va natijadan tanlang yoki xaritada belgilang."}</p>
