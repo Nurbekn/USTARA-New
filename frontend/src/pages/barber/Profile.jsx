@@ -21,6 +21,7 @@ export default function Profile() {
 
   const [form, setForm] = useState(() => Object.fromEntries(FIELDS.map((k) => [k, profile[k] ?? (k === "location" ? null : "")])));
   const [pickingAvatar, setPickingAvatar] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const photoBusyRef = useRef(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
@@ -170,12 +171,24 @@ export default function Profile() {
         </button>
       </div>
 
-      <button type="button" className="bx-btn bx-btn-ghost bx-btn-block" onClick={() => {
-          clearSession();
-          navigate("/login");
-        }}>
+      <button type="button" className="bx-btn bx-btn-danger bx-btn-block" onClick={() => setConfirmLogout(true)}>
         Chiqish
       </button>
+
+      <Sheet open={confirmLogout} title="Hisobdan chiqish" onClose={() => setConfirmLogout(false)}>
+        <div className="bx-form">
+          <p>Hisobingizdan aniq chiqmoqchimisiz?</p>
+          <button type="button" className="bx-btn bx-btn-ghost bx-btn-block" onClick={() => setConfirmLogout(false)}>
+            Bekor qilish
+          </button>
+          <button type="button" className="bx-btn bx-btn-danger bx-btn-block" onClick={() => {
+            clearSession();
+            navigate("/login", { replace: true });
+          }}>
+            Ha, chiqish
+          </button>
+        </div>
+      </Sheet>
 
       <Sheet open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
         <div className="bx-form" aria-busy={photoBusy}>
