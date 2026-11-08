@@ -34,7 +34,6 @@ export default function Profile() {
 
   const changePhoto = async (event) => {
     const file = event.target.files?.[0];
-    const input = event.currentTarget;
     if (!file || photoBusyRef.current) return;
     photoBusyRef.current = true;
     setPhotoBusy(true);
@@ -50,7 +49,6 @@ export default function Profile() {
     } catch (error) {
       setPhotoError(error.message);
     } finally {
-      input.value = "";
       photoBusyRef.current = false;
       setPhotoBusy(false);
     }

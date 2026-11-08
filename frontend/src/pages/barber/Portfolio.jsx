@@ -69,7 +69,6 @@ export default function Portfolio() {
 
   const pickFile = async (event) => {
     const file = event.target.files?.[0];
-    const input = event.currentTarget;
     if (!file || operationRef.current) return;
     const isVideo = isVideoFile(file);
     if (!isVideo && !isImageFile(file)) {
@@ -94,7 +93,6 @@ export default function Portfolio() {
     } catch (error) {
       if (selection === selectionRef.current) setSaveError(error.message || "Faylni o'qib bo'lmadi");
     } finally {
-      input.value = "";
       if (selection === selectionRef.current) setBusy(false);
     }
   };

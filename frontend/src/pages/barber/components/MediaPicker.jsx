@@ -1,9 +1,9 @@
-// Tap the native input directly: mobile browsers need no scripted click.
+// Keep the native control visible, including the selected filename on Android.
 export default function MediaPicker({ accept, onChange, disabled, className = "", label, children }) {
   return (
-    <label className={`bx-media-picker ${className} ${disabled ? "is-disabled" : ""}`}>
+    <div className={`bx-media-picker ${className} ${disabled ? "is-disabled" : ""}`}>
       {children}
       <input type="file" accept={accept} onChange={onChange} disabled={disabled} aria-label={label} />
-    </label>
+    </div>
   );
 }
