@@ -237,7 +237,7 @@ export default function Portfolio() {
         <div className="bx-form">
 
           {mediaType === "video" && image && (
-            <video className="bx-post-full" src={image} controls playsInline preload="metadata" aria-label="Tanlangan video" />
+            <video className="bx-post-full" src={image} controls playsInline preload="metadata" onError={() => setSaveError("Bu video telefon brauzerida ochilmadi. MP4 (H.264) nusxasini tanlang.")} aria-label="Tanlangan video" />
           )}
           {!(mediaType === "video" && image) && <MediaPicker
             accept="image/*,video/*"
