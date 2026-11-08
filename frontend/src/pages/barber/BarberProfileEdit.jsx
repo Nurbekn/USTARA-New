@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LocationPicker from "../../components/LocationPicker";
+import { isValidLocation } from "../../components/locationSearch";
 import { AuthLayout } from "../auth/components/AuthParts";
 import { getSession, setSession } from "../auth/utils/session.js";
 import "../auth/auth-ui.css";
@@ -25,7 +26,7 @@ export default function BarberProfileEdit() {
     const next = {};
     const working = hours.filter((h) => !h.isOff);
 
-    if (!location) {
+    if (!isValidLocation(location)) {
       next.location = "Joylashuvni xaritada belgilang.";
     }
 

@@ -886,3 +886,28 @@ textarea.bx-input { resize: vertical; min-height: 80px; }
 .bp-map-box.is-locked .bp-map-surface { pointer-events: none; }
 .bp-map-box.is-locked .leaflet-container { touch-action: pan-y pinch-zoom; }
 .bp-map-box.is-locked .leaflet-control-zoom { visibility: hidden; }
+
+/* Shared location editor in setup and profile. */
+.bp-picker { --bp-primary: #3b82f6; --bp-text: #e8eefc; --bp-muted: #a8b3c7; --bp-line: #94a3b833; --bp-ok: #34d399; --bp-danger: #f87171; min-width: 0; }
+.bp-location-summary { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid var(--bp-line); border-radius: 14px; background: #0f1a2e; }
+.bp-location-summary > div { min-width: 0; }
+.bp-location-summary strong { font-size: 14px; color: var(--bp-text); }
+.bp-location-summary p { margin: 5px 0 0; color: var(--bp-muted); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.bp-location-pin { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 11px; background: #3b82f622; color: #93c5fd; font-size: 24px; }
+.bp-location-summary.is-set { border-color: #34d39944; }
+.bp-address-editor { display: grid; gap: 8px; min-width: 0; }
+.bp-address-editor > label { font-size: 13px; font-weight: 600; color: var(--bp-text); }
+.bp-address-editor .bp-search .bp-input { width: 100%; min-height: 48px; font-size: 16px; }
+.bp-address-editor .bp-btn { min-height: 48px; }
+.bp-address-editor .bp-note { margin: 0; }
+.bp-location-results { display: grid; gap: 8px; margin: 4px 0; padding: 0; list-style: none; }
+.bp-location-results button { display: grid; gap: 6px; width: 100%; min-height: 64px; padding: 12px 14px; border: 1px solid var(--bp-line); border-radius: 12px; background: #141f33; color: var(--bp-text); text-align: left; }
+.bp-location-results button:hover, .bp-location-results button:focus-visible { border-color: #60a5fa; }
+.bp-location-results span { color: var(--bp-muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.bp-location-results b { color: #93c5fd; font-size: 12px; }
+.bx-map .bp-map { height: 280px; }
+.bx-map .bx-location-head { align-items: flex-start; }
+@media (max-width: 599px) {
+  .bp-address-editor .bp-search { flex-direction: column; }
+  .bx-location-head > button { width: 100%; }
+}

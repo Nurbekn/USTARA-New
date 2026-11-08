@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LocationPicker from "../../components/LocationPicker";
+import { isValidLocation } from "../../components/locationSearch";
 import { clearSession } from "../auth/utils/session";
 import PageHeader from "./components/PageHeader";
 import Sheet from "./components/Sheet";
@@ -29,7 +30,7 @@ export default function Profile() {
   const [error, setError] = useState("");
 
   const dirty = FIELDS.some((k) => JSON.stringify(form[k]) !== JSON.stringify(profile[k] ?? (k === "location" ? null : "")));
-  const set = (patch) => setForm({ ...form, ...patch });
+  const set = (patch) => setForm((previous) => ({ ...previous, ...patch }));
 
   const completed = bookings.filter((b) => b.status === STATUS.COMPLETED).length;
   const { average, count } = getRatingSummary(reviews);
@@ -61,6 +62,9 @@ export default function Profile() {
     if (form.salonName.trim() && form.salonName.trim().length < 2) return setError("Salon nomi kamida 2 belgi bo'lsin");
     const username = form.username.trim().replace(/^@+/, "");
     if (username && !/^[a-zA-Z0-9_.]{3,30}$/.test(username)) return setError("Username 3–30 ta harf, raqam, nuqta yoki pastki chiziqdan iborat bo'lsin.");
+    if ((form.address !== (profile.address || "") || JSON.stringify(form.location) !== JSON.stringify(profile.location)) && !isValidLocation(form.location)) {
+      return setError("Manzilni qidirib, topilgan natijani tanlang yoki xaritada joyni belgilang.");
+    }
     setError("");
     const saved = updateProfile({
       ...form,
@@ -156,19 +160,22 @@ export default function Profile() {
       <section className="bx-card bx-form bx-map">
         <div className="bx-location-head">
           <h3>Manzil</h3>
-          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm" aria-pressed={editingLocation} aria-controls="profile-location-map" onClick={() => setEditingLocation((previous) => !previous)}>
+          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm" aria-pressed={editingLocation} aria-controls="profile-location-map" onClick={() => {
+            if (editingLocation && !isValidLocation(form.location)) return setError("Avval topilgan manzilni tanlang yoki xaritada joyni belgilang.");
+            setError("");
+            setEditingLocation((previous) => !previous);
+          }}>
             {editingLocation ? "Tayyor" : "Joylashuvni o‘zgartirish"}
           </button>
         </div>
-        <label className="bx-field">
-          Manzil (matn)
-          <input className="bx-input" value={form.address} onChange={(e) => set({ address: e.target.value })} />
-        </label>
         <LocationPicker
+          key={editingLocation ? "editing" : "locked"}
           id="profile-location-map"
           editable={editingLocation}
           value={form.location}
-          onChange={(location) => set({ location })}
+          address={form.address}
+          onAddressChange={(address) => set({ address })}
+          onChange={(location) => { set({ location }); setError(""); }}
         />
       </section>
 
