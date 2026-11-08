@@ -7,6 +7,8 @@ import { mediaError } from "./data/portfolioMedia";
 import { publishPortfolioPost, deletePortfolioPost } from "./data/portfolioPosts";
 import Sheet from "./components/Sheet";
 import MediaPicker from "./components/MediaPicker";
+import EmojiPicker from "./components/EmojiPicker";
+import PostReactions from "./components/PostReactions";
 import { useToast } from "./components/Toast";
 import { useBarber } from "./data/store";
 import { longDate } from "./data/format";
@@ -28,6 +30,8 @@ export default function Portfolio() {
   const visiblePosts = activeTab === "video" ? posts.filter((post) => post.mediaType === "video") : posts;
 
   const [adding, setAdding] = useState(false);
+  const [uploadKind, setUploadKind] = useState("image");
+  const captionInput = useRef(null);
   const [image, setImage] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -61,6 +65,7 @@ export default function Portfolio() {
     setBusy(false);
     setImage("");
     setMediaType("image");
+    setUploadKind("image");
     setSaveError("");
     setCaption("");
     setService("");
@@ -90,6 +95,7 @@ export default function Portfolio() {
       setVideoFile(isVideo ? file : null);
       setImage(preview);
       setMediaType(isVideo ? "video" : "image");
+      setUploadKind(isVideo ? "video" : "image");
     } catch (error) {
       if (selection === selectionRef.current) setSaveError(error.message || "Faylni o'qib bo'lmadi");
     } finally {
@@ -226,6 +232,7 @@ export default function Portfolio() {
               ) : (
                 <PortfolioImage key={post.image} src={post.image} alt={post.caption || "Soch olish ishi"} thumbnail />
               )}
+              <span className="bx-grid-engagement"><span>♥ {post.likeCount || 0}</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M21 11.5a9 9 0 0 1-9 9 10 10 0 0 1-4-.9L3 21l1.4-4.8A9 9 0 1 1 21 11.5Z" /></svg> {Array.isArray(post.comments) ? post.comments.length : 0}</span></span>
             </button>
           ))}
         </div>
@@ -234,32 +241,20 @@ export default function Portfolio() {
       </div>
       {/* Add a new post */}
       <Sheet open={adding} title="Yangi post" onClose={() => { if (operationRef.current) return; clearPreview(); setVideoFile(null); selectionRef.current += 1; setBusy(false); setAdding(false); setImage(""); }}>
-        <div className="bx-form">
-
-          {mediaType === "video" && image && (
-            <video className="bx-post-full" src={image} controls playsInline preload="metadata" onError={() => setSaveError("Bu video telefon brauzerida ochilmadi. MP4 (H.264) nusxasini tanlang.")} aria-label="Tanlangan video" />
-          )}
-          {!(mediaType === "video" && image) && <MediaPicker
-            accept="image/*,video/*"
-            onChange={pickFile}
-            label="Post uchun rasm yoki video tanlash"
-            className={`bx-drop ${image ? "has-image" : ""}`}
-            disabled={busy || saving}
-          >
-            {image ? (
-              mediaType === "video" ? <strong>Boshqa fayl tanlash</strong> : <img src={image} alt="Tanlangan rasm" onError={() => setSaveError("Rasmni ko‘rsatib bo‘lmadi. Boshqa JPG yoki PNG rasm tanlang.")} />
-            ) : (
-              <>
-                <strong>{busy ? "Yuklanmoqda..." : "Rasm yoki video tanlash"}</strong>
-                <span>Kameradan yoki galereyadan</span>
-              </>
-            )}
-          </MediaPicker>}
-          {image && mediaType === "video" && (
-            <MediaPicker accept="image/*,video/*" onChange={pickFile} label="Boshqa rasm yoki video tanlash" className="bx-btn bx-btn-sm bx-btn-ghost" disabled={busy || saving}>
-              Faylni almashtirish
-            </MediaPicker>
-          )}
+        <div className="bx-form bx-post-composer">
+          <div className="bx-composer-author"><Avatar photo={profile.avatarPhoto} id={profile.avatar} name={fullName} size={38} /><div><strong>{username || fullName || "Sizning profilingiz"}</strong><small>Yangi ishingizni ulashing</small></div></div>
+          <div className="bx-upload-types" role="group" aria-label="Post turi">
+            <button type="button" aria-pressed={uploadKind === "image"} disabled={busy || saving} onClick={() => setUploadKind("image")}>▧ Rasm</button>
+            <button type="button" aria-pressed={uploadKind === "video"} disabled={busy || saving} onClick={() => setUploadKind("video")}>▷ Video</button>
+          </div>
+          {image && <div className="bx-upload-preview">
+            <span className="bx-upload-badge">{mediaType === "video" ? "▷ Video" : "▧ Rasm"}</span>
+            {mediaType === "video" ? <video src={image} controls playsInline preload="metadata" onError={() => setSaveError("Bu video telefon brauzerida ochilmadi. MP4 (H.264) nusxasini tanlang.")} aria-label="Tanlangan video" /> : <img src={image} alt="Tanlangan rasm" onError={() => setSaveError("Rasmni ko'rsatib bo'lmadi. Boshqa rasm tanlang.")} />}
+          </div>}
+          <MediaPicker accept={uploadKind === "video" ? "video/*" : "image/*"} onChange={pickFile} label="Post uchun fayl tanlash" className={`bx-upload-picker ${image ? "has-media" : ""}`} disabled={busy || saving}>
+            {!image && <><span className="bx-upload-symbol" aria-hidden="true">{uploadKind === "video" ? "▷" : "▧"}</span><strong>{uploadKind === "video" ? "Videongizni tanlang" : "Eng yaxshi ishingizni ko'rsating"}</strong><p>Galereyadan tanlang, izoh yozing va ulashing.</p></>}
+            {image && <strong>Faylni almashtirish</strong>}
+          </MediaPicker>
 
           {busy && <p role="status" className="bx-muted">Tanlangan rasm tayyorlanmoqda...</p>}
           <p className="bx-muted">Rasm: 25 MB gacha. Video: 50 MB gacha. Saqlash imkoniyati brauzer xotirasidagi bo'sh joyga bog'liq.</p>
@@ -277,8 +272,9 @@ export default function Portfolio() {
           </label>
 
           <label className="bx-field">
-            Izoh ({caption.length}/120)
+            Post matni ({caption.length}/120)
             <textarea
+              ref={captionInput}
               className="bx-input"
               rows={3}
               maxLength={120}
@@ -288,8 +284,17 @@ export default function Portfolio() {
             />
           </label>
 
+          <EmojiPicker disabled={busy || saving} onSelect={(emoji) => {
+            const start = captionInput.current?.selectionStart ?? caption.length;
+            const end = captionInput.current?.selectionEnd ?? caption.length;
+            const next = caption.slice(0, start) + emoji + caption.slice(end);
+            if (next.length > 120) return;
+            setCaption(next);
+            requestAnimationFrame(() => { captionInput.current?.focus(); captionInput.current?.setSelectionRange(start + emoji.length, start + emoji.length); });
+          }} />
+
           <button type="button" className="bx-btn bx-btn-primary bx-btn-block" onClick={publish} disabled={!image || busy || saving}>
-            {saving ? "Saqlanmoqda..." : "Joylash"}
+            {saving ? "Ulashilmoqda…" : "Ulashish →"}
           </button>
         </div>
       </Sheet>
@@ -323,6 +328,7 @@ export default function Portfolio() {
               {viewing.caption && <p className="bx-caption">{viewing.caption}</p>}
               {viewing.date && <p className="bx-muted">{longDate(viewing.date)}</p>}
             </div>
+            <PostReactions key={viewing.id} postId={viewing.id} />
             {deleteError && <p className="bx-error" role="alert">{deleteError}</p>}
             {deleting && <p role="status">O'chirilmoqda...</p>}
             {confirmDelete ? (

@@ -261,6 +261,33 @@ export const addPost = (post) =>
     posts: [{ id: Date.now(), date: toISODate(), ...post }, ...state.posts],
   });
 
+// Likes and comments share the same persistence boundary as post metadata.
+export function togglePostLike(id) {
+  const post = state.posts.find((item) => item.id === id);
+  if (!post) return false;
+  const count = Number.isSafeInteger(post.likeCount) && post.likeCount > 0 ? post.likeCount : 0;
+  return commit({ posts: state.posts.map((item) => item.id === id ? {
+    ...item,
+    likedByMe: !item.likedByMe,
+    likeCount: Math.max(0, count + (item.likedByMe ? -1 : 1)),
+  } : item) });
+}
+
+export function addPostComment(id, value) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text || text.length > 300 || !state.posts.some((item) => item.id === id)) return false;
+  const comment = {
+    id: globalThis.crypto?.randomUUID?.() ?? `comment-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    author: state.profile.username || [state.profile.firstName, state.profile.lastName].filter(Boolean).join(" ") || "Siz",
+    avatar: state.profile.avatar,
+    text,
+    date: new Date().toISOString(),
+  };
+  return commit({ posts: state.posts.map((item) => item.id === id ? {
+    ...item, comments: [...(Array.isArray(item.comments) ? item.comments : []), comment],
+  } : item) });
+}
+
 export const removePost = (id) =>
   commit({ posts: state.posts.filter((p) => p.id !== id) });
 
