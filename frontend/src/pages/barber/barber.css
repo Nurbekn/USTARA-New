@@ -980,22 +980,3 @@ textarea.bx-input { resize: vertical; min-height: 80px; }
 @media (max-width: 380px) { .bx-emoji-list { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 .bx-grid-engagement > span { display: inline-flex; align-items: center; gap: 3px; }
 .bx-grid-engagement svg { width: 12px; height: 12px; }
-
-/* Open posts directly in a feed so likes and comments are discoverable. */
-.bx-feed-switch { display: flex; justify-content: flex-end; gap: 6px; padding: 10px 0; }
-.bx-feed-switch button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--bx-line); border-radius: 10px; background: transparent; color: var(--bx-muted); font: inherit; font-size: 13px; }
-.bx-feed-switch button[aria-pressed="true"] { background: #3b82f622; border-color: #60a5fa66; color: #bfdbfe; }
-.bx-post-feed { display: grid; gap: 24px; padding-bottom: 12px; scroll-margin-top: 80px; }
-.bx-feed-post { min-width: 0; overflow: hidden; border: 1px solid var(--bx-line); border-radius: 18px; background: #101a2c; }
-.bx-feed-author { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
-.bx-feed-author > div { display: grid; gap: 4px; flex: 1; min-width: 0; }
-.bx-feed-author strong { font-size: 13px; overflow-wrap: anywhere; }
-.bx-feed-author small { color: var(--bx-muted); font-size: 11px; }
-.bx-feed-media { background: #050914; }
-.bx-feed-photo { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; }
-.bx-feed-photo .bx-portfolio-image > img, .bx-feed-media > video { display: block; width: 100%; height: auto; max-height: 580px; object-fit: contain; }
-.bx-feed-caption { padding: 0 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
-.bx-feed-post > .bx-reactions { margin: 12px 14px; }
-.bx-feed-post .bx-reaction-actions > span { font-size: 11px; }
-.bx-feed-date { margin: 12px 14px 16px; color: var(--bx-muted); font-size: 11px; }
-@media (max-width: 380px) { .bx-feed-author { padding-inline: 10px; } .bx-feed-post > .bx-reactions { margin-inline: 10px; } .bx-comment-form { padding: 10px; } }

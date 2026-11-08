@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { addPostComment, togglePostLike, useBarber } from "../data/store";
 import { Avatar } from "../data/avatars";
 import EmojiPicker from "./EmojiPicker";
@@ -9,7 +9,6 @@ export default function PostReactions({ postId }) {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const input = useRef(null);
-  const inputId = useId();
   if (!post) return null;
   const comments = Array.isArray(post.comments) ? post.comments : [];
   const addEmoji = (emoji) => {
@@ -48,10 +47,10 @@ export default function PostReactions({ postId }) {
       </li>)}</ul> : <p className="bx-comment-empty">Birinchi izohni siz yozing ✨</p>}
     </div>
     <form className="bx-comment-form" onSubmit={submit}>
-      <label className="bx-field" htmlFor={inputId}>Izoh yozing</label>
+      <label className="bx-field" htmlFor={`comment-${postId}`}>Izoh yozing</label>
       <div className="bx-comment-compose">
         <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={32} />
-        <textarea id={inputId} ref={input} rows={2} maxLength={300} value={text} placeholder="Fikringizni yozing…" onChange={(event) => setText(event.target.value)} />
+        <textarea id={`comment-${postId}`} ref={input} rows={2} maxLength={300} value={text} placeholder="Fikringizni yozing…" onChange={(event) => setText(event.target.value)} />
       </div>
       <div className="bx-comment-tools"><EmojiPicker onSelect={addEmoji} /><small>{text.length}/300</small><button type="submit" disabled={!text.trim()}>Yuborish →</button></div>
     </form>
