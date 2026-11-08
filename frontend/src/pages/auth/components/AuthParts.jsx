@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { formatPhone } from "../utils/phone";
 
 // Page shell shared by every auth screen: back link, logo, card.
-export function AuthLayout({ children, wide = false }) {
+export function AuthLayout({ children, wide = false, className = "" }) {
   return (
-    <div className={`au-page ${wide ? "is-wide" : ""}`}>
+    <div className={`au-page ${wide ? "is-wide" : ""} ${className}`}>
       <header className="au-top">
         <Link to="/" className="au-back">
           ← Bosh sahifa

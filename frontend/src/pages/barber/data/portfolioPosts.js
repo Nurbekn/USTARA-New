@@ -5,7 +5,7 @@ import { saveVideo, loadVideo, deleteVideo } from "./portfolioMedia.js";
 export async function publishPortfolioPost({ image, videoFile, caption, service }) {
   let videoId;
   if (videoFile) {
-    videoId = crypto.randomUUID();
+    videoId = globalThis.crypto?.randomUUID?.() ?? `video-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     await saveVideo(videoId, videoFile);
   }
   const media = videoId ? { mediaType: "video", videoId } : { mediaType: "image", image };

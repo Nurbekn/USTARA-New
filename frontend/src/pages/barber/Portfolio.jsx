@@ -9,41 +9,10 @@ import Sheet from "./components/Sheet";
 import { useToast } from "./components/Toast";
 import { useBarber } from "./data/store";
 import { longDate } from "./data/format";
+import { prepareImage, isImageFile, isVideoFile } from "./data/imageUpload";
 
-const MAX_SIDE = 900; // px: keeps each photo around 80–150 KB
-const MAX_FILE = 15 * 1024 * 1024;
+const MAX_FILE = 25 * 1024 * 1024;
 const MAX_VIDEO = 50 * 1024 * 1024;
-const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const VIDEO_TYPES = ["video/mp4", "video/webm"];
-
-// Shrinks a photo in the browser and returns a JPEG data URL.
-// (localStorage is small; the backend will store real files later.)
-function compressImage(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      try {
-        if (!img.naturalWidth || !img.naturalHeight) throw new Error("bad image");
-        const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 0.78));
-      } catch (error) {
-        reject(error);
-      } finally {
-        URL.revokeObjectURL(url);
-      }
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("bad image"));
-    };
-    img.src = url;
-  });
-}
 
 export default function Portfolio() {
   const { profile, posts } = useBarber();
@@ -102,19 +71,19 @@ export default function Portfolio() {
     const file = event.target.files?.[0];
     event.target.value = ""; // allow picking the same file again
     if (!file || operationRef.current) return;
-    const isVideo = VIDEO_TYPES.includes(file.type);
-    if (!isVideo && !IMAGE_TYPES.includes(file.type)) {
+    const isVideo = isVideoFile(file);
+    if (!isVideo && !isImageFile(file)) {
       return show("JPG, PNG, WEBP rasm yoki MP4, WEBM video tanlang");
     }
     if (file.size > (isVideo ? MAX_VIDEO : MAX_FILE)) {
-      return show(isVideo ? "Video 50 MB dan oshmasin" : "Rasm 15 MB dan oshmasin");
+      return show(isVideo ? "Video 50 MB dan oshmasin" : "Rasm 25 MB dan oshmasin");
     }
 
     const selection = ++selectionRef.current;
     setBusy(true);
     setSaveError("");
     try {
-      const data = isVideo ? "" : await compressImage(file);
+      const data = isVideo ? "" : await prepareImage(file);
       if (selection !== selectionRef.current) return;
       clearPreview();
       const preview = isVideo ? URL.createObjectURL(file) : data;
@@ -122,8 +91,8 @@ export default function Portfolio() {
       setVideoFile(isVideo ? file : null);
       setImage(preview);
       setMediaType(isVideo ? "video" : "image");
-    } catch {
-      if (selection === selectionRef.current) show("Faylni o'qib bo'lmadi");
+    } catch (error) {
+      if (selection === selectionRef.current) setSaveError(error.message || "Faylni o'qib bo'lmadi");
     } finally {
       if (selection === selectionRef.current) setBusy(false);
     }
@@ -267,7 +236,7 @@ export default function Portfolio() {
       {/* Add a new post */}
       <Sheet open={adding} title="Yangi post" onClose={() => { if (operationRef.current) return; clearPreview(); setVideoFile(null); selectionRef.current += 1; setBusy(false); setAdding(false); setImage(""); }}>
         <div className="bx-form">
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" hidden onChange={pickFile} />
+          <input ref={fileRef} type="file" accept="image/*,video/*" className="bx-file-input" tabIndex={-1} onChange={pickFile} />
 
           {mediaType === "video" && image && (
             <video className="bx-post-full" src={image} controls playsInline preload="metadata" aria-label="Tanlangan video" />
@@ -293,7 +262,7 @@ export default function Portfolio() {
             </button>
           )}
 
-          <p className="bx-muted">JPG, PNG, WEBP: 15 MB gacha. MP4, WEBM: 50 MB gacha. Saqlash imkoniyati brauzer xotirasidagi bo'sh joyga bog'liq.</p>
+          <p className="bx-muted">Rasm: 25 MB gacha. Video: 50 MB gacha. Saqlash imkoniyati brauzer xotirasidagi bo'sh joyga bog'liq.</p>
           {saving && <p role="status" className="bx-muted">{mediaType === "video" ? "Video saqlanmoqda..." : "Post saqlanmoqda..."}</p>}
           {saveError && <p className="bx-error" role="alert">{saveError}</p>}
 

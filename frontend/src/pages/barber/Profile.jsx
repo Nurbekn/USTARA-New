@@ -180,11 +180,11 @@ export default function Profile() {
 
       <Sheet open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
         <div className="bx-form" aria-busy={photoBusy}>
-          <input ref={photoInput} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={changePhoto} />
+          <input ref={photoInput} type="file" accept="image/*" className="bx-file-input" tabIndex={-1} onChange={changePhoto} />
           <button type="button" className="bx-btn bx-btn-primary bx-btn-block" disabled={photoBusy} onClick={() => photoInput.current.click()}>
             {photoBusy ? "Rasm tayyorlanmoqda..." : "O'z rasmimni yuklash"}
           </button>
-          <p className="bx-muted">JPG, PNG, WEBP · 15 MB gacha. Rasm markazdan kvadrat kesilib, kichraytirib saqlanadi.</p>
+          <p className="bx-muted">Rasm · 25 MB gacha. Rasm markazdan kvadrat kesilib, kichraytirib saqlanadi.</p>
           {photoBusy && <p role="status" className="bx-muted">Rasm yuklanmoqda...</p>}
           {photoError && <p className="bx-error" role="alert">{photoError}</p>}
           <h3>Yoki tayyor avatar tanlang</h3>

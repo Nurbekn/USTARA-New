@@ -92,7 +92,7 @@ export default function BarberLayout() {
   }, [pathname]);
 
   return (
-    <div className="bx-app">
+    <div className={`bx-app ${pathname.replace(/\/+$/, "") === "/barber/portfolio" ? "bx-app-portfolio" : ""}`}>
       <header className="bx-top">
         <Link to="/barber" className="bx-logo">
           USTARA<span>.</span>

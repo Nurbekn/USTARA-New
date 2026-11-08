@@ -1,0 +1,26 @@
+.wh-editor { min-width: 0; color: #e8eefc; }
+.wh-tools { display: grid; gap: 10px; margin-bottom: 14px; }
+.wh-tools p { margin: 0; color: #a8b3c7; font-size: 13px; line-height: 1.5; }
+.wh-tools button { min-height: 48px; padding: 10px 14px; border: 1px solid #3b82f666; border-radius: 12px; background: #3b82f614; color: #bfdbfe; font: inherit; font-size: 13px; line-height: 1.5; cursor: pointer; }
+.wh-tools button:disabled { opacity: .5; cursor: default; }
+.wh-days { display: grid; gap: 10px; }
+.wh-day { min-width: 0; padding: 12px; border: 1px solid #94a3b833; border-radius: 14px; background: #0f1a2e; }
+.wh-day.is-off { background: #94a3b808; }
+.wh-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.wh-toggle strong { display: block; font-size: 14px; }
+.wh-toggle small { display: block; margin-top: 3px; color: #a8b3c7; font-size: 12px; }
+.wh-track { flex: none; width: 46px; height: 28px; padding: 3px; border-radius: 30px; background: #64748b; }
+.wh-track::after { content: ""; display: block; width: 22px; height: 22px; border-radius: 50%; background: #fff; }
+.wh-toggle[aria-checked="true"] .wh-track { background: #3b82f6; }
+.wh-toggle[aria-checked="true"] .wh-track::after { transform: translateX(18px); }
+.wh-times { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.wh-times label { display: grid; min-width: 0; gap: 6px; font-size: 12px; color: #a8b3c7; }
+.wh-times select { width: 100%; min-width: 0; min-height: 48px; padding: 8px 10px; border: 1px solid #94a3b84d; border-radius: 10px; color: #e8eefc; background: #141f33; font: inherit; font-size: 16px; font-variant-numeric: tabular-nums; color-scheme: dark; }
+.wh-times select[aria-invalid="true"] { border-color: #f87171; }
+.wh-error { margin: 10px 0 0; color: #f87171; font-size: 12px; }
+.wh-editor :is(button, select):focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+@media (min-width: 600px) {
+  .wh-day { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); align-items: center; gap: 16px; }
+  .wh-times { margin: 0; }
+  .wh-error { grid-column: 1 / -1; }
+}
