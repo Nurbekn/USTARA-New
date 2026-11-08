@@ -9,6 +9,7 @@ import Sheet from "./components/Sheet";
 import MediaPicker from "./components/MediaPicker";
 import EmojiPicker from "./components/EmojiPicker";
 import PostReactions from "./components/PostReactions";
+import PortfolioFeedPost from "./components/PortfolioFeedPost";
 import { useToast } from "./components/Toast";
 import { useBarber } from "./data/store";
 import { longDate } from "./data/format";
@@ -27,6 +28,7 @@ export default function Portfolio() {
     ? profile.username.trim().replace(/^@+/, "")
     : "";
   const [activeTab, setActiveTab] = useState("all");
+  const [display, setDisplay] = useState("feed");
   const visiblePosts = activeTab === "video" ? posts.filter((post) => post.mediaType === "video") : posts;
 
   const [adding, setAdding] = useState(false);
@@ -115,7 +117,10 @@ export default function Portfolio() {
       setImage("");
       clearPreview();
       setVideoFile(null);
+      setActiveTab("all");
+      setDisplay("feed");
       show("Post joylandi");
+      requestAnimationFrame(() => document.querySelector(".bx-post-feed")?.scrollIntoView({ block: "start", behavior: "smooth" }));
     } catch (error) {
       setSaveError(error.message?.startsWith("Post ") ? error.message : mediaError(error));
     } finally {
@@ -209,6 +214,10 @@ export default function Portfolio() {
           <span>Videolar</span>
         </button>
       </div>
+      <div className="bx-feed-switch" role="group" aria-label="Postlar ko'rinishi">
+        <button type="button" aria-pressed={display === "feed"} onClick={() => setDisplay("feed")}>☰ Lenta</button>
+        <button type="button" aria-pressed={display === "grid"} onClick={() => setDisplay("grid")}>▦ Kataklar</button>
+      </div>
       <div id="portfolio-post-panel" className="bx-portfolio-panel" role="tabpanel" aria-labelledby={activeTab === "all" ? "portfolio-all-tab" : "portfolio-video-tab"}>
 
       {visiblePosts.length === 0 ? (
@@ -219,6 +228,10 @@ export default function Portfolio() {
           <button type="button" className="bx-btn bx-btn-primary" onClick={openAdd}>
             Birinchi postni qo'shish
           </button>
+        </div>
+      ) : display === "feed" ? (
+        <div className="bx-post-feed">
+          {visiblePosts.map((post) => <PortfolioFeedPost key={post.id} post={post} profile={profile} onOpen={() => { setDeleteError(""); setViewing(post); }} />)}
         </div>
       ) : (
         <div className="bx-portfolio-grid">
