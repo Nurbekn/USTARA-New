@@ -16,6 +16,12 @@ import Earnings from "./pages/barber/Earnings";
 import Reviews from "./pages/barber/Reviews";
 import Services from "./pages/barber/Services";
 import Profile from "./pages/barber/Profile";
+import UserLayout from "./layouts/UserLayout";
+import UserHome from "./pages/user/UserHome";
+import Explore from "./pages/user/Explore";
+import UserBookings from "./pages/user/Bookings";
+import Social from "./pages/user/Social";
+import UserProfile from "./pages/user/Profile";
 
 function App() {
   return (
@@ -32,6 +38,14 @@ function App() {
       <Route path="/signup/usta" element={<UstaSignup />} />
       <Route path="/login" element={<Login />} />
       <Route path="/otp" element={<Otp />} />
+      <Route path="/user" element={<UserLayout />}>
+        <Route index element={<UserHome />} />
+        <Route path="explore" element={<Explore />} />
+        <Route path="bookings" element={<UserBookings />} />
+        <Route path="social" element={<Social />} />
+        <Route path="profile" element={<UserProfile />} />
+        <Route path="*" element={<Navigate to="/user" replace />} />
+      </Route>
       {/* Barber onboarding (first-time setup) */}
       <Route path="/barber/setup" element={<BarberProfileEdit />} />
       <Route path="/barber/pending" element={<ApprovalPending />} />
@@ -47,6 +61,9 @@ function App() {
         <Route path="services" element={<Services />} />
         <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/barber" replace />} />
+      </Route>
+      <Route path="/user" element={<UserLayout />}>
+        <Route index element={<UserHome />} />
       </Route>
     </Routes>
   );

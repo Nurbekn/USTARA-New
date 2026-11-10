@@ -52,12 +52,14 @@ export default function Otp() {
       navigate("/barber/setup", { replace: true });
     } else if (role === "customer") {
       setSession({ role, phone });
-      navigate("/", { replace: true });
+      navigate("/user", { replace: true });
     } else {
       // Sign in: send the person where they belong
       const session = getSession();
       const target =
-        session?.role === "barber" ? (session.setupDone ? "/barber" : "/barber/setup") : "/";
+        session?.role === "barber"
+          ? (session.setupDone ? "/barber" : "/barber/setup")
+          : session?.role === "customer" ? "/user" : "/";
       navigate(target, { replace: true });
     }
   };

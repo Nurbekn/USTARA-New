@@ -8,7 +8,7 @@
   padding: 0 20px;
   border: 1px solid transparent;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: var(--font-button);
   font-weight: 700;
   transition:
     background 0.2s ease,

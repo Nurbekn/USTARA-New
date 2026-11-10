@@ -33,7 +33,7 @@
   align-items: center;
   min-height: 44px;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: var(--font-button);
   font-weight: 600;
 }
 .au-logo {
@@ -62,10 +62,10 @@
 }
 @keyframes au-rise { from { opacity: 0; transform: translateY(14px); } }
 
-.au-title { margin: 0 0 8px; font-size: clamp(1.5rem, 6.5vw, 1.9rem); line-height: 1.15; letter-spacing: -0.02em; }
-.au-sub { margin: 0 0 22px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+.au-title { margin: 0 0 8px; font-size: var(--font-page); line-height: 1.15; letter-spacing: -0.02em; }
+.au-sub { margin: 0 0 22px; color: var(--muted); font-size: var(--font-body); line-height: 1.6; }
 .au-sub b { color: var(--text); }
-.au-foot { margin: 20px 0 0; color: var(--muted); font-size: 0.92rem; text-align: center; }
+.au-foot { margin: 20px 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; }
 .au-foot a { color: #60a5fa; font-weight: 700; }
 .au-center { text-align: center; }
 
@@ -86,7 +86,7 @@
   min-height: 44px;
   border-radius: 10px;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: var(--font-button);
   font-weight: 700;
   transition: background 0.2s, color 0.2s;
 }
@@ -95,7 +95,7 @@
 /* ---------- Form ---------- */
 .au-form { display: flex; flex-direction: column; gap: 18px; }
 .au-field { display: flex; flex-direction: column; gap: 8px; }
-.au-label { color: var(--muted); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.au-label { color: var(--muted); font-size: var(--font-small); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 
 .au-input,
 .au-phone {
@@ -105,7 +105,7 @@
   border-radius: 14px;
   background: var(--bg);
   color: var(--text);
-  font-size: 1rem; /* 16px: iOS does not zoom the page */
+  font-size: var(--font-input); /* 16px: iOS does not zoom the page */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .au-input { padding: 0 16px; }
@@ -135,7 +135,7 @@
   border-radius: 6px;
   background: rgba(59, 130, 246, 0.18);
   color: #93c5fd;
-  font-size: 0.68rem;
+  font-size: var(--font-small);
 }
 .au-phone input {
   flex: 1;
@@ -145,14 +145,14 @@
   border: 0;
   background: transparent;
   color: inherit;
-  font-size: 1.05rem;
+  font-size: var(--font-input);
   letter-spacing: 0.02em;
 }
 .au-phone input:focus { outline: none; }
 
-.au-error { margin: 0; color: #f87171; font-size: 0.85rem; font-weight: 600; }
+.au-error { margin: 0; color: #f87171; font-size: var(--font-small); font-weight: 600; }
 .au-error a { color: #93c5fd; text-decoration: underline; }
-.au-info { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #bfdbfe; font-size: 0.86rem; line-height: 1.55; }
+.au-info { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #bfdbfe; font-size: var(--font-body); line-height: 1.55; }
 
 /* ---------- Buttons ---------- */
 .au-btn {
@@ -166,7 +166,7 @@
   border-radius: 14px;
   background: var(--primary);
   color: #fff;
-  font-size: 1rem;
+  font-size: var(--font-button);
   font-weight: 700;
   box-shadow: 0 10px 28px rgba(37, 99, 235, 0.28);
   -webkit-tap-highlight-color: transparent;
@@ -178,8 +178,8 @@
 @media (hover: hover) { .au-btn:not(:disabled):not(.au-btn-ghost):hover { background: var(--primary-hover); } }
 
 .au-link-back, .au-text-btn { padding: 0; border: 0; background: none; color: var(--muted); font-weight: 600; }
-.au-link-back { min-height: 44px; margin-bottom: 4px; font-size: 0.9rem; }
-.au-text-btn { color: #60a5fa; font-weight: 700; font-size: inherit; }
+.au-link-back { min-height: 44px; margin-bottom: 4px; font-size: var(--font-button); }
+.au-text-btn { color: #60a5fa; font-weight: 700; font-size: var(--font-button); }
 .au-text-btn:disabled { color: var(--muted); }
 
 /* ---------- Chips + avatars ---------- */
@@ -197,7 +197,7 @@
 
 .au-avatar-top { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .au-avatar-big { border: 3px solid var(--primary); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.14); }
-.au-avatar-top small { color: var(--muted); font-size: 0.8rem; }
+.au-avatar-top small { color: var(--muted); font-size: var(--font-small); }
 .au-avatars.bx-avatar-grid {
   grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   gap: 8px;
@@ -222,7 +222,7 @@
   background: var(--bg);
   color: var(--text);
   font-family: "Manrope", sans-serif;
-  font-size: 1.6rem;
+  font-size: var(--font-input);
   font-weight: 800;
   text-align: center;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -232,7 +232,7 @@
 .au-otp.is-error input { border-color: #ef4444; animation: au-shake 0.35s; }
 .au-otp + .au-error { margin-bottom: 14px; }
 .au-otp.is-error + .au-error { margin-top: -4px; }
-.au-dev { margin: 14px 0 0; color: var(--muted); font-size: 0.78rem; text-align: center; opacity: 0.7; }
+.au-dev { margin: 14px 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; opacity: 0.7; }
 
 /* ---------- Setup blocks ---------- */
 .au-block {
@@ -244,7 +244,7 @@
   border-radius: 18px;
   background: rgba(11, 17, 32, 0.55);
 }
-.au-block h2 { margin: 0; font-size: 1.05rem; }
+.au-block h2 { margin: 0; font-size: var(--font-section); }
 
 .au-day { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .au-day:last-of-type { border-bottom: 0; }
@@ -262,10 +262,10 @@
 .au-map .location-picker { display: flex; flex-direction: column; gap: 10px; }
 .au-map .add-btn { min-height: 48px; border: 1.5px dashed var(--primary); border-radius: 12px; background: transparent; color: #93c5fd; font-weight: 700; }
 .au-map .map { z-index: 0; width: 100%; height: 260px; border: 1px solid var(--border); border-radius: 14px; }
-.au-map .location-hint, .au-map .location-address, .au-map .location-coordinates { margin: 0; color: var(--muted); font-size: 0.82rem; }
+.au-map .location-hint, .au-map .location-address, .au-map .location-coordinates { margin: 0; color: var(--muted); font-size: var(--font-small); }
 .au-map .location-hint.is-set { color: #4ade80; }
-.au-map .error { margin: 0; color: #f87171; font-size: 0.85rem; }
-.au-map .barber-map-marker { width: 80px; padding: 6px 0; border-radius: 8px; background: #3b82f6; color: #fff; font-size: 0.78rem; font-weight: 700; text-align: center; }
+.au-map .error { margin: 0; color: #f87171; font-size: var(--font-small); }
+.au-map .barber-map-marker { width: 80px; padding: 6px 0; border-radius: 8px; background: #3b82f6; color: #fff; font-size: var(--font-small); font-weight: 700; text-align: center; }
 @media (min-width: 640px) { .au-map .map { height: 300px; } }
 
 /* ---------- Approval pending ---------- */
@@ -277,7 +277,7 @@
 @keyframes au-ring { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.7); opacity: 0; } }
 
 .au-steps { display: grid; grid-template-columns: repeat(3, 1fr); margin: 4px 0; padding: 0; list-style: none; }
-.au-steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+.au-steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: var(--font-small); font-weight: 600; }
 .au-steps li + li::before { content: ""; position: absolute; top: 15px; right: 50%; width: 100%; height: 2px; background: var(--border); }
 .au-steps li span { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid var(--border); border-radius: 50%; background: var(--surface); }
 .au-steps li.done { color: #4ade80; }
@@ -287,8 +287,8 @@
 .au-steps li.active span { border-color: var(--primary); background: rgba(59, 130, 246, 0.18); }
 
 .au-contact { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--border); }
-.au-contact h2 { margin: 0 0 4px; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
-.au-contact a { display: grid; place-items: center; min-height: 48px; border: 1px solid var(--border); border-radius: 12px; font-weight: 600; font-size: 0.92rem; }
+.au-contact h2 { margin: 0 0 4px; color: var(--muted); font-size: var(--font-small); letter-spacing: 0.1em; text-transform: uppercase; }
+.au-contact a { display: grid; place-items: center; min-height: 48px; border: 1px solid var(--border); border-radius: 12px; font-weight: 600; font-size: var(--font-button); }
 
 @media (prefers-reduced-motion: reduce) {
   .au-card, .au-pending-icon span, .au-input.has-error, .au-phone.has-error, .au-otp.is-error input { animation: none; }

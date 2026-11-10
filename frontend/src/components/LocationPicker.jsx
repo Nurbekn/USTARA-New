@@ -42,7 +42,15 @@ function MapCenter({ value }) {
 function MapInteraction({ editable }) {
   const map = useMap();
   useEffect(() => {
-    for (const name of ["dragging", "touchZoom", "doubleClickZoom", "scrollWheelZoom", "keyboard", "boxZoom", "tapHold"]) {
+    for (const name of [
+      "dragging",
+      "touchZoom",
+      "doubleClickZoom",
+      "scrollWheelZoom",
+      "keyboard",
+      "boxZoom",
+      "tapHold",
+    ]) {
       map[name]?.[editable ? "enable" : "disable"]();
     }
   }, [map, editable]);
@@ -67,6 +75,7 @@ export default function LocationPicker({
   error,
   editable = true,
   id,
+  icon = markerIcon,
 }) {
   const inputId = useId();
   const [message, setMessage] = useState("");
@@ -86,10 +95,13 @@ export default function LocationPicker({
       request.current?.abort();
     }
   }, [editable]);
-  useEffect(() => () => {
-    version.current += 1;
-    request.current?.abort();
-  }, []);
+  useEffect(
+    () => () => {
+      version.current += 1;
+      request.current?.abort();
+    },
+    [],
+  );
 
   const begin = () => {
     request.current?.abort();
@@ -125,15 +137,31 @@ export default function LocationPicker({
     setMessage("");
     const timeout = setTimeout(() => controller.abort(), 12000);
     try {
-      const params = new URLSearchParams({ format: "jsonv2", q: query, countrycodes: "uz", addressdetails: "1", limit: "5", "accept-language": "uz" });
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { signal: controller.signal });
+      const params = new URLSearchParams({
+        format: "jsonv2",
+        q: query,
+        countrycodes: "uz",
+        addressdetails: "1",
+        limit: "5",
+        "accept-language": "uz",
+      });
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?${params}`,
+        { signal: controller.signal },
+      );
       if (!response.ok) throw new Error();
       const matches = locationResults(await response.json());
       if (!current(token)) return;
       setResults(matches);
-      if (!matches.length) setMessage("Manzil topilmadi. Yozilishini tekshiring yoki xaritadan aniq joyni tanlang.");
+      if (!matches.length)
+        setMessage(
+          "Manzil topilmadi. Yozilishini tekshiring yoki xaritadan aniq joyni tanlang.",
+        );
     } catch {
-      if (current(token)) setMessage("Manzilni tekshirib bo'lmadi. Internetni tekshirib, qayta qidiring yoki xaritadan tanlang.");
+      if (current(token))
+        setMessage(
+          "Manzilni tekshirib bo'lmadi. Internetni tekshirib, qayta qidiring yoki xaritadan tanlang.",
+        );
     } finally {
       clearTimeout(timeout);
       if (current(token)) setSearching(false);
@@ -159,15 +187,26 @@ export default function LocationPicker({
     setResolving(true);
     const timeout = setTimeout(() => controller.abort(), 12000);
     try {
-      const params = new URLSearchParams({ format: "jsonv2", lat: point.lat, lon: point.lng, "accept-language": "uz" });
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, { signal: controller.signal });
+      const params = new URLSearchParams({
+        format: "jsonv2",
+        lat: point.lat,
+        lon: point.lng,
+        "accept-language": "uz",
+      });
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?${params}`,
+        { signal: controller.signal },
+      );
       if (!response.ok) throw new Error();
       const data = await response.json();
       if (!current(token)) return;
       if (data.display_name) onAddressChange?.(data.display_name);
       else throw new Error();
     } catch {
-      if (current(token)) setMessage("Nuqta belgilandi, lekin manzil nomi aniqlanmadi. Xaritadagi joyni tekshiring yoki manzilni qayta qidiring.");
+      if (current(token))
+        setMessage(
+          "Nuqta belgilandi, lekin manzil nomi aniqlanmadi. Xaritadagi joyni tekshiring yoki manzilni qayta qidiring.",
+        );
     } finally {
       clearTimeout(timeout);
       if (current(token)) setResolving(false);
@@ -175,17 +214,28 @@ export default function LocationPicker({
   };
 
   const detectLocation = () => {
-    if (!navigator.geolocation) return setMessage("Brauzeringiz GPS ni qo'llab-quvvatlamaydi.");
+    if (!navigator.geolocation)
+      return setMessage("Brauzeringiz GPS ni qo'llab-quvvatlamaydi.");
     const { token } = begin();
     setLocating(true);
     setMessage("");
-    navigator.geolocation.getCurrentPosition((position) => {
-      if (current(token)) resolvePoint({ lat: position.coords.latitude, lng: position.coords.longitude });
-    }, () => {
-      if (!current(token)) return;
-      setLocating(false);
-      setMessage("Joylashuv aniqlanmadi. GPS ruxsatini tekshiring yoki xaritadan tanlang.");
-    }, { enableHighAccuracy: true, timeout: 10000 });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (current(token))
+          resolvePoint({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+      },
+      () => {
+        if (!current(token)) return;
+        setLocating(false);
+        setMessage(
+          "Joylashuv aniqlanmadi. GPS ruxsatini tekshiring yoki xaritadan tanlang.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
   };
 
   const problem = error || message;
@@ -193,73 +243,122 @@ export default function LocationPicker({
   return (
     <div className="bp-picker">
       <div className={`bp-location-summary ${valid ? "is-set" : "is-missing"}`}>
-        <span className="bp-location-pin" aria-hidden="true">{valid ? "⌖" : "!"}</span>
+        <span className="bp-location-pin" aria-hidden="true">
+          {valid ? "⌖" : "!"}
+        </span>
         <div>
-          <strong>{valid ? "Tanlangan joylashuv" : "Joylashuv tanlanmagan"}</strong>
-          <p>{valid ? (address || "Xaritada tanlangan nuqta") : "Manzilni qidiring va natijadan tanlang yoki xaritada belgilang."}</p>
+          <strong>
+            {valid ? "Tanlangan joylashuv" : "Joylashuv tanlanmagan"}
+          </strong>
+          <p>
+            {valid
+              ? address || "Xaritada tanlangan nuqta"
+              : "Manzilni qidiring va natijadan tanlang yoki xaritada belgilang."}
+          </p>
         </div>
       </div>
-      {editable && onAddressChange && <div className="bp-address-editor">
-        <label htmlFor={inputId}>Manzilni qidiring</label>
-        <div className="bp-search">
-          <input id={inputId} type="search" className="bp-input" placeholder="Masalan: Toshkent, Amir Temur ko'chasi, 15" value={address}
-            onChange={(event) => editAddress(event.target.value)}
-            onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); searchAddress(); } }}
-            aria-describedby={`${inputId}-hint`} aria-invalid={!!problem && !valid} />
-          <button type="button" className="bp-btn bp-btn-primary" onClick={searchAddress} disabled={searching || address.trim().length < 3}>
-            {searching ? "Qidirilmoqda…" : "Qidirish"}
-          </button>
-        </div>
-        <p id={`${inputId}-hint`} className="bp-note">Topilgan manzilni tanlang, so'ng markerning aniq joyini tekshiring.</p>
-        {results?.length > 0 && <ul className="bp-location-results" aria-label="Topilgan manzillar">
-          {results.map((item) => <li key={item.id}><button type="button" onClick={() => chooseResult(item)}><strong>{item.label.split(",")[0]}</strong><span>{item.label}</span><b>Shu joyni tanlash →</b></button></li>)}
-        </ul>}
-      </div>}
-
-      <div id={id} className={`bp-map-box ${editable ? "is-editable" : "is-locked"}`}>
-        <div className="bp-map-surface" inert={!editable}>
-        <MapContainer
-          center={valid ? [value.lat, value.lng] : TASHKENT}
-          zoom={valid ? 16 : 12}
-          className="bp-map"
-          scrollWheelZoom={false}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
-          <MapCenter value={valid ? value : null} />
-          <MapInteraction editable={editable} />
-          <MapClick onChange={resolvePoint} editable={editable} />
-
-          {valid && (
-            <Marker
-              position={[value.lat, value.lng]}
-              icon={markerIcon}
-              draggable={editable}
-              eventHandlers={{
-                dragend(event) {
-                  const position = event.target.getLatLng();
-                  if (editable) resolvePoint({ lat: position.lat, lng: position.lng });
-                },
+      {editable && onAddressChange && (
+        <div className="bp-address-editor">
+          <label htmlFor={inputId}>Manzilni qidiring</label>
+          <div className="bp-search">
+            <input
+              id={inputId}
+              type="search"
+              className="bp-input"
+              placeholder="Masalan: Toshkent, Amir Temur ko'chasi, 15"
+              value={address}
+              onChange={(event) => editAddress(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  searchAddress();
+                }
               }}
+              aria-describedby={`${inputId}-hint`}
+              aria-invalid={!!problem && !valid}
             />
+            <button
+              type="button"
+              className="bp-btn bp-btn-primary"
+              onClick={searchAddress}
+              disabled={searching || address.trim().length < 3}
+            >
+              {searching ? "Qidirilmoqda…" : "Qidirish"}
+            </button>
+          </div>
+          <p id={`${inputId}-hint`} className="bp-note">
+            Topilgan manzilni tanlang, so'ng markerning aniq joyini tekshiring.
+          </p>
+          {results?.length > 0 && (
+            <ul className="bp-location-results" aria-label="Topilgan manzillar">
+              {results.map((item) => (
+                <li key={item.id}>
+                  <button type="button" onClick={() => chooseResult(item)}>
+                    <strong>{item.label.split(",")[0]}</strong>
+                    <span>{item.label}</span>
+                    <b>Shu joyni tanlash →</b>
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
-        </MapContainer>
+        </div>
+      )}
+
+      <div
+        id={id}
+        className={`bp-map-box ${editable ? "is-editable" : "is-locked"}`}
+      >
+        <div className="bp-map-surface" inert={!editable}>
+          <MapContainer
+            center={valid ? [value.lat, value.lng] : TASHKENT}
+            zoom={valid ? 16 : 12}
+            className="bp-map"
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            <MapCenter value={valid ? value : null} />
+            <MapInteraction editable={editable} />
+            <MapClick onChange={resolvePoint} editable={editable} />
+
+            {valid && (
+              <Marker
+                position={[value.lat, value.lng]}
+                icon={icon}
+                draggable={editable}
+                eventHandlers={{
+                  dragend(event) {
+                    const position = event.target.getLatLng();
+                    if (editable)
+                      resolvePoint({ lat: position.lat, lng: position.lng });
+                  },
+                }}
+              />
+            )}
+          </MapContainer>
         </div>
       </div>
 
-      {editable && <button
+      {editable && (
+        <button
           type="button"
           className="bp-btn bp-gps"
           onClick={detectLocation}
           disabled={locating}
         >
           {locating ? "Aniqlanmoqda..." : "Mening joylashuvim"}
-        </button>}
+        </button>
+      )}
 
-      {resolving && editable && <p className="bp-note" role="status">Nuqta belgilandi. Manzil aniqlanmoqda…</p>}
+      {resolving && editable && (
+        <p className="bp-note" role="status">
+          Nuqta belgilandi. Manzil aniqlanmoqda…
+        </p>
+      )}
       {problem ? (
         <p className="bp-note is-error" role="alert">
           {problem}
@@ -269,8 +368,8 @@ export default function LocationPicker({
           {!editable
             ? "Xarita qulflangan. Joyni almashtirish uchun «Joylashuvni o‘zgartirish»ni bosing."
             : valid
-            ? "Joylashuv belgilandi. Nuqtani sudrab aniqlashtirishingiz mumkin."
-            : "Xaritaga bosing, manzilni qidiring yoki GPS dan foydalaning."}
+              ? "Joylashuv belgilandi. Nuqtani sudrab aniqlashtirishingiz mumkin."
+              : "Xaritaga bosing, manzilni qidiring yoki GPS dan foydalaning."}
         </p>
       )}
     </div>

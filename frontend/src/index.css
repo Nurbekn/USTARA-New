@@ -19,6 +19,15 @@
   --muted: #a8b3c7;
   --border: rgba(148, 163, 184, 0.16);
 
+  /* Shared typography: phone, then tablet and desktop below. */
+  --font-body: 16px;
+  --font-small: 13px;
+  --font-button: 15px;
+  --font-input: 16px;
+  --font-page: 24px;
+  --font-section: 18px;
+  --font-hero: 28px;
+
   /* Sizes */
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -54,6 +63,7 @@ body {
     ),
     var(--bg);
   font-family: "DM Sans", sans-serif;
+  font-size: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -123,5 +133,21 @@ select:focus-visible {
 @media (min-width: 1024px) {
   :root {
     --page-padding: 32px;
+  }
+}
+
+@media (min-width: 600px) {
+  :root {
+    --font-small: 14px;
+    --font-page: 28px;
+    --font-section: 20px;
+    --font-hero: 34px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --font-page: 32px;
+    --font-section: 22px;
+    --font-hero: 40px;
   }
 }

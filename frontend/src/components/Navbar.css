@@ -148,7 +148,7 @@
   background: transparent;
   color: var(--muted);
   text-align: left;
-  font-size: 14px;
+  font-size: var(--font-button);
   font-weight: 500;
   transition:
     background 0.2s ease,
@@ -176,7 +176,7 @@
   justify-content: center;
   min-height: 43px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: var(--font-button);
   font-weight: 600;
 }
 
@@ -208,7 +208,7 @@
 }
 
 .navbar-signup span {
-  font-size: 16px;
+  font-size: var(--font-button);
 }
 
 /* TABLET */
@@ -262,7 +262,7 @@
     width: auto;
     padding: 10px;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: var(--font-button);
   }
 
   .navbar-actions {
@@ -293,7 +293,7 @@
 
   .navbar-links button {
     padding-inline: 12px;
-    font-size: 14px;
+    font-size: var(--font-button);
   }
 
   .navbar-actions {
