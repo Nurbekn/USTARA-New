@@ -1,5 +1,7 @@
 export default function UserIcon({ name, size = 22 }) {
   const paths = {
+    calendar: <><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 11h16m-11 5h3"/></>,
+    bookmark: <path d="M6 3h12v18l-6-4-6 4Z"/>,
     search: (
       <>
         <circle cx="10.5" cy="10.5" r="6.5" />

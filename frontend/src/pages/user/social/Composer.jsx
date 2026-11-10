@@ -1,3 +1,4 @@
+import ArrowIcon from "../../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import UserAvatar from "../components/UserAvatar";
 import UserIcon from "../components/UserIcon";
@@ -213,7 +214,7 @@ export default function Composer({
             setStep(step === "details" ? "preview" : "select");
           }}
         >
-          ← Ortga
+          <ArrowIcon direction="left" /> Ortga
         </button>
         <span>
           {step === "select"
@@ -233,7 +234,7 @@ export default function Composer({
             disabled={!media.length}
             onClick={nextStep}
           >
-            Keyingi →
+            Keyingi <ArrowIcon />
           </button>
         )}
       </div>
@@ -271,7 +272,7 @@ export default function Composer({
                     aria-label="Oldingi rasm"
                     onClick={() => setActive((n) => n - 1)}
                   >
-                    ‹
+                    <ArrowIcon direction="left" variant="chevron" />
                   </button>
                   <button
                     type="button"
@@ -280,7 +281,7 @@ export default function Composer({
                     aria-label="Keyingi rasm"
                     onClick={() => setActive((n) => n + 1)}
                   >
-                    ›
+                    <ArrowIcon variant="chevron" />
                   </button>
                 </>
               )}

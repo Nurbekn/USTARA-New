@@ -1,45 +1,152 @@
-/* Shared browser capabilities, with desktop layout preserved. */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body { min-height: 100svh; }
-button, a, input, select, textarea { touch-action: manipulation; }
-input, textarea, select { min-width: 0; }
-video { max-width: 100%; }
+/* Browser and safe-area support shared by the existing page layouts. */
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+input,
+textarea,
+select {
+  min-width: 0;
+}
 
 @media (pointer: coarse) {
-  /* 16px prevents Safari focus zoom without disabling pinch zoom. */
-  input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: max(16px, 1rem); }
-  .bx-icon-btn, .bx-portfolio-tool, .navbar-menu-toggle { min-width: 44px; min-height: 44px; }
-  .bx-chip, .bx-seg button, .bx-btn-sm { min-height: 44px; }
+  /* Prevent Safari focus zoom without disabling pinch zoom. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: max(var(--font-input), 1rem);
+  }
+
+  .bx-icon-btn,
+  .bx-portfolio-tool,
+  .navbar-menu-toggle {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .bx-chip,
+  .bx-seg button,
+  .bx-btn-sm {
+    min-height: 44px;
+  }
 }
+
+/* Retain legacy layout boundaries until each page's migration phase. */
 @media (max-width: 767px) {
-  .container { padding-left: max(var(--page-padding), env(safe-area-inset-left)); padding-right: max(var(--page-padding), env(safe-area-inset-right)); }
-  .navbar { padding-top: env(safe-area-inset-top); }
-  .navbar-menu { max-height: calc(var(--visible-height, 100dvh) - 90px - env(safe-area-inset-top)); overscroll-behavior: contain; }
-  .au-page { min-height: 100svh; padding-top: max(12px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
-  .bx-app { padding-top: env(safe-area-inset-top); }
-  .bx-main, .bx-top { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
-  .bx-nav { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); -webkit-backdrop-filter: blur(14px); }
-  .bx-top { -webkit-backdrop-filter: blur(12px); }
-  .bx-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .bx-field { min-width: 0; }
-  .bx-sheet-back { top: var(--visible-top, 0px); bottom: auto; height: var(--visible-height, 100dvh); }
-  .bx-sheet { max-height: calc(var(--visible-height, 100dvh) - 12px); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-  .bx-sheet-head { position: sticky; top: -16px; z-index: 2; padding: 12px 0; margin-top: -12px; background: var(--bg-soft, #101a2c); }
-  html[data-keyboard="open"] .bx-nav { display: none; }
-  html[data-keyboard="open"] .bx-savebar { position: static; }
-  html[data-keyboard="open"] .bx-sheet { padding-bottom: 16px; }
+  .container {
+    padding-inline: max(var(--page-padding), env(safe-area-inset-left))
+      max(var(--page-padding), env(safe-area-inset-right));
+  }
+
+  .navbar {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .navbar-menu {
+    max-height: calc(var(--visible-height, 100dvh) - 90px - env(safe-area-inset-top));
+    overscroll-behavior: contain;
+  }
+
+  .au-page {
+    min-height: 100svh;
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
+    padding-inline: max(var(--space-3), env(safe-area-inset-left))
+      max(var(--space-3), env(safe-area-inset-right));
+  }
+
+  .bx-app {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .bx-main,
+  .bx-top {
+    padding-inline: max(var(--space-4), env(safe-area-inset-left))
+      max(var(--space-4), env(safe-area-inset-right));
+  }
+
+  .bx-nav {
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  }
+
+  .bx-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bx-field {
+    min-width: 0;
+  }
+
+  .bx-sheet-back {
+    top: var(--visible-top, 0px);
+    bottom: auto;
+    height: var(--visible-height, 100dvh);
+  }
+
+  .bx-sheet {
+    max-height: calc(var(--visible-height, 100dvh) - var(--space-3));
+    padding-inline: max(var(--space-4), env(safe-area-inset-left))
+      max(var(--space-4), env(safe-area-inset-right));
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bx-sheet-head {
+    position: sticky;
+    top: calc(-1 * var(--space-4));
+    z-index: 2;
+    padding: var(--space-3) 0;
+    margin-top: calc(-1 * var(--space-3));
+    background: var(--bg-soft);
+  }
+
+  html[data-keyboard="open"] .bx-nav {
+    display: none;
+  }
+
+  html[data-keyboard="open"] .bx-savebar {
+    position: static;
+  }
+
+  html[data-keyboard="open"] .bx-sheet {
+    padding-bottom: var(--space-4);
+  }
 }
+
 @media (max-width: 359px) {
-  .bx-grid-2 { grid-template-columns: minmax(0, 1fr); }
-  .navbar-logo { font-size: 16px; gap: 6px; }
-  .navbar-right { gap: 6px; }
-  .navbar-signup--top { padding-inline: 10px; }
+  .bx-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .navbar-logo {
+    font-size: 16px;
+    gap: var(--space-2);
+  }
+
+  .navbar-right {
+    gap: var(--space-2);
+  }
+
+  .navbar-signup--top {
+    padding-inline: var(--space-3);
+  }
 }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-}
+
 @media (pointer: coarse) and (max-width: 767px) {
   /* Solid surfaces avoid repeated blur work while a phone is scrolling. */
-  .navbar, .bx-top, .bx-nav { background: #101a2c; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .au-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .navbar,
+  .bx-top,
+  .bx-nav {
+    background: var(--bg-soft);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .au-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

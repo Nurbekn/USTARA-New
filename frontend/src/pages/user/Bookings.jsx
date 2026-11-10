@@ -1,14 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import ArrowIcon from "../../components/ArrowIcon";
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { Link, useLocation, useOutletContext, useSearchParams } from 'react-router-dom';
 import { Avatar } from '../../components/Avatar';
 import UserIcon from './components/UserIcon';
 import { isValidLocation } from '../../components/locationSearch';
 import BookingCard from './bookings/BookingCard';
 import { STATUSES, barberName, canCancel, cancelCustomerBooking, dateLabel, known, loadCustomerBookings, money, nearestBooking, normalizeBookings, sortBookings, statusInfo, timestamp, total, validateCancellation } from './bookings/model';
 import './Bookings.css';
+import { cancelDemoBooking, getDemoBookingsSnapshot, readDemoBookings, subscribeDemoBookings } from './bookings/demoBookingStore';
 
 export default function Bookings({ loadBookings = loadCustomerBookings, cancelBooking = cancelCustomerBooking }) {
   const [params, setParams] = useSearchParams();
+  const context = useOutletContext();
+  const location = useLocation();
+  const viewerId = context?.profile?.phone || context?.profile?.id || '';
+  const bookingsBase = location.pathname.startsWith('/demo') ? '/demo/reservations' : '/user/bookings';
+  const demoSnapshot = useSyncExternalStore(subscribeDemoBookings, getDemoBookingsSnapshot, () => null);
+  const demoBookings = readDemoBookings(demoSnapshot).filter((booking) => booking.viewerId === viewerId);
   const [request, setRequest] = useState({ status: 'loading', bookings: [] });
   const [attempt, setAttempt] = useState(0);
   const [cancelling, setCancelling] = useState(null);
@@ -34,18 +42,19 @@ export default function Bookings({ loadBookings = loadCustomerBookings, cancelBo
   }, [loadBookings, attempt]);
   useEffect(() => () => action.current?.abort(), []);
 
+  const allBookings = [...request.bookings, ...demoBookings];
   const filter = Object.hasOwn(STATUSES, params.get('status')) ? params.get('status') : 'all';
-  const selected = request.bookings.find((b) => String(b.id) === params.get('booking'));
-  const sorted = sortBookings(request.bookings);
+  const selected = allBookings.find((b) => String(b.id) === params.get('booking'));
+  const sorted = sortBookings(allBookings);
   const visible = filter === 'all' ? sorted : sorted.filter((b) => b.status === filter);
-  const nearest = ['all', 'confirmed'].includes(filter) ? nearestBooking(request.bookings) : null;
+  const nearest = ['all', 'confirmed'].includes(filter) ? nearestBooking(allBookings) : null;
   const remaining = nearest ? visible.filter((b) => String(b.id) !== String(nearest.id)) : visible;
   function update(patch) {
     const next = new URLSearchParams(params);
     Object.entries(patch).forEach(([key, value]) => value == null ? next.delete(key) : next.set(key, value));
     setParams(next);
   }
-  function detailUrl(id) { const next = new URLSearchParams(params); next.set('booking', id); return `/user/bookings?${next}`; }
+  function detailUrl(id) { const next = new URLSearchParams(params); next.set('booking', id); return `${bookingsBase}?${next}`; }
   function retry() { setRequest({ status: 'loading', bookings: [] }); setAttempt((n) => n + 1); }
   function askCancel(booking) {
     if (!canCancel(booking)) return;
@@ -56,11 +65,11 @@ export default function Bookings({ loadBookings = loadCustomerBookings, cancelBo
     if (!canCancel(cancelling)) { setActionError('Bu bronni bekor qilish muddati tugagan. Ma’lumotlarni yangilang.'); return; }
     const controller = new AbortController(); action.current = controller; setBusy(true); setActionError('');
     try {
-      const response = await cancelBooking(cancelling.id, { signal: controller.signal });
+      const response = cancelling.isDemo ? await cancelDemoBooking(cancelling.id, viewerId) : await cancelBooking(cancelling.id, { signal: controller.signal });
       const updated = validateCancellation(response, cancelling.id);
       if (controller.signal.aborted) return;
       setRequest((previous) => ({ ...previous, bookings: previous.bookings.map((b) => String(b.id) === String(updated.id) ? updated : b) }));
-      setNotice('Bron bekor qilindi. Yangi bron uchun Explore orqali barberni tanlang.');
+      setNotice(cancelling.isDemo ? 'Namuna bron bekor qilindi. Bu vaqt yana bo‘sh.' : 'Bron bekor qilindi. Yangi bron uchun ustani tanlang.');
       dialog.current.close(); setCancelling(null);
     } catch (error) {
       if (!controller.signal.aborted) setActionError(error.message === 'Bekor qilish xizmati hali ulanmagan.' ? error.message : 'Bron bekor qilinmadi. Holatini tekshirib, qayta urinib ko‘ring.');
@@ -68,11 +77,12 @@ export default function Bookings({ loadBookings = loadCustomerBookings, cancelBo
   }
   const loading = request.status === 'loading';
   return <section className="ub-page" aria-busy={loading}>
-    <header className="ub-heading ub-heading-with-filter"><div><h1>Bronlar</h1><p>Yaqinlashayotgan tashriflar va bronlaringiz tarixi.</p></div><details className="ub-filter-menu" ref={filterMenu} data-status={filter}><summary aria-label="Bron holatini tanlash"><span className="ub-filter-dot" aria-hidden="true"/><span>{filter === 'all' ? 'Hammasi' : statusInfo(filter).label}</span><span className="ub-filter-number">{loading ? '…' : request.status === 'error' ? '—' : visible.length}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div className="ub-filter-options" role="group" aria-label="Bron holatlari">{[['all',{label:'Hammasi'}],...Object.entries(STATUSES)].map(([key,value]) => <button type="button" key={key} className={`ub-filter-option ub-option-${key}`} aria-pressed={filter === key} onClick={() => {update({status:key === 'all' ? null : key,booking:null});filterMenu.current.open=false;}}><span className="ub-filter-dot" aria-hidden="true"/><span>{value.label}</span><span className="ub-filter-number">{request.status === 'ready' ? key === 'all' ? request.bookings.length : request.bookings.filter((b) => b.status===key).length : '—'}</span></button>)}</div></details></header>
+    <header className="ub-heading ub-heading-with-filter"><div><h1>Bronlar</h1><p>Yaqinlashayotgan tashriflar va bronlaringiz tarixi.</p></div><details className="ub-filter-menu" ref={filterMenu} data-status={filter}><summary aria-label="Bron holatini tanlash"><span className="ub-filter-dot" aria-hidden="true"/><span>{filter === 'all' ? 'Hammasi' : statusInfo(filter).label}</span><span className="ub-filter-number">{loading ? '…' : request.status === 'error' ? '—' : visible.length}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div className="ub-filter-options" role="group" aria-label="Bron holatlari">{[['all',{label:'Hammasi'}],...Object.entries(STATUSES)].map(([key,value]) => <button type="button" key={key} className={`ub-filter-option ub-option-${key}`} aria-pressed={filter === key} onClick={() => {update({status:key === 'all' ? null : key,booking:null});filterMenu.current.open=false;}}><span className="ub-filter-dot" aria-hidden="true"/><span>{value.label}</span><span className="ub-filter-number">{request.status === 'ready' ? key === 'all' ? allBookings.length : allBookings.filter((b) => b.status===key).length : '—'}</span></button>)}</div></details></header>
+    {demoBookings.length > 0 && <p className="ub-demo-note">Namuna bronlar — brauzerda saqlangan sinov buyurtmalari. Haqiqiy ustaga yuborilmagan.</p>}
     <p className="ub-notice" role="status">{notice}</p>
-    {params.has('booking') && <Link className="ub-back" to={`/user/bookings${filter === 'all' ? '' : `?status=${filter}`}`}>← Bronlarga qaytish</Link>}
-    {loading ? <div className="ub-loading" role="status"><p>Bronlar yuklanmoqda…</p><div className="ub-list" aria-hidden="true">{[0,1].map((n) => <div className="ub-skeleton" key={n}><i /><i /><i /></div>)}</div></div> : request.status === 'error' ? <div className="ub-empty" role="alert"><h2>Bronlarni yuklab bo‘lmadi</h2><p>Internet aloqasini tekshiring va qayta urinib ko‘ring.</p><button type="button" className="ub-button ub-primary" onClick={retry}>Qayta urinish</button></div> : params.has('booking') ? selected ? <BookingDetails booking={selected} onCancel={askCancel} /> : <div className="ub-empty"><h2>Bron topilmadi</h2><p>Bron mavjud emas yoki sizning hisobingizga tegishli emas.</p></div> : <>
-      {visible.length ? <div className="ub-rows" aria-label={filter === 'all' ? 'Barcha bronlar' : statusInfo(filter).description}>{nearest && <BookingRow booking={nearest} href={detailUrl(nearest.id)} nearest />}{remaining.map((b) => <BookingRow key={b.id} booking={b} href={detailUrl(b.id)} />)}</div> : <div className="ub-empty"><span className="ub-empty-icon"><UserIcon name="scissors" size={30} /></span><h2>{request.bookings.length ? 'Bu holatda bronlar yo‘q' : 'Birinchi tashrifingizni rejalashtiring'}</h2><p>{request.bookings.length ? 'Boshqa holatni tanlang yoki barcha bronlarni ko‘ring.' : 'Explore orqali barber va xizmatlarni toping. Bronlaringiz shu yerda ko‘rinadi.'}</p>{request.bookings.length ? <button type="button" className="ub-button" onClick={() => update({status:null})}>Barcha bronlar</button> : <Link className="ub-button ub-primary" to="/user/explore">Barber topish<UserIcon name="arrow" size={18} /></Link>}</div>}
+    {params.has('booking') && <Link className="ub-back" to={`${bookingsBase}${filter === 'all' ? '' : `?status=${filter}`}`}><ArrowIcon direction="left" /> Bronlarga qaytish</Link>}
+    {loading ? <div className="ub-loading" role="status"><p>Bronlar yuklanmoqda…</p><div className="ub-list" aria-hidden="true">{[0,1].map((n) => <div className="ub-skeleton" key={n}><i /><i /><i /></div>)}</div></div> : request.status === 'error' ? <div className="ub-empty" role="alert"><h2>Bronlarni yuklab bo‘lmadi</h2><p>Internet aloqasini tekshiring va qayta urinib ko‘ring.</p><button type="button" className="ub-button ub-primary" onClick={retry}>Qayta urinish</button></div> : params.has('booking') ? selected ? <BookingDetails booking={selected} onCancel={askCancel} profileBase={bookingsBase.startsWith("/demo") ? "/demo" : "/user"} /> : <div className="ub-empty"><h2>Bron topilmadi</h2><p>Bron mavjud emas yoki sizning hisobingizga tegishli emas.</p></div> : <>
+      {visible.length ? <div className="ub-rows" aria-label={filter === 'all' ? 'Barcha bronlar' : statusInfo(filter).description}>{nearest && <BookingRow booking={nearest} href={detailUrl(nearest.id)} nearest />}{remaining.map((b) => <BookingRow key={b.id} booking={b} href={detailUrl(b.id)} />)}</div> : <div className="ub-empty"><span className="ub-empty-icon"><UserIcon name="scissors" size={30} /></span><h2>{allBookings.length ? 'Bu holatda bronlar yo‘q' : 'Birinchi tashrifingizni rejalashtiring'}</h2><p>{allBookings.length ? 'Boshqa holatni tanlang yoki barcha bronlarni ko‘ring.' : 'Explore orqali barber va xizmatlarni toping. Bronlaringiz shu yerda ko‘rinadi.'}</p>{allBookings.length ? <button type="button" className="ub-button" onClick={() => update({status:null})}>Barcha bronlar</button> : <Link className="ub-button ub-primary" to="/user/explore">Barber topish<UserIcon name="arrow" size={18} /></Link>}</div>}
     </>}
     <dialog ref={dialog} className="ub-cancel-dialog" aria-labelledby="ub-cancel-title" aria-describedby="ub-cancel-description" onCancel={(event) => { if (busy) event.preventDefault(); }}>
       <h2 id="ub-cancel-title">Bronni bekor qilasizmi?</h2><p id="ub-cancel-description">Bu amalni ortga qaytarib bo‘lmaydi. Keyingi tashrif uchun yangi bron qilish kerak bo‘ladi.</p>
@@ -83,7 +93,7 @@ export default function Bookings({ loadBookings = loadCustomerBookings, cancelBo
   </section>;
 }
 
-function BookingDetails({ booking, onCancel }) {
+function BookingDetails({ booking, onCancel, profileBase }) {
   const b = booking;
   const location = b.salon?.location;
   const phone = /^\+?\d{7,15}$/.test(b.barber?.phone || '') ? b.barber.phone : null;
@@ -91,7 +101,7 @@ function BookingDetails({ booking, onCancel }) {
   return <div className="ub-details">
     <BookingCard booking={b} onCancel={onCancel} detail />
     <section className="ub-panel" id="ub-services"><h2>Tanlangan xizmatlar</h2>{b.services.length ? <ul className="ub-service-list">{b.services.map((s,index) => <li key={s.id ?? index}><div><strong>{s.name || 'Xizmat nomi kiritilmagan'}</strong><span>{known(s.durationMinutes) ? `${s.durationMinutes} daqiqa` : 'Davomiyligi ko‘rsatilmagan'}</span></div><strong>{money(s.price)}</strong></li>)}</ul> : <p>Xizmatlar haqida ma’lumot yo‘q.</p>}<div className="ub-grand-total"><span>Umumiy to‘lov</span><strong>{money(total(b,'totalPrice','price'))}</strong></div></section>
-    <section className="ub-panel"><h2>Barber va salon</h2><div className="ub-barber"><Avatar photo={b.barber?.avatarPhoto} id={b.barber?.avatar} name={barberName(b)} size={48} /><div><h3>{barberName(b)}</h3><p>{b.salon?.name || 'Salon nomi ko‘rsatilmagan'}</p></div></div><p className="ub-address"><UserIcon name="pin" size={18} />{b.salon?.address || 'Manzil ko‘rsatilmagan'}</p><div className="ub-contact-actions">{b.barber?.id != null && <Link className="ub-button" to={`/user/explore?type=barbers&profile=${encodeURIComponent(b.barber.id)}`}>Barber profili</Link>}{isValidLocation(location) && <a className="ub-button" target="_blank" rel="noopener noreferrer" href={`https://www.openstreetmap.org/?mlat=${location.lat}&mlon=${location.lng}#map=17/${location.lat}/${location.lng}`}>Xaritada ko‘rish</a>}{phone && <a className="ub-button" href={`tel:${phone}`}>Qo‘ng‘iroq qilish</a>}{telegram && <a className="ub-button" href={`https://t.me/${telegram}`} target="_blank" rel="noopener noreferrer">Telegram</a>}</div>{!phone && !telegram && <p className="ub-hint">Bog‘lanish ma’lumotlari ko‘rsatilmagan.</p>}</section>
+    <section className="ub-panel"><h2>Barber va salon</h2><div className="ub-barber"><Avatar photo={b.barber?.avatarPhoto} id={b.barber?.avatar} name={barberName(b)} size={48} /><div><h3>{barberName(b)}</h3><p>{b.salon?.name || 'Salon nomi ko‘rsatilmagan'}</p></div></div><p className="ub-address"><UserIcon name="pin" size={18} />{b.salon?.address || 'Manzil ko‘rsatilmagan'}</p><div className="ub-contact-actions">{b.barber?.id != null && <Link className="ub-button" to={b.isDemo ? `${profileBase}/barbers/${encodeURIComponent(b.barber.id)}?demo=1` : `/user/explore?type=barbers&profile=${encodeURIComponent(b.barber.id)}`}>Barber profili</Link>}{isValidLocation(location) && <a className="ub-button" target="_blank" rel="noopener noreferrer" href={`https://www.openstreetmap.org/?mlat=${location.lat}&mlon=${location.lng}#map=17/${location.lat}/${location.lng}`}>Xaritada ko‘rish</a>}{phone && <a className="ub-button" href={`tel:${phone}`}>Qo‘ng‘iroq qilish</a>}{telegram && <a className="ub-button" href={`https://t.me/${telegram}`} target="_blank" rel="noopener noreferrer">Telegram</a>}</div>{!phone && !telegram && <p className="ub-hint">Bog‘lanish ma’lumotlari ko‘rsatilmagan.</p>}</section>
     <section className="ub-panel"><h2>Holat tarixi</h2>{b.history.length ? <ol className="ub-history">{b.history.map((item,index) => <li key={index}><strong>{statusInfo(item.status).label}</strong><span>{dateLabel(item.at,b.timezone)} · {dateLabel(item.at,b.timezone,true)}</span>{item.note && <p>{item.note}</p>}</li>)}</ol> : <p>Holat tarixi hali taqdim etilmagan.</p>}{b.status === 'rejected' && b.rejectionReason && <p className="ub-rejection">Rad etish sababi: {b.rejectionReason}</p>}</section>
     <section className="ub-panel"><h2>Bekor qilish qoidalari</h2><p>{b.cancellationPolicy?.text || 'Bekor qilish qoidalari ko‘rsatilmagan.'}</p>{b.cancellationPolicy?.deadline && <p>Bekor qilish muddati: {dateLabel(b.cancellationPolicy.deadline,b.timezone)} · {dateLabel(b.cancellationPolicy.deadline,b.timezone,true)}</p>}<p>Bekor qilish to‘lovi: {money(b.cancellationPolicy?.fee)}</p>{!canCancel(b) && ['pending','confirmed'].includes(b.status) && <p className="ub-hint">Bu bronni onlayn bekor qilishga hozir ruxsat berilmagan.</p>}</section>
     {['cancelled','rejected','completed'].includes(b.status) && <Link className="ub-button ub-primary" to="/user/explore">Yangi bron uchun barber topish<UserIcon name="arrow" size={18} /></Link>}
@@ -106,5 +116,5 @@ function BookingRow({booking:b,href,nearest=false}) {
     day=new Intl.DateTimeFormat('uz-UZ',{day:'2-digit',timeZone:timezone}).format(new Date(b.startsAt));
     month=new Intl.DateTimeFormat('uz-UZ',{month:'short',timeZone:timezone}).format(new Date(b.startsAt));
   }
-  return <Link to={href} className={`ub-booking-row ${nearest ? 'ub-row-nearest' : ''}`}><span className="ub-row-date"><strong>{day}</strong><span>{month}</span></span><span className="ub-row-body"><strong>{barberName(b)}</strong><span>{b.salon?.name || b.salon?.address || 'Salon ko‘rsatilmagan'} · {dateLabel(b.startsAt,b.timezone,true)}</span>{b.services.length>0 && <span>{b.services.map((s) => s.name).filter(Boolean).join(', ')}</span>}{nearest && <small>Eng yaqin bron</small>}</span><span className={`ub-row-status ub-status-${Object.hasOwn(STATUSES,b.status)?b.status:'unknown'}`}><span className="ub-row-status-dot"/>{statusInfo(b.status).label}</span><span className="ub-row-arrow" aria-hidden="true">›</span></Link>;
+  return <Link to={href} className={`ub-booking-row ${nearest ? 'ub-row-nearest' : ''}`}><span className="ub-row-date"><strong>{day}</strong><span>{month}</span></span><span className="ub-row-body"><strong>{barberName(b)}</strong><span>{b.salon?.name || b.salon?.address || 'Salon ko‘rsatilmagan'} · {dateLabel(b.startsAt,b.timezone,true)}</span>{b.services.length>0 && <span>{b.services.map((s) => s.name).filter(Boolean).join(', ')}</span>}{nearest && <small>Eng yaqin bron</small>}{b.isDemo && <small>Namuna buyurtma</small>}</span><span className={`ub-row-status ub-status-${Object.hasOwn(STATUSES,b.status)?b.status:'unknown'}`}><span className="ub-row-status-dot"/>{statusInfo(b.status).label}</span><span className="ub-row-arrow" aria-hidden="true"><ArrowIcon variant="chevron" /></span></Link>;
 }

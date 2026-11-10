@@ -1,3 +1,4 @@
+import ArrowIcon from "../../../components/ArrowIcon";
 import { useRef, useState } from "react";
 import { addPostComment, togglePostLike, useBarber } from "../data/store";
 import { Avatar } from "../../../components/Avatar";
@@ -52,7 +53,7 @@ export default function PostReactions({ postId }) {
         <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={32} />
         <textarea id={`comment-${postId}`} ref={input} rows={2} maxLength={300} value={text} placeholder="Fikringizni yozing…" onChange={(event) => setText(event.target.value)} />
       </div>
-      <div className="bx-comment-tools"><EmojiPicker onSelect={addEmoji} /><small>{text.length}/300</small><button type="submit" disabled={!text.trim()}>Yuborish →</button></div>
+      <div className="bx-comment-tools"><EmojiPicker onSelect={addEmoji} /><small>{text.length}/300</small><button type="submit" className="ui-arrow-inline" disabled={!text.trim()}>Yuborish <ArrowIcon /></button></div>
     </form>
     {error && <p className="bx-error" role="alert">{error}</p>}
   </section>;

@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout, PhoneField } from "./components/AuthParts";
-import { getAccount } from "./utils/session";
+import { getAccount, setSession } from "./utils/session";
 import "./auth-ui.css";
+import PasswordField from "./components/PasswordField";
+import { hasPasswordRecord, verifyPassword } from "./credentials";
 
-// Sign in: same phone + OTP flow as sign-up (no passwords on the platform)
+// Local test login verifies the stored password and restores the existing session.
 export default function Login() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [busy, setBusy] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (busy) return;
+    setPasswordError("");
     const digits = phone.replace(/\D/g, "");
     const full = "+998" + digits;
 
@@ -23,17 +30,35 @@ export default function Login() {
 
     // MOCK check: only accounts created in this browser exist.
     // Replace with an API call when the backend is ready.
-    if (getAccount()?.phone !== full) {
+    const account = getAccount();
+    if (account?.phone !== full) {
       setNotFound(true);
       return;
     }
-    navigate("/otp", { state: { phone: full, role: "login" } });
+    setBusy(true);
+    try {
+      if (!hasPasswordRecord(full)) {
+        setPasswordError("Bu hisobda parol hali yaratilmagan. Ro‘yxatdan o‘tish orqali parol yarating.");
+        return;
+      }
+      // Login checks the saved password, not the current sign-up format rules.
+      if (!await verifyPassword(full, password)) {
+        setPasswordError("Parol noto‘g‘ri. Qayta kiriting.");
+        return;
+      }
+      setSession({ ...account, authenticated: true });
+      navigate("/complete-profile", { replace: true });
+    } catch {
+      setPasswordError("Kirishni tekshirib bo‘lmadi. Qayta urinib ko‘ring.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <AuthLayout>
-      <h1 className="au-title">Xush kelibsiz!</h1>
-      <p className="au-sub">Telefon raqamingiz orqali hisobingizga kiring.</p>
+    <AuthLayout className="au-page--entry">
+      <h1 className="au-title">Kirish</h1>
+      <p className="au-sub">Telefon raqamingiz va yaratgan parolingiz bilan kiring.</p>
 
       <form className="au-form" onSubmit={handleSubmit} noValidate>
         <PhoneField
@@ -43,8 +68,11 @@ export default function Login() {
             setPhone(value);
             setError("");
             setNotFound(false);
+            setPasswordError("");
           }}
         />
+
+        <PasswordField value={password} error={passwordError} onChange={(value) => { setPassword(value); setPasswordError(""); }} />
 
         {notFound && (
           <p className="au-error" role="alert">
@@ -52,8 +80,8 @@ export default function Login() {
           </p>
         )}
 
-        <button type="submit" className="au-btn">
-          Kod olish <span aria-hidden="true">→</span>
+        <button type="submit" className="au-btn" disabled={busy}>
+          {busy ? "Tekshirilmoqda…" : "Kirish"}
         </button>
       </form>
 

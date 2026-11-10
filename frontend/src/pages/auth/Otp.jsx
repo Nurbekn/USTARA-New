@@ -1,9 +1,12 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { savePasswordRecord } from "./credentials";
+import { readCustomerProfile, saveCustomerProfile } from "../user/data/profile";
 import { createAccount } from "../barber/data/store";
 import { AuthLayout } from "./components/AuthParts";
 import { formatPhone } from "./utils/phone";
-import { dashboardPath, getAccount, isValidPhone, setSession } from "./utils/session";
+import { getAccount, isValidPhone, setSession } from "./utils/session";
 import "./auth-ui.css";
 
 const LENGTH = 5;
@@ -34,27 +37,31 @@ export default function Otp() {
   }, []);
 
   // Opened directly (no phone in state) -> back to sign-up
-  if (!isValidPhone(state?.phone) || !["customer", "barber", "login"].includes(state?.role) || (state.role === "barber" && !state.name?.trim())) return <Navigate to="/signup" replace />;
+  if (!isValidPhone(state?.phone) || !["customer", "barber", "login"].includes(state?.role)) return <Navigate to="/signup" replace />;
 
   // Code is correct: create / restore the account and go to the right page
   const finish = () => {
     const { phone, role } = state;
 
+    if (role !== "login" && state.passwordRecord) savePasswordRecord(phone, state.passwordRecord);
+
     if (role === "barber") {
-      const [firstName, ...rest] = state.name.trim().split(/\s+/);
       createAccount({
-        firstName,
-        lastName: rest.join(" "),
+        nameConfirmed: false,
+        firstName: "",
+        lastName: "",
         phone: `+998 ${formatPhone(phone.slice(4))}`,
-        avatar: state.avatar,
+        avatar: null,
+        avatarPhoto: "",
         specialty: state.specialty,
-        salonName: `${firstName} Barber`,
+        salonName: "",
       });
       setSession({ role, phone, setupDone: false, authenticated: true });
-      navigate("/barber/setup", { replace: true });
+      navigate("/complete-profile", { replace: true });
     } else if (role === "customer") {
+      saveCustomerProfile(phone, { ...readCustomerProfile(phone), nameConfirmed: false });
       setSession({ role, phone, authenticated: true });
-      navigate("/user", { replace: true });
+      navigate("/complete-profile", { replace: true });
     } else {
       // Sign in: send the person where they belong
       const account = getAccount();
@@ -63,7 +70,7 @@ export default function Otp() {
         return;
       }
       setSession({ ...account, authenticated: true });
-      navigate(dashboardPath(account), { replace: true });
+      navigate("/complete-profile", { replace: true });
     }
   };
 
@@ -118,12 +125,12 @@ export default function Otp() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout className="au-page--otp">
       <button type="button" className="au-link-back" onClick={() => navigate(-1)}>
-        ← Orqaga
+        <ArrowIcon direction="left" /> Orqaga
       </button>
 
-      <h1 className="au-title">Kodni kiriting</h1>
+      <h1 className="au-title">Tasdiqlash kodi</h1>
       <p className="au-sub">
         <b>+998 {formatPhone(state.phone.slice(4))}</b> uchun {LENGTH} xonali test kodini kiriting. SMS hozircha yuborilmaydi.
       </p>
@@ -160,7 +167,7 @@ export default function Otp() {
         disabled={!code.every(Boolean)}
         onClick={() => verify(code)}
       >
-        Tasdiqlash <span aria-hidden="true">→</span>
+        Tasdiqlash <ArrowIcon />
       </button>
 
       <p className="au-foot">

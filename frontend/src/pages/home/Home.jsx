@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import "./Home.css";
 
@@ -142,7 +143,7 @@ function Home() {
           <div className="hm-actions">
             <Link to="/signup" className="hm-btn hm-btn-primary">
               Sartarosh topish
-              <span aria-hidden="true">→</span>
+              <ArrowIcon />
             </Link>
             <a href="#how-it-works" className="hm-btn hm-btn-ghost">
               Qanday ishlaydi?
@@ -234,7 +235,7 @@ function Home() {
 
           <Link to="/signup/usta" className="hm-btn hm-btn-primary">
             Sartarosh sifatida boshlash
-            <span aria-hidden="true">→</span>
+            <ArrowIcon />
           </Link>
         </div>
       </section>
@@ -252,7 +253,7 @@ function Home() {
         </p>
         <Link to="/signup" className="hm-btn hm-btn-ghost">
           Sartaroshlarni ko'rish
-          <span aria-hidden="true">→</span>
+          <ArrowIcon />
         </Link>
       </section>
     </div>

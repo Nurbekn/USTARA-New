@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef } from "react";
 
 // Bottom sheet on phones, centered dialog on large screens.
 // Closes with the backdrop, the ✕ button, or the Escape key.
-export default function Sheet({ open, title, onClose, children }) {
+export default function Sheet({ open, title, onClose, children, compact = false }) {
   const dialog = useRef(null);
   const close = useEffectEvent(() => onClose());
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function Sheet({ open, title, onClose, children }) {
   if (!open) return null;
 
   return (
-    <div className="bx-sheet-back" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className={`bx-sheet-back${compact ? " bx-sheet-back--compact" : ""}`} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section
         ref={dialog}
         tabIndex={-1}

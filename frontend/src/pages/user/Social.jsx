@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import Sheet from "../../components/Sheet";
@@ -310,7 +311,7 @@ export default function Social({
           type="button"
           onClick={() => update({ post: null, author: null })}
         >
-          ← Barcha postlar
+          <ArrowIcon direction="left" /> Barcha postlar
         </button>
       )}
       {status === "loading" ? (

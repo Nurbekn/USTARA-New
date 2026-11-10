@@ -82,6 +82,7 @@ export default function BarberProfileEdit() {
           </div>
 
           <LocationPicker
+            showEmptySummary={false}
             value={location}
             onChange={(value) => {
               setLocation(value);

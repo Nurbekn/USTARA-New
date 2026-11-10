@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import BookingCard from "./components/BookingCard";
 import Stars from "./components/Stars";
@@ -40,7 +41,7 @@ export default function Dashboard() {
       {profile.services.length === 0 && (
         <Link to="/barber/services" className="bx-todo">
           <strong>Xizmat qo'shing</strong>
-          <span>Mijozlar bron qila olishi uchun kamida bitta xizmat va narx kerak →</span>
+          <span className="ui-arrow-inline">Mijozlar bron qila olishi uchun kamida bitta xizmat va narx kerak <ArrowIcon /></span>
         </Link>
       )}
 
@@ -48,7 +49,7 @@ export default function Dashboard() {
         <Link to="/barber/earnings" className="bx-stat bx-stat-main">
           <span>Bugungi daromad</span>
           <strong>{formatMoney(earnedToday)}</strong>
-          <small>Batafsil →</small>
+          <small className="ui-arrow-inline">Batafsil <ArrowIcon /></small>
         </Link>
         <Link to="/barber/reviews" className="bx-stat">
           <span>Reyting</span>

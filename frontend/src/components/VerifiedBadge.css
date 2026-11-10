@@ -1,0 +1,2 @@
+.verified-badge { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 20px; height: 20px; color: #4a9fff; vertical-align: middle; }
+.verified-badge svg { display: block; }

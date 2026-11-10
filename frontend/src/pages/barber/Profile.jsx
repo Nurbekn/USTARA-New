@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LocationPicker from "../../components/LocationPicker";
@@ -5,15 +6,14 @@ import { isValidLocation } from "../../components/locationSearch";
 import { clearSession } from "../auth/utils/session";
 import PageHeader from "./components/PageHeader";
 import Sheet from "../../components/Sheet";
-import MediaPicker from "./components/MediaPicker";
 import Stars from "./components/Stars";
 import { useToast } from "./components/Toast";
-import { Avatar, AvatarPicker } from "../../components/Avatar";
+import { Avatar } from "../../components/Avatar";
 import { STATUS, getRatingSummary, updateProfile, useBarber } from "./data/store";
 
-import { prepareProfilePhoto } from "../../utils/media/profilePhoto";
+import ProfilePhotoField from "../../components/ProfilePhotoField";
 
-const FIELDS = ["firstName", "lastName", "username", "salonName", "telegram", "experience", "about", "address", "location"];
+const FIELDS = ["firstName", "lastName", "salonName", "telegram", "experience", "about", "address", "location"];
 
 export default function Profile() {
   const { profile, bookings, reviews } = useBarber();
@@ -35,40 +35,15 @@ export default function Profile() {
   const completed = bookings.filter((b) => b.status === STATUS.COMPLETED).length;
   const { average, count } = getRatingSummary(reviews);
 
-  const changePhoto = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file || photoBusyRef.current) return;
-    photoBusyRef.current = true;
-    setPhotoBusy(true);
-    setPhotoError("");
-    try {
-      const avatarPhoto = await prepareProfilePhoto(file);
-      if (!updateProfile({ avatarPhoto })) {
-        setPhotoError("Rasm saqlanmadi. Brauzer xotirasi to'lgan yoki saqlash bloklangan. Joy bo'shatib qayta urinib ko'ring.");
-        return;
-      }
-      setPickingAvatar(false);
-      show("Profil rasmi yangilandi");
-    } catch (error) {
-      setPhotoError(error.message);
-    } finally {
-      photoBusyRef.current = false;
-      setPhotoBusy(false);
-    }
-  };
-
   const save = () => {
     if (form.firstName.trim().length < 2) return setError("Ismni kiriting");
     if (form.salonName.trim() && form.salonName.trim().length < 2) return setError("Salon nomi kamida 2 belgi bo'lsin");
-    const username = form.username.trim().replace(/^@+/, "");
-    if (username && !/^[a-zA-Z0-9_.]{3,30}$/.test(username)) return setError("Username 3–30 ta harf, raqam, nuqta yoki pastki chiziqdan iborat bo'lsin.");
     if ((form.address !== (profile.address || "") || JSON.stringify(form.location) !== JSON.stringify(profile.location)) && !isValidLocation(form.location)) {
       return setError("Manzilni qidirib, topilgan natijani tanlang yoki xaritada joyni belgilang.");
     }
     setError("");
     const saved = updateProfile({
       ...form,
-      username,
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       salonName: form.salonName.trim(),
@@ -85,9 +60,9 @@ export default function Profile() {
       <PageHeader title="Profil" />
 
       <section className="bx-card bx-hero">
-        <button type="button" className="bx-hero-avatar" onClick={() => { setPhotoError(""); setPickingAvatar(true); }} aria-label="Avatarni o'zgartirish">
+        <button type="button" className="bx-hero-avatar" onClick={() => { setPhotoError(""); setPickingAvatar(true); }} aria-label="Profil rasmini o‘zgartirish">
           <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={92} />
-          <span>✎</span>
+          <span aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M4 7h4l2-3h4l2 3h4v13H4Z" /><circle cx="12" cy="13" r="3" /></svg></span>
         </button>
         <h2>
           {profile.firstName} {profile.lastName}
@@ -110,9 +85,9 @@ export default function Profile() {
       </section>
 
       <nav className="bx-links" aria-label="Bo'limlar">
-        <Link to="/barber/earnings">Daromad <span>›</span></Link>
-        <Link to="/barber/reviews">Sharhlar <span>›</span></Link>
-        <Link to="/barber/services">Xizmatlar va narxlar <span>›</span></Link>
+        <Link to="/barber/earnings">Daromad <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
+        <Link to="/barber/reviews">Sharhlar <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
+        <Link to="/barber/services">Xizmatlar va narxlar <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
       </nav>
 
       <section className="bx-card bx-form">
@@ -127,11 +102,6 @@ export default function Profile() {
             <input className="bx-input" value={form.lastName} onChange={(e) => set({ lastName: e.target.value })} />
           </label>
         </div>
-        <label className="bx-field">
-          Username
-          <input className="bx-input" value={form.username} maxLength={31} autoCapitalize="none" spellCheck={false} onChange={(e) => set({ username: e.target.value })} />
-          <span className="bx-muted">Ixtiyoriy · 3–30 belgi. Hozircha faqat profilingizda ko'rsatiladi.</span>
-        </label>
         <label className="bx-field">
           Salon nomi
           <input className="bx-input" value={form.salonName} onChange={(e) => set({ salonName: e.target.value })} />
@@ -160,7 +130,7 @@ export default function Profile() {
       <section className="bx-card bx-form bx-map">
         <div className="bx-location-head">
           <h3>Manzil</h3>
-          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm" aria-pressed={editingLocation} aria-controls="profile-location-map" onClick={() => {
+          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm bx-location-edit" aria-expanded={editingLocation} aria-controls="profile-location-map" onClick={() => {
             if (editingLocation && !isValidLocation(form.location)) return setError("Avval topilgan manzilni tanlang yoki xaritada joyni belgilang.");
             setError("");
             setEditingLocation((previous) => !previous);
@@ -168,15 +138,16 @@ export default function Profile() {
             {editingLocation ? "Tayyor" : "Joylashuvni o‘zgartirish"}
           </button>
         </div>
-        <LocationPicker
-          key={editingLocation ? "editing" : "locked"}
-          id="profile-location-map"
-          editable={editingLocation}
-          value={form.location}
-          address={form.address}
-          onAddressChange={(address) => set({ address })}
-          onChange={(location) => { set({ location }); setError(""); }}
-        />
+        {!editingLocation && <p className="bx-muted">{form.address || (isValidLocation(form.location) ? "Joylashuv xaritada belgilangan." : "Manzil hali belgilanmagan.")}</p>}
+        <div id="profile-location-map" hidden={!editingLocation}>
+          {editingLocation && <LocationPicker
+            showEmptySummary={false}
+            value={form.location}
+            address={form.address}
+            onAddressChange={(address) => set({ address })}
+            onChange={(location) => { set({ location }); setError(""); }}
+          />}
+        </div>
       </section>
 
       {error && <p className="bx-error" role="alert">{error}</p>}
@@ -206,27 +177,26 @@ export default function Profile() {
         </div>
       </Sheet>
 
-      <Sheet open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
+      <Sheet compact open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
         <div className="bx-form" aria-busy={photoBusy}>
-          <MediaPicker accept="image/*" onChange={changePhoto} disabled={photoBusy} className="bx-btn bx-btn-primary bx-btn-block" label="Profil uchun rasm tanlash">
-            {photoBusy ? "Rasm tayyorlanmoqda..." : "O'z rasmimni yuklash"}
-          </MediaPicker>
-          <p className="bx-muted">Rasm · 25 MB gacha. Rasm markazdan kvadrat kesilib, kichraytirib saqlanadi.</p>
-          {photoBusy && <p role="status" className="bx-muted">Rasm yuklanmoqda...</p>}
+          <ProfilePhotoField
+            compact
+            value={profile.avatarPhoto || ""}
+            name={`${profile.firstName} ${profile.lastName}`}
+            onBusyChange={(busy) => { photoBusyRef.current = busy; setPhotoBusy(busy); }}
+            onChange={(avatarPhoto) => {
+              setPhotoError("");
+              if (!updateProfile({ avatarPhoto, avatar: null })) {
+                setPhotoError("Rasm saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
+                return;
+              }
+              photoBusyRef.current = false;
+              setPhotoBusy(false);
+              setPickingAvatar(false);
+              show(avatarPhoto ? "Profil rasmi yangilandi" : "Profil rasmi olib tashlandi");
+            }}
+          />
           {photoError && <p className="bx-error" role="alert">{photoError}</p>}
-          <h3>Yoki tayyor avatar tanlang</h3>
-        <AvatarPicker
-          value={profile.avatarPhoto ? null : profile.avatar}
-          onChange={(id) => {
-            if (photoBusyRef.current) return;
-            if (!updateProfile({ avatar: id, avatarPhoto: "" })) {
-              setPhotoError("Avatar saqlanmadi. Brauzer xotirasini tekshirib qayta urinib ko'ring.");
-              return;
-            }
-            setPickingAvatar(false);
-            show("Avatar o'zgartirildi");
-          }}
-        />
         </div>
       </Sheet>
       {toast}

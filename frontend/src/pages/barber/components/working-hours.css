@@ -24,3 +24,11 @@
   .wh-times { margin: 0; }
   .wh-error { grid-column: 1 / -1; }
 }
+
+.wh-tools button { display: flex; align-items: center; justify-content: center; gap: var(--space-2); }
+.wh-tools button svg { flex-shrink: 0; }
+.wh-tools button:active:not(:disabled) { border-color: var(--accent-hover); background: var(--accent-soft); }
+.wh-tools button.is-applied { border-color: var(--success); color: var(--success); background: color-mix(in srgb, var(--success) 8%, transparent); }
+.wh-tools button.is-applied:focus-visible { outline-color: var(--success); }
+.wh-tools .wh-apply-status { color: var(--success); font-size: 13px; }
+.wh-apply-status:empty { display: none; }

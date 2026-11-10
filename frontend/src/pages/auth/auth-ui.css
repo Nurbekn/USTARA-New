@@ -12,10 +12,7 @@
   align-items: center;
   min-height: 100dvh;
   padding: 12px 16px calc(28px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(ellipse 80% 45% at 85% 0%, rgba(37, 99, 235, 0.2), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(76, 29, 149, 0.16), transparent 70%),
-    var(--bg);
+  background: var(--page-background);
 }
 .au-page.is-wide { --au-width: 580px; }
 
@@ -37,9 +34,9 @@
   font-weight: 600;
 }
 .au-logo {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-ui);
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
 }
 .au-logo span { color: var(--accent); }
@@ -95,7 +92,7 @@
 /* ---------- Form ---------- */
 .au-form { display: flex; flex-direction: column; gap: 18px; }
 .au-field { display: flex; flex-direction: column; gap: 8px; }
-.au-label { color: var(--muted); font-size: var(--font-small); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.au-label { color: var(--text); font-size: 14px; line-height: 1.5; font-weight: 500; letter-spacing: normal; text-transform: none; }
 
 .au-input,
 .au-phone {
@@ -182,7 +179,7 @@
 .au-text-btn { color: #60a5fa; font-weight: 700; font-size: var(--font-button); }
 .au-text-btn:disabled { color: var(--muted); }
 
-/* ---------- Chips + avatars ---------- */
+/* ---------- Specialty chips ---------- */
 .au-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .au-chip {
   min-height: 44px;
@@ -195,21 +192,6 @@
 }
 .au-chip.is-active { border-color: var(--primary); background: rgba(59, 130, 246, 0.16); color: #bfdbfe; }
 
-.au-avatar-top { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.au-avatar-big { border: 3px solid var(--primary); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.14); }
-.au-avatar-top small { color: var(--muted); font-size: var(--font-small); }
-.au-avatars.bx-avatar-grid {
-  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--bg);
-}
-.au-avatars .bx-avatar-option { padding: 3px; border: 2px solid transparent; border-radius: 50%; background: none; }
-.au-avatars .bx-avatar-option.is-active { border-color: var(--primary); }
-.au-avatars .bx-avatar { border-radius: 50%; }
-
 /* ---------- OTP ---------- */
 .au-otp { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
 .au-otp input {
@@ -221,9 +203,9 @@
   border-radius: 14px;
   background: var(--bg);
   color: var(--text);
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--font-input);
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -278,7 +260,7 @@
 
 .au-steps { display: grid; grid-template-columns: repeat(3, 1fr); margin: 4px 0; padding: 0; list-style: none; }
 .au-steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: var(--font-small); font-weight: 600; }
-.au-steps li + li::before { content: ""; position: absolute; top: 15px; right: 50%; width: 100%; height: 2px; background: var(--border); }
+.au-steps li + li::before { content: ""; position: absolute; top: 15px; right: calc(50% + 20px); width: calc(100% - 36px); height: 2px; background: var(--border); }
 .au-steps li span { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid var(--border); border-radius: 50%; background: var(--surface); }
 .au-steps li.done { color: #4ade80; }
 .au-steps li.done span { border-color: #22c55e; background: rgba(34, 197, 94, 0.16); }
@@ -296,3 +278,49 @@
 
 /* Validation messages should be easy to spot on small screens. */
 .au-error { padding: 10px 12px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 10px; background: #ef44440d; color: #fca5a5; line-height: 1.5; overflow-wrap: anywhere; }
+
+/* Shared phone-and-password registration, with a separate centered OTP screen. */
+.au-registration-fields { display: grid; gap: var(--space-5); min-width: 0; margin: 0; padding: 0; border: 0; }
+.au-password { display: flex; align-items: center; min-height: 54px; overflow: hidden; border: 1.5px solid var(--border); border-radius: 14px; background: var(--bg); }
+.au-password input { flex: 1; min-width: 0; width: 100%; height: 52px; padding: 0 var(--space-4); border: 0; background: transparent; color: var(--text); font: inherit; font-size: 16px; }
+.au-password input:focus { outline: none; }
+.au-password:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.au-password.has-error { border-color: var(--danger); }
+.au-password button { display: grid; place-items: center; flex-shrink: 0; min-width: 48px; min-height: 48px; padding: var(--space-3); border: 0; background: transparent; color: var(--muted); }
+.au-password button:focus-visible { outline-offset: -4px; }
+.au-password-hint { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.au-page--otp .au-card { text-align: center; }
+.au-page--otp .au-link-back { display: flex; align-items: center; justify-content: center; margin-inline: auto; margin-bottom: var(--space-5); }
+.au-page--otp .au-sub { max-width: 34ch; margin-inline: auto; }
+.au-page--otp .au-otp { width: 100%; max-width: 340px; margin-inline: auto; margin-block: var(--space-6); }
+.au-page--otp .au-otp input { font-family: var(--font-ui); font-size: 24px; font-weight: 500; }
+
+/* Matching changes the outline only; the password field keeps its dark fill. */
+.au-password.is-match:not(.has-error) { border-color: var(--success); }
+.au-password.is-match:not(.has-error):focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 18%, transparent); }
+.au-password.is-mismatch, .au-password.has-error { border-color: var(--danger); }
+.au-password.is-mismatch:focus-within, .au-password.has-error:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+.au-password-match { margin: 0; font-size: 13px; line-height: 1.5; }
+.au-password-match:empty { display: none; }
+.au-password-match.is-match { color: var(--success); }
+.au-password-match.is-mismatch { color: var(--danger); }
+
+/* Keep a real password input for editing/autofill; the overlay briefly reveals one character. */
+.au-password-entry { position: relative; flex: 1; min-width: 0; }
+.au-password-entry input { display: block; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; line-height: 52px; }
+.au-password-entry .au-password-concealed { color: transparent; -webkit-text-fill-color: transparent; caret-color: var(--text); }
+.au-password-mask { position: absolute; inset: 0 var(--space-4); display: flex; align-items: center; overflow: hidden; pointer-events: none; color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 16px; line-height: 52px; white-space: pre; }
+.au-password-mask > span { display: block; flex-shrink: 0; }
+
+/* Clearer sign-up/login typography and steady, well-defined form surfaces. */
+.au-page--entry { --border: rgba(148, 163, 184, 0.24); }
+.au-page--entry .au-card { background: var(--bg-soft); border-color: var(--border-strong); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; }
+.au-page--entry .au-title { margin-bottom: var(--space-3); font-family: var(--font-ui); font-size: clamp(28px, 4vw, 32px); font-weight: 600; line-height: 1.25; letter-spacing: -.02em; text-align: center; }
+.au-page--entry .au-sub { max-width: 34ch; margin: 0 auto var(--space-6); line-height: 1.65; text-align: center; }
+.au-page--entry .au-label { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.au-page--entry :is(.au-input, .au-phone, .au-password) { background: #0e1829; }
+.au-page--entry :is(.au-input, .au-phone input, .au-password input) { font-size: 17px; font-weight: 400; }
+.au-page--entry .au-password-mask { font-size: 17px; }
+.au-page--entry .au-password-hint { font-size: 14px; line-height: 1.6; }
+.au-page--entry .au-foot { font-size: 15px; line-height: 1.6; text-align: center; }
+.au-page--entry .au-foot a { color: var(--accent-hover); font-weight: 600; }

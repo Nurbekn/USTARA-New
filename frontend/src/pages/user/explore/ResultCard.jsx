@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { sampleBarberDetails } from "../../home/sampleData";
 import { Avatar } from "../../../components/Avatar";
 import UserIcon from "../components/UserIcon";
 import { knownNumber, nameOf, providersFor, servicesFor } from "./catalog";
@@ -31,6 +32,9 @@ export default function ResultCard({
   makeUrl,
   detail = false,
 }) {
+  const location = useLocation();
+  const base = location.pathname.startsWith("/demo") ? "/demo" : "/user";
+  const sampleDetails = type === "barbers" ? sampleBarberDetails[item.id] : null;
   const service = type === "services";
   const services = service ? [] : servicesFor(item, type, catalog);
   const providers = service ? providersFor(item, catalog) : null;
@@ -133,6 +137,10 @@ export default function ResultCard({
             </Link>
           )}
         </div>
+        {detail && sampleDetails && <>
+          <p className="ex-description">{sampleDetails.about}</p>
+          <Link className="ex-action" to={`${base}/barbers/${item.id}?demo=1`} state={{ from: location.pathname + location.search }}>Profilga o‘tish <UserIcon name="arrow" size={17} /></Link>
+        </>}
         {service && (
           <div className="ex-provider-links">
             <Link

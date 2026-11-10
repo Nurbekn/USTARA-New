@@ -6,7 +6,7 @@ import { STATUSES, barberName, canCancel, dateLabel, known, money, statusInfo, t
 export default function BookingCard({ booking, detailUrl, onCancel, nearest = false, detail = false }) {
   const duration = total(booking, 'durationMinutes');
   return <article className={`ub-card ${nearest ? 'ub-nearest' : ''}`}>
-    <div className="ub-card-top">{nearest ? <span className="ub-next-label">Eng yaqin bron</span> : <span className="ub-id">Bron #{booking.id}</span>}<span className={`ub-status ub-status-${Object.hasOwn(STATUSES,booking.status) ? booking.status : 'unknown'}`}>{statusInfo(booking.status).label}</span></div>
+    <div className="ub-card-top">{nearest ? <span className="ub-next-label">Eng yaqin bron</span> : <span className="ub-id">{booking.isDemo ? "Namuna buyurtma" : `Bron #${booking.id}`}</span>}<span className={`ub-status ub-status-${Object.hasOwn(STATUSES,booking.status) ? booking.status : 'unknown'}`}>{statusInfo(booking.status).label}</span></div>
     <div className="ub-barber"><Avatar photo={booking.barber?.avatarPhoto} id={booking.barber?.avatar} name={barberName(booking)} size={52} /><div><h3>{barberName(booking)}</h3><p>{booking.salon?.name || 'Salon nomi ko‘rsatilmagan'}</p></div></div>
     <p className="ub-address"><UserIcon name="pin" size={17} />{booking.salon?.address || 'Manzil ko‘rsatilmagan'}</p>
     <div className="ub-services-summary">{booking.services.length ? booking.services.map((s) => s.name).filter(Boolean).join(', ') || 'Xizmat nomi ko‘rsatilmagan' : 'Xizmatlar ko‘rsatilmagan'}</div>

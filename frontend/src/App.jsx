@@ -1,10 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/home/Home";
+import SampleBarbers from "./pages/home/SampleBarbers";
+import { loadSampleCatalog } from "./pages/home/sampleData";
+import { DemoLayout, DemoHome, DemoBookings, DemoProfile } from "./pages/demo/Demo";
 import Signup from "./pages/auth/Signup";
 import BarberSignup from "./pages/auth/BarberSignup";
 import Login from "./pages/auth/Login";
 import Otp from "./pages/auth/Otp";
+import CompleteProfile from "./pages/auth/CompleteProfile";
 import RequireSession from "./pages/auth/components/RequireSession";
 import BarberProfileEdit from "./pages/barber/BarberProfileEdit";
 import ApprovalPending from "./pages/barber/ApprovalPending";
@@ -23,6 +27,7 @@ import Explore from "./pages/user/Explore";
 import UserBookings from "./pages/user/Bookings";
 import Social from "./pages/user/Social";
 import UserProfile from "./pages/user/Profile";
+import BarberPublicProfile from "./pages/user/barber/BarberPublicProfile";
 
 function App() {
   return (
@@ -31,18 +36,29 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route
           path="/barbers"
-          element={<h1>Sartaroshlar sahifasi tez orada!</h1>}
+          element={<SampleBarbers />}
         />
+      </Route>
+
+      <Route path="/demo" element={<DemoLayout />}>
+        <Route index element={<DemoHome />} />
+        <Route path="explore" element={<Explore loadCatalog={loadSampleCatalog} basePath="/demo/explore" />} />
+        <Route path="barbers/:id" element={<BarberPublicProfile />} />
+        <Route path="bookings" element={<DemoBookings />} />
+        <Route path="reservations" element={<UserBookings />} />
+        <Route path="profile" element={<DemoProfile />} />
       </Route>
 
       <Route path="/signup" element={<Signup />} />
       <Route path="/signup/usta" element={<BarberSignup />} />
       <Route path="/login" element={<Login />} />
       <Route path="/otp" element={<Otp />} />
+      <Route path="/complete-profile" element={<CompleteProfile />} />
       <Route element={<RequireSession role="customer" />}>
         <Route path="/user" element={<UserLayout />}>
           <Route index element={<UserHome />} />
           <Route path="explore" element={<Explore />} />
+          <Route path="barbers/:id" element={<BarberPublicProfile />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="social" element={<Social />} />
           <Route path="profile" element={<UserProfile />} />

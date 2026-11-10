@@ -27,12 +27,12 @@ export default function NearbyBarbers() {
         </p>
         {hasLocation && (
           <p className="uh-nearby-status">
-            Sartaroshlar ro‘yxati tez orada shu yerda ko‘rinadi.
+            <Link to="/user/profile">Manzilni o‘zgartirish</Link>
           </p>
         )}
       </div>
-      <Link className="uh-location-link" to="/user/profile">
-        {hasLocation ? "Manzilni o‘zgartirish" : "Manzil tanlash"}
+      <Link className="uh-location-link" to={hasLocation ? "/user/explore?type=barbers&distance=5" : "/user/profile"}>
+        {hasLocation ? "Yaqin sartaroshlarni ko‘rish" : "Manzil tanlash"}
         <UserIcon name="arrow" size={18} />
       </Link>
     </section>

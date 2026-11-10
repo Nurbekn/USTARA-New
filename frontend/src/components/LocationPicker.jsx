@@ -1,3 +1,4 @@
+import ArrowIcon from "./ArrowIcon";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   MapContainer,
@@ -74,6 +75,7 @@ export default function LocationPicker({
   onAddressChange,
   error,
   editable = true,
+  showEmptySummary = true,
   id,
   icon = markerIcon,
 }) {
@@ -242,7 +244,7 @@ export default function LocationPicker({
 
   return (
     <div className="bp-picker">
-      <div className={`bp-location-summary ${valid ? "is-set" : "is-missing"}`}>
+      {(valid || showEmptySummary) && <div className={`bp-location-summary ${valid ? "is-set" : "is-missing"}`}>
         <span className="bp-location-pin" aria-hidden="true">
           {valid ? "⌖" : "!"}
         </span>
@@ -256,7 +258,7 @@ export default function LocationPicker({
               : "Manzilni qidiring va natijadan tanlang yoki xaritada belgilang."}
           </p>
         </div>
-      </div>
+      </div>}
       {editable && onAddressChange && (
         <div className="bp-address-editor">
           <label htmlFor={inputId}>Manzilni qidiring</label>
@@ -296,7 +298,7 @@ export default function LocationPicker({
                   <button type="button" onClick={() => chooseResult(item)}>
                     <strong>{item.label.split(",")[0]}</strong>
                     <span>{item.label}</span>
-                    <b>Shu joyni tanlash →</b>
+                    <b className="ui-arrow-inline">Shu joyni tanlash <ArrowIcon /></b>
                   </button>
                 </li>
               ))}

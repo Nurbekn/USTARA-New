@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { WEEKDAYS } from "../data/format";
 import "./working-hours.css";
 
@@ -8,17 +9,31 @@ const TIMES = Array.from({ length: 36 }, (_, i) => {
 });
 
 export default function WorkingHours({ value, onChange }) {
+  const [applied, setApplied] = useState(null);
+  const appliedNow = applied?.signature === JSON.stringify(value);
   const days = ORDER.map((day) => value.find((item) => item.day === day)).filter(Boolean);
   const first = days.find((item) => !item.isOff);
-  const change = (day, patch) => onChange(value.map((item) => item.day === day ? { ...item, ...patch } : item));
+  const change = (day, patch) => {
+    setApplied(null);
+    onChange(value.map((item) => item.day === day ? { ...item, ...patch } : item));
+  };
+
+  function applyToWorkdays() {
+    if (!first || first.start >= first.end) return;
+    const next = value.map((item) => item.isOff ? item : { ...item, start: first.start, end: first.end });
+    onChange(next);
+    setApplied({ signature: JSON.stringify(next), start: first.start, end: first.end, count: next.filter((item) => !item.isOff).length });
+  }
 
   return (
     <div className="wh-editor">
       <div className="wh-tools">
         <p>Kunlarni yoqing va ish vaqtini tanlang. Toshkent vaqti.</p>
-        <button type="button" disabled={!first || first.start >= first.end} onClick={() => onChange(value.map((item) => item.isOff ? item : { ...item, start: first.start, end: first.end }))}>
-          {first ? `${WEEKDAYS[first.day]} vaqtini ish kunlariga qo'llash` : "Avval ish kunini tanlang"}
+        <button type="button" className={appliedNow ? "is-applied" : ""} disabled={!first || first.start >= first.end} onClick={applyToWorkdays}>
+          {appliedNow && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>}
+          {appliedNow ? "Ish kunlariga qo‘llanildi" : first ? `${WEEKDAYS[first.day]} vaqtini ish kunlariga qo'llash` : "Avval ish kunini tanlang"}
         </button>
+        <p className="wh-apply-status" role="status" aria-live="polite">{appliedNow ? `${applied.start}–${applied.end} vaqti ${applied.count} ta ish kuniga qo‘llandi.` : ""}</p>
       </div>
       <div className="wh-days">
         {days.map((item) => {

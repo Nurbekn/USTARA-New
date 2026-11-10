@@ -10,7 +10,7 @@
 .ub-heading-with-filter { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: 0; }
 .ub-heading-with-filter h1 { margin-bottom: 10px; }
 .ub-filter-menu { --filter-color: #c4b5fd; position: relative; width: 240px; flex-shrink: 0; }
-.ub-filter-menu[data-status="pending"] { --filter-color: #fdba74; }
+.ub-filter-menu[data-status="pending"] { --filter-color: var(--accent-hover); }
 .ub-filter-menu[data-status="confirmed"] { --filter-color: #93c5fd; }
 .ub-filter-menu[data-status="completed"] { --filter-color: #86efac; }
 .ub-filter-menu[data-status="cancelled"] { --filter-color: #cbd5e1; }
@@ -24,7 +24,7 @@
 .ub-filter-options { position: absolute; top: calc(100% + 8px); right: 0; width: 260px; max-width: calc(100vw - 40px); padding: 6px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-hover); box-shadow: 0 14px 40px #0004; z-index: 10; }
 .ub-filter-option { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 10px 12px; border: 0; border-radius: 8px; background: none; color: var(--text); font: inherit; font-size: var(--font-button); cursor: pointer; text-align: left; }
 .ub-option-all { --filter-color: #c4b5fd; }
-.ub-option-pending { --filter-color: #fdba74; }
+.ub-option-pending { --filter-color: var(--accent-hover); }
 .ub-option-confirmed { --filter-color: #93c5fd; }
 .ub-option-completed { --filter-color: #86efac; }
 .ub-option-cancelled { --filter-color: #cbd5e1; }
@@ -68,7 +68,7 @@
 .ub-id { color: var(--muted); font-size: var(--font-small); overflow-wrap: anywhere; }
 .ub-status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 20px; font-size: var(--font-small); background: #94a3b812; color: #cbd5e1; }
 .ub-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-.ub-status-pending { color: #fdba74; background: #f9731612; }
+.ub-status-pending { color: var(--accent-hover); background: var(--accent-soft); }
 .ub-status-confirmed { color: #93c5fd; background: #3b82f612; }
 .ub-status-completed { color: #86efac; background: #22c55e12; }
 .ub-status-rejected { color: #fca5a5; background: #ef444412; }
@@ -141,3 +141,5 @@
 @media (prefers-reduced-motion: reduce) { .ub-page * { animation: none !important; transition: none !important; } }
 
 .ub-booking-row .ub-row-status { background: none; }
+
+.ub-demo-note { margin: var(--space-4) 0; padding: var(--space-3) var(--space-4); border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--muted); font-size: 13px; line-height: 1.6; }

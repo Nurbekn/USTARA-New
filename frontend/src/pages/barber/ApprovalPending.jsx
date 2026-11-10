@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "../auth/components/AuthParts";
 import "../auth/auth-ui.css";
@@ -41,7 +42,7 @@ export default function ApprovalPending() {
         </p>
 
         <Link to="/barber/services" className="au-btn">
-          Xizmatlarni qo'shish <span aria-hidden="true">→</span>
+          Xizmatlarni qo'shish <ArrowIcon />
         </Link>
         <Link to="/barber" className="au-btn au-btn-ghost">
           Panelni ochish

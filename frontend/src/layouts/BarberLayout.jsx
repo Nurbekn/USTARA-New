@@ -118,7 +118,9 @@ export default function BarberLayout() {
             className="bx-nav-item"
           >
             <span className="bx-nav-icon">
-              {item.icon}
+              {item.to === "/barber/profile" ? (
+                <Avatar photo={profile.avatarPhoto} name={profile.firstName} size={24} className="bx-nav-avatar" />
+              ) : item.icon}
               {item.badge && pending > 0 && <i className="bx-dot">{pending}</i>}
             </span>
             {item.label}

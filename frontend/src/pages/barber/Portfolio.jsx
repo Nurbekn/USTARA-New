@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PortfolioImage from "./components/PortfolioImage";
@@ -294,7 +295,7 @@ export default function Portfolio() {
           }} />
 
           <button type="button" className="bx-btn bx-btn-primary bx-btn-block" onClick={publish} disabled={!image || busy || saving}>
-            {saving ? "Ulashilmoqda…" : "Ulashish →"}
+            {saving ? "Ulashilmoqda…" : <>Ulashish <ArrowIcon /></>}
           </button>
         </div>
       </Sheet>

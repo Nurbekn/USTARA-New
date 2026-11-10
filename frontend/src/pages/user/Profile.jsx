@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { clearSession } from "../auth/utils/session";
@@ -5,7 +6,8 @@ import L from "leaflet";
 import LocationPicker from "../../components/LocationPicker";
 import { isValidLocation } from "../../components/locationSearch";
 import Avatar from "./components/UserAvatar";
-import { prepareProfilePhoto } from "../../utils/media/profilePhoto";
+import ProfilePhotoField from "../../components/ProfilePhotoField";
+import Sheet from "../../components/Sheet";
 import "./Profile.css";
 
 const userMarker = L.divIcon({
@@ -14,7 +16,6 @@ const userMarker = L.divIcon({
   iconSize: [130, 38],
   iconAnchor: [65, 38],
 });
-const avatarOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
 function ProfileIcon({ name }) {
   const paths = {
@@ -88,13 +89,9 @@ export default function Profile() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
-  const uploadVersion = useRef(0);
-  useEffect(
-    () => () => {
-      uploadVersion.current += 1;
-    },
-    [],
-  );
+  const [photoOpen, setPhotoOpen] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+  const photoBusyRef = useRef(false);
 
   function confirmLogout() {
     try {
@@ -107,6 +104,12 @@ export default function Profile() {
   }
 
   function startEditing(section = "info") {
+    if (section === "photo") {
+      setPhotoError("");
+      setMessage("");
+      setPhotoOpen(true);
+      return;
+    }
     setDraft({ ...profile });
     setError("");
     setMessage("");
@@ -114,53 +117,41 @@ export default function Profile() {
   }
 
   function cancelEditing() {
-    uploadVersion.current += 1;
     setUploading(false);
     setDraft({ ...profile });
     setError("");
     setEditor(null);
   }
 
-  async function uploadPhoto(event) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    const version = ++uploadVersion.current;
-    setUploading(true);
-    setError("");
-    try {
-      const avatarPhoto = await prepareProfilePhoto(file);
-      if (version === uploadVersion.current) {
-        setDraft((previous) => ({ ...previous, avatarPhoto }));
-      }
-    } catch (cause) {
-      if (version === uploadVersion.current) setError(cause.message);
-    } finally {
-      if (version === uploadVersion.current) setUploading(false);
-    }
-  }
-
   function saveProfile(event) {
     event.preventDefault();
     if (uploading || editor === "phone") return;
+    if (editor === "info" && (draft.firstName.trim().length < 2 || draft.lastName.trim().length < 2)) {
+      setError("Ism va familiyangizni to‘liq kiriting (kamida 2 belgi).");
+      return;
+    }
     if (
       editor === "location" &&
-      draft.address.trim() &&
       !isValidLocation(draft.location)
     ) {
       setError("Manzilni qidiruv natijasidan tanlang yoki xaritada belgilang.");
       return;
     }
-    setProfile({
-      ...draft,
-      phone: profile.phone,
-      firstName: draft.firstName.trim(),
-      lastName: draft.lastName.trim(),
-      address: draft.address.trim(),
-    });
+    try {
+      setProfile({
+        ...draft,
+        phone: profile.phone,
+        firstName: draft.firstName.trim(),
+        lastName: draft.lastName.trim(),
+        address: draft.address.trim(),
+      });
+    } catch {
+      setError("Profil saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
+      return;
+    }
     setEditor(null);
     setError("");
-    setMessage("Profil ma’lumotlari saqlandi.");
+    setMessage(editor === "location" ? "Joylashuvingiz saqlandi." : "Profil ma’lumotlari saqlandi.");
   }
 
   const shown = isEditing ? draft : profile;
@@ -183,7 +174,6 @@ export default function Profile() {
 
   const titles = {
     info: "Shaxsiy ma’lumotlar",
-    photo: "Profil rasmi",
     location: "Manzil",
     phone: "Telefon raqami",
   };
@@ -191,14 +181,12 @@ export default function Profile() {
   const descriptions = {
     info: "Profilingizda ko‘rinadigan ma’lumotlarni yangilang.",
     phone: "Hisobingizga bog‘langan telefon raqami.",
-    location: "Sizga yaqin barberlarni topish uchun joy tanlang.",
-    photo: "Rasm yuklang yoki tayyor avatar tanlang.",
+    location: "Sizga yaqin ustalarni topish uchun joy tanlang.",
   };
   const editorIcons = {
     info: "person",
     phone: "phone",
     location: "pin",
-    photo: "camera",
   };
 
   return (
@@ -206,7 +194,7 @@ export default function Profile() {
       {isEditing ? (
         <>
           <button type="button" className="up-back" onClick={cancelEditing}>
-            ← Profilga qaytish
+            <ArrowIcon direction="left" /> Profilga qaytish
           </button>
           <div className="up-editor-heading">
             <span className="up-editor-symbol">
@@ -296,69 +284,10 @@ export default function Profile() {
                 </div>
               </div>
             )}
-            {editor === "photo" && (
-              <div className="up-photo-editor">
-                <div className="up-photo-preview">
-                  <Avatar
-                    photo={draft.avatarPhoto}
-                    id={draft.avatar}
-                    name={fullName}
-                    size={96}
-                  />
-                </div>
-                <label className="up-button up-upload">
-                  {uploading ? "Rasm tayyorlanmoqda…" : "Rasm yuklash"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    aria-label="Profil rasmini yuklash"
-                    onChange={uploadPhoto}
-                    disabled={uploading}
-                  />
-                </label>
-                <p className="up-hint">Rasm hajmi 25 MB gacha</p>
-                <div className="up-avatar-divider">Yoki avatar tanlang</div>
-                <div
-                  className="up-avatar-options"
-                  aria-label="Tayyor avatarlar"
-                >
-                  {avatarOptions.map((id, index) => (
-                    <button
-                      type="button"
-                      key={id}
-                      aria-label={`${index + 1}-avatar`}
-                      aria-pressed={!draft.avatarPhoto && draft.avatar === id}
-                      onClick={() => {
-                        uploadVersion.current += 1;
-                        setUploading(false);
-                        setError("");
-                        setDraft((previous) => ({
-                          ...previous,
-                          avatar: id,
-                          avatarPhoto: "",
-                        }));
-                      }}
-                    >
-                      <Avatar id={id} size={56} />
-                    </button>
-                  ))}
-                </div>
-                {draft.avatarPhoto && (
-                  <button
-                    className="up-text-button"
-                    type="button"
-                    onClick={() =>
-                      setDraft((previous) => ({ ...previous, avatarPhoto: "" }))
-                    }
-                  >
-                    Rasmni olib tashlash
-                  </button>
-                )}
-              </div>
-            )}
             {editor === "location" && (
               <div className="up-location">
                 <LocationPicker
+                  showEmptySummary={false}
                   icon={userMarker}
                   value={draft.location}
                   address={draft.address}
@@ -463,7 +392,7 @@ export default function Profile() {
                   type="button"
                   onClick={() => startEditing(nextSection)}
                 >
-                  Davom ettirish →
+                  Davom ettirish <ArrowIcon />
                 </button>
               )}
             </div>
@@ -520,8 +449,9 @@ export default function Profile() {
                   {profile.address ||
                     (hasLocation
                       ? "Xaritada belgilangan"
-                      : "Yaqin barberlarni topish uchun")}
+                      : "Yaqin ustalarni topish uchun")}
                 </span>
+                <span className="up-location-action">Joylashuvni o‘zgartirish</span>
               </span>
               <span className="up-chevron">
                 <ProfileIcon name="arrow" />
@@ -529,9 +459,9 @@ export default function Profile() {
             </button>
           </div>
           {hasLocation && (
-            <Link to="/user#nearby" className="up-nearby-link">
+            <Link to="/user/explore?type=barbers&distance=5" className="up-nearby-link">
               <ProfileIcon name="pin" />
-              <span>Yaqin barberlarni ko‘rish</span>
+              <span>Yaqin ustalarni ko‘rish</span>
               <span className="up-chevron">
                 <ProfileIcon name="arrow" />
               </span>
@@ -559,7 +489,7 @@ export default function Profile() {
             </span>
             <h2 id="up-logout-title">Hisobdan chiqasizmi?</h2>
             <p id="up-logout-description">
-              Joriy sessiyada saqlangan profil o‘zgarishlari tozalanadi.
+              Hisobingizdan chiqasiz. Profil ma’lumotlaringiz saqlanadi.
             </p>
             {logoutError && (
               <p className="up-error" role="alert">
@@ -586,6 +516,28 @@ export default function Profile() {
           </dialog>
         </>
       )}
+      <Sheet compact open={photoOpen} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPhotoOpen(false); }}>
+        <ProfilePhotoField
+          compact
+          value={profile.avatarPhoto || ""}
+          name={[profile.firstName, profile.lastName].filter(Boolean).join(" ")}
+          onBusyChange={(busy) => { photoBusyRef.current = busy; setUploading(busy); }}
+          onChange={(avatarPhoto) => {
+            setPhotoError("");
+            try {
+              setProfile({ ...profile, avatarPhoto, avatar: null });
+            } catch {
+              setPhotoError("Rasm saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
+              return;
+            }
+            photoBusyRef.current = false;
+            setUploading(false);
+            setPhotoOpen(false);
+            setMessage(avatarPhoto ? "Profil rasmi yangilandi." : "Profil rasmi olib tashlandi.");
+          }}
+        />
+        {photoError && <p className="up-error" role="alert">{photoError}</p>}
+      </Sheet>
     </section>
   );
 }

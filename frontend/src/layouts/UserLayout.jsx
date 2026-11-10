@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
+import { Avatar } from "../components/Avatar";
 import { getSession } from "../pages/auth/utils/session";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import "./UserLayout.css";
+import { readCustomerProfile, saveCustomerProfile } from "../pages/user/data/profile";
 
 const navigation = [
-  { to: "/user", label: "Home", icon: "home", end: true },
-  { to: "/user/explore", label: "Explore", icon: "explore" },
-  { to: "/user/bookings", label: "Bookings", icon: "bookings" },
-  { to: "/user/social", label: "Social", icon: "social" },
-  { to: "/user/profile", label: "Profile", icon: "profile" },
+  { to: "/user", label: "Bosh sahifa", icon: "home", end: true },
+  { to: "/user/explore", label: "Qidiruv", icon: "explore" },
+  { to: "/user/bookings", label: "Bronlar", icon: "bookings" },
+  { to: "/user/social", label: "Lenta", icon: "social" },
+  { to: "/user/profile", label: "Profil", icon: "profile" },
 ];
 
 function UserIcon({ name }) {
@@ -30,14 +32,21 @@ function UserIcon({ name }) {
 
 export default function UserLayout() {
   const { pathname } = useLocation();
-  const [profile, setProfile] = useState(() => {
+  const [profile, setProfileState] = useState(() => {
     const session = getSession();
     return {
       firstName: "", lastName: "", birthDate: "",
-      phone: session?.role === "customer" ? session.phone || "" : "",
       avatar: null, avatarPhoto: "", address: "", location: null,
+      ...readCustomerProfile(session?.phone),
+      phone: session?.role === "customer" ? session.phone || "" : "",
     };
   });
+
+  function setProfile(next) {
+    const updated = { ...next, phone: profile.phone };
+    saveCustomerProfile(profile.phone, updated);
+    setProfileState(updated);
+  }
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -67,11 +76,13 @@ export default function UserLayout() {
         <Outlet context={{ profile, setProfile }} />
       </main>
 
-      <nav className="uc-nav" aria-label="Customer navigatsiyasi">
+      <nav className="uc-nav" aria-label="Mijoz navigatsiyasi">
         <div className="uc-nav-inner">
           {navigation.map(({ to, label, icon, end }) => (
             <NavLink key={to} to={to} end={end} className={({ isActive }) => `uc-nav-item${isActive ? " uc-nav-item-active" : ""}`}>
-              <UserIcon name={icon} />
+              {icon === "profile" ? (
+                <Avatar photo={profile.avatarPhoto} name={profile.firstName} size={24} className="uc-nav-avatar" />
+              ) : <UserIcon name={icon} />}
               <span className="uc-nav-label">{label}</span>
             </NavLink>
           ))}

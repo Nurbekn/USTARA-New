@@ -1,0 +1,57 @@
+.ib-booking { padding: var(--space-5) var(--space-4); }
+.ib-heading h2 { font-size: 18px; font-weight: 600; }
+.ib-heading > p { margin-top: var(--space-2); color: var(--muted); font-size: 13px; }
+.ib-services { display: grid; gap: var(--space-2); margin-top: var(--space-4); }
+.ib-service { display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: 76px; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--text); font: inherit; text-align: left; }
+.ib-service[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.ib-check { display: grid; place-items: center; flex-shrink: 0; width: 22px; height: 22px; border: 1px solid var(--border-strong); border-radius: 6px; }
+.ib-service[aria-pressed="true"] .ib-check { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.ib-service-name { display: grid; flex: 1; min-width: 0; gap: var(--space-1); }
+.ib-service-name strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.ib-service-name small { color: var(--muted); font-size: 12px; }
+.ib-price { flex-shrink: 0; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.ib-total { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-4) !important; color: var(--muted); font-size: 13px; }
+.ib-total strong { color: var(--text); font-weight: 600; }
+.ib-section-label { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-6) 0 var(--space-3); }
+.ib-section-label h3 { font-size: 16px; font-weight: 600; }
+.ib-section-label > span { color: var(--muted); font-size: 12px; }
+.ib-dates { display: flex; gap: var(--space-2); padding: var(--space-1) 0; overflow-x: auto; scrollbar-width: thin; }
+.ib-dates button { display: grid; justify-items: center; gap: var(--space-1); flex: 0 0 64px; min-height: 88px; padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--text); font: inherit; }
+.ib-dates button span { font-size: 12px; }
+.ib-dates button strong { font-size: 20px; font-weight: 600; }
+.ib-dates button small { color: var(--muted); font-size: 11px; }
+.ib-dates button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.ib-dates button:disabled { opacity: .4; cursor: default; }
+.ib-legend { display: flex; gap: var(--space-4); margin-bottom: var(--space-3); color: var(--muted); font-size: 11px; }
+.ib-legend > span { display: inline-flex; align-items: center; gap: var(--space-1); }
+.ib-legend > span::before { content: ''; width: 8px; height: 8px; border: 1px solid var(--border-strong); border-radius: 2px; background: var(--surface-2); }
+.ib-legend > span:last-child::before { opacity: .35; }
+.ib-slots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+.ib-slots button { min-height: 44px; padding: var(--space-2) var(--space-1); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text); font: inherit; font-size: 13px; font-variant-numeric: tabular-nums; }
+.ib-slots button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-hover); }
+.ib-slots button:disabled { border-color: var(--border); background: transparent; color: var(--muted); opacity: .35; cursor: default; }
+.ib-no-slots { padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--muted); font-size: 14px; line-height: 1.6; }
+.ib-selection { margin-top: var(--space-4) !important; color: var(--accent-hover); font-size: 14px; }
+.ib-primary { display: flex; align-items: center; justify-content: center; gap: var(--space-2); width: 100%; min-height: 48px; margin-top: var(--space-5); padding: var(--space-3); border: 1px solid var(--accent); border-radius: var(--radius-md); background: var(--accent); color: var(--accent-ink); font: inherit; font-size: 14px; font-weight: 600; }
+.ib-primary:disabled { opacity: .4; cursor: default; }
+.bpv-page .ib-note { margin-top: var(--space-4); color: var(--muted); font-size: 12px; line-height: 1.65; }
+.ib-error { margin-top: var(--space-3) !important; color: var(--danger); font-size: 13px; line-height: 1.6; }
+.ib-confirm > h3 { font-size: 18px; font-weight: 600; }
+.ib-confirm > p { margin-top: var(--space-1); color: var(--muted); font-size: 13px; }
+.ib-confirm ul { display: grid; gap: var(--space-2); margin: var(--space-5) 0; padding: 0; list-style: none; }
+.ib-confirm li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); font-size: 14px; }
+.ib-confirm li > span { color: var(--muted); font-size: 12px; }
+.ib-confirm dl { display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+.ib-confirm dl > div { display: flex; justify-content: space-between; gap: var(--space-3); font-size: 14px; }
+.ib-confirm dt { color: var(--muted); }
+.ib-confirm dd { margin: 0; font-weight: 500; }
+.ib-success { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-6) var(--space-4); text-align: center; }
+.ib-success-mark { display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid var(--success); border-radius: 50%; color: var(--success); }
+.ib-success h2 { font-size: 20px; }
+.ib-success > p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.ib-success .ib-primary { max-width: 360px; margin-top: var(--space-3); }
+.ib-text { min-height: 44px; padding: var(--space-2); border: 0; background: transparent; color: var(--accent-hover); font: inherit; font-size: 14px; }
+@media (min-width: 640px) { .ib-booking { padding: var(--space-6); } .ib-slots { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+.ib-heading h2, .ib-section-label h3, .ib-service-name small { display: flex; align-items: center; gap: var(--space-2); }
+.ib-heading svg, .ib-section-label svg, .ib-service-name svg { flex-shrink: 0; }

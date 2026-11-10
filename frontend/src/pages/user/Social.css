@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-.so-page, .so-dialog-scope { --so-primary: #60a5fa; font-family: 'Inter', sans-serif; color: var(--text); font-size: var(--font-body); line-height: 1.6; }
+.so-page, .so-dialog-scope { --so-primary: #60a5fa; font-family: var(--font-ui); color: var(--text); font-size: var(--font-body); line-height: 1.6; }
 .so-page { width: 100%; max-width: 860px; margin: 0 auto; }
 .so-page *, .so-dialog-scope * { box-sizing: border-box; }
 .so-page :is(h1,h2,h3), .so-dialog-scope :is(h1,h2,h3) { font-family: inherit; }
@@ -65,7 +65,7 @@
 .so-popular > div { display: grid; gap: 8px; }
 .so-popular button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; font: inherit; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
 .so-text-button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--so-primary); font: inherit; font-size: var(--font-button); cursor: pointer; }
-.so-dialog-scope .bx-sheet { width: min(640px,calc(100% - 32px)); background: var(--surface); color: var(--text); font-family: 'Inter',sans-serif; }
+.so-dialog-scope .bx-sheet { width: min(640px,calc(100% - 32px)); background: var(--surface); color: var(--text); font-family: var(--font-ui); }
 .so-dialog-scope .bx-sheet-head { margin-bottom: 22px; }
 .so-dialog-scope .bx-sheet-head h2 { font-family: inherit; font-size: var(--font-section); }
 .so-composer, .so-report, .so-comments form { display: grid; gap: 20px; }

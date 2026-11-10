@@ -1,3 +1,4 @@
+import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import UserIcon from "./components/UserIcon";
@@ -13,10 +14,12 @@ import {
   validPoint,
 } from "./explore/catalog";
 import "./Explore.css";
+import { loadSampleCatalog } from "../home/sampleData";
 
-export default function Explore({ loadCatalog = loadExploreCatalog }) {
+export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "/user/explore" }) {
   const { profile } = useOutletContext();
   const [params, setParams] = useSearchParams();
+  const sampleMode = params.get("demo") === "1";
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [request, setRequest] = useState({
@@ -27,7 +30,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
     const controller = new AbortController();
     let active = true;
     Promise.resolve()
-      .then(() => loadCatalog({ signal: controller.signal }))
+      .then(() => (sampleMode ? loadSampleCatalog : loadCatalog)({ signal: controller.signal }))
       .then(normalizeCatalog)
       .then((catalog) => {
         if (active) setRequest({ status: "ready", catalog });
@@ -39,7 +42,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
       active = false;
       controller.abort();
     };
-  }, [loadCatalog, attempt]);
+  }, [loadCatalog, attempt, sampleMode]);
 
   const type = Object.hasOwn(TYPES, params.get("type"))
     ? params.get("type")
@@ -75,11 +78,12 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
   }
   function makeUrl(patch) {
     const value = changed(patch).toString();
-    return `/user/explore${value ? `?${value}` : ""}`;
+    return `${basePath}${value ? `?${value}` : ""}`;
   }
   function reset() {
     const next = new URLSearchParams();
     next.set("type", type);
+    if (sampleMode) next.set("demo", "1");
     setParams(next, { replace: true });
   }
   function retry() {
@@ -103,10 +107,11 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
       aria-label="Explore"
       aria-busy={status === "loading"}
     >
+      {sampleMode && <p className="ex-sample-notice">Namuna ustalar · Ismlar, narxlar va reytinglar to‘qima. Haqiqiy bron yaratilmaydi.</p>}
       {detailId ? (
         <>
           <Link className="ex-back" to={makeUrl({ profile: null })}>
-            ← Natijalarga qaytish
+            <ArrowIcon direction="left" /> Natijalarga qaytish
           </Link>
           {status === "loading" ? (
             <Loading />
@@ -298,7 +303,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
               {!hasLocation && (
                 <p className="ex-filter-hint">
                   Masofa bo‘yicha qidirish uchun{" "}
-                  <Link to="/user/profile">profilingizda manzil tanlang</Link>.
+                  <Link to={basePath === "/user/explore" ? "/user/profile" : "/demo/profile"}>profilingizda manzil tanlang</Link>.
                 </p>
               )}
             </div>

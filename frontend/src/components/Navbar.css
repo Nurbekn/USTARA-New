@@ -26,9 +26,9 @@
   align-items: center;
   gap: 9px;
   flex-shrink: 0;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-ui);
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 1px;
 }
 
@@ -213,7 +213,7 @@
 
 /* TABLET */
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .navbar-inner {
     min-height: 78px;
     gap: 24px;

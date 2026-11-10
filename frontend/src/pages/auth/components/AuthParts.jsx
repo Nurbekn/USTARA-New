@@ -1,3 +1,4 @@
+import ArrowIcon from "../../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import { formatPhone } from "../utils/phone";
 
@@ -7,7 +8,7 @@ export function AuthLayout({ children, wide = false, className = "" }) {
     <div className={`au-page ${wide ? "is-wide" : ""} ${className}`}>
       <header className="au-top">
         <Link to="/" className="au-back">
-          ← Bosh sahifa
+          <ArrowIcon direction="left" /> Bosh sahifa
         </Link>
         <Link to="/" className="au-logo" aria-label="Ustara">
           USTARA<span>.</span>
