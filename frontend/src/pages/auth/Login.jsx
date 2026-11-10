@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout, PhoneField } from "./components/AuthParts";
-import { getSession } from "./utils/session";
+import { getAccount } from "./utils/session";
 import "./auth-ui.css";
 
 // Sign in: same phone + OTP flow as sign-up (no passwords on the platform)
@@ -23,7 +23,7 @@ export default function Login() {
 
     // MOCK check: only accounts created in this browser exist.
     // Replace with an API call when the backend is ready.
-    if (getSession()?.phone !== full) {
+    if (getAccount()?.phone !== full) {
       setNotFound(true);
       return;
     }

@@ -3,7 +3,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { createAccount } from "../barber/data/store";
 import { AuthLayout } from "./components/AuthParts";
 import { formatPhone } from "./utils/phone";
-import { getSession, setSession } from "./utils/session";
+import { dashboardPath, getAccount, isValidPhone, setSession } from "./utils/session";
 import "./auth-ui.css";
 
 const LENGTH = 5;
@@ -18,6 +18,8 @@ export default function Otp() {
   const [status, setStatus] = useState("idle"); // idle | error
   const [seconds, setSeconds] = useState(RESEND_SECONDS);
   const refs = useRef([]);
+  const finished = useRef(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Resend countdown
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function Otp() {
   }, []);
 
   // Opened directly (no phone in state) -> back to sign-up
-  if (!state?.phone) return <Navigate to="/signup" replace />;
+  if (!isValidPhone(state?.phone) || !["customer", "barber", "login"].includes(state?.role) || (state.role === "barber" && !state.name?.trim())) return <Navigate to="/signup" replace />;
 
   // Code is correct: create / restore the account and go to the right page
   const finish = () => {
@@ -48,25 +50,34 @@ export default function Otp() {
         specialty: state.specialty,
         salonName: `${firstName} Barber`,
       });
-      setSession({ role, phone, setupDone: false });
+      setSession({ role, phone, setupDone: false, authenticated: true });
       navigate("/barber/setup", { replace: true });
     } else if (role === "customer") {
-      setSession({ role, phone });
+      setSession({ role, phone, authenticated: true });
       navigate("/user", { replace: true });
     } else {
       // Sign in: send the person where they belong
-      const session = getSession();
-      const target =
-        session?.role === "barber"
-          ? (session.setupDone ? "/barber" : "/barber/setup")
-          : session?.role === "customer" ? "/user" : "/";
-      navigate(target, { replace: true });
+      const account = getAccount();
+      if (!account || account.phone !== phone) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      setSession({ ...account, authenticated: true });
+      navigate(dashboardPath(account), { replace: true });
     }
   };
 
   const verify = (digits) => {
-    if (digits.join("") === TEST_CODE) finish();
-    else setStatus("error");
+    if (finished.current) return;
+    setSubmitError("");
+    if (digits.join("") !== TEST_CODE) { setStatus("error"); return; }
+    finished.current = true;
+    try { finish(); }
+    catch {
+      finished.current = false;
+      setSubmitError("Sessiyani saqlab bo‘lmadi. Brauzer xotirasiga ruxsatni tekshirib, qayta urinib ko‘ring.");
+      setStatus("error");
+    }
   };
 
   const handleChange = (index, value) => {
@@ -114,8 +125,7 @@ export default function Otp() {
 
       <h1 className="au-title">Kodni kiriting</h1>
       <p className="au-sub">
-        <b>+998 {formatPhone(state.phone.slice(4))}</b> raqamiga {LENGTH} xonali kod
-        yuborildi.
+        <b>+998 {formatPhone(state.phone.slice(4))}</b> uchun {LENGTH} xonali test kodini kiriting. SMS hozircha yuborilmaydi.
       </p>
 
       <div className={`au-otp ${status === "error" ? "is-error" : ""}`}>
@@ -140,7 +150,7 @@ export default function Otp() {
 
       {status === "error" && (
         <p className="au-error au-center" role="alert">
-          Kod noto'g'ri. Qayta urinib ko'ring.
+          {submitError || "Kod noto'g'ri. Qayta urinib ko'ring."}
         </p>
       )}
 
@@ -160,9 +170,7 @@ export default function Otp() {
         </button>
       </p>
 
-      {import.meta.env.DEV && (
-        <p className="au-dev">Test rejimi: kod <b>{TEST_CODE}</b></p>
-      )}
+      <p className="au-dev">Test rejimi: kod <b>{TEST_CODE}</b>. Haqiqiy SMS tasdiqlash hali ulanmagan.</p>
     </AuthLayout>
   );
 }

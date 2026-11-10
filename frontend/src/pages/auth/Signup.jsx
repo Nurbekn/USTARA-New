@@ -25,7 +25,7 @@ export default function Signup() {
       <RoleSwitch role="customer" />
 
       <h1 className="au-title">Ro'yxatdan o'ting</h1>
-      <p className="au-sub">Telefon raqamingizga tasdiqlash kodini yuboramiz.</p>
+      <p className="au-sub">Telefon raqamingizni kiriting. Hozircha test kodi orqali tasdiqlanadi.</p>
 
       <form className="au-form" onSubmit={handleSubmit} noValidate>
         <PhoneField

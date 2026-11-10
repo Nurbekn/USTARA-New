@@ -5,6 +5,7 @@ import Signup from "./pages/auth/Signup";
 import UstaSignup from "./pages/auth/UstaSignUp";
 import Login from "./pages/auth/Login";
 import Otp from "./pages/auth/Otp";
+import RequireSession from "./pages/auth/components/RequireSession";
 import BarberProfileEdit from "./pages/barber/BarberProfileEdit";
 import ApprovalPending from "./pages/barber/ApprovalPending";
 import BarberLayout from "./pages/barber/BarberLayout";
@@ -38,6 +39,7 @@ function App() {
       <Route path="/signup/usta" element={<UstaSignup />} />
       <Route path="/login" element={<Login />} />
       <Route path="/otp" element={<Otp />} />
+      <Route element={<RequireSession role="customer" />}>
       <Route path="/user" element={<UserLayout />}>
         <Route index element={<UserHome />} />
         <Route path="explore" element={<Explore />} />
@@ -46,6 +48,8 @@ function App() {
         <Route path="profile" element={<UserProfile />} />
         <Route path="*" element={<Navigate to="/user" replace />} />
       </Route>
+      </Route>
+      <Route element={<RequireSession role="barber" />}>
       {/* Barber onboarding (first-time setup) */}
       <Route path="/barber/setup" element={<BarberProfileEdit />} />
       <Route path="/barber/pending" element={<ApprovalPending />} />
@@ -62,8 +66,6 @@ function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/barber" replace />} />
       </Route>
-      <Route path="/user" element={<UserLayout />}>
-        <Route index element={<UserHome />} />
       </Route>
     </Routes>
   );
