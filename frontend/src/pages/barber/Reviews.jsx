@@ -2,7 +2,7 @@ import { useState } from "react";
 import PageHeader from "./components/PageHeader";
 import Stars from "./components/Stars";
 import { useToast } from "./components/Toast";
-import { Avatar } from "./data/avatars";
+import { Avatar } from "../../components/Avatar";
 import { getRatingSummary, replyToReview, useBarber } from "./data/store";
 import { dateLabel } from "./data/format";
 

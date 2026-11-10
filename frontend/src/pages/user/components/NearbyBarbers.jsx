@@ -1,6 +1,6 @@
 import { Link, useOutletContext } from "react-router-dom";
-import { isValidLocation } from "../../components/locationSearch";
-import HomeIcon from "./HomeIcon";
+import { isValidLocation } from "../../../components/locationSearch";
+import UserIcon from "./UserIcon";
 
 export default function NearbyBarbers() {
   const { profile } = useOutletContext();
@@ -12,10 +12,10 @@ export default function NearbyBarbers() {
       aria-labelledby="uh-nearby-title"
     >
       <div className="uh-nearby-icon">
-        <HomeIcon name="pin" size={26} />
+        <UserIcon name="pin" size={26} />
       </div>
       <div className="uh-nearby-copy">
-        <h2 id="uh-nearby-title">Yaqiningizdagi barberlar</h2>
+        <h2 id="uh-nearby-title">Yaqiningizdagi sartaroshlar</h2>
         <p>
           {hasLocation ? (
             <strong className="uh-saved-address">
@@ -27,13 +27,13 @@ export default function NearbyBarbers() {
         </p>
         {hasLocation && (
           <p className="uh-nearby-status">
-            Barberlar ro‘yxati tez orada shu yerda ko‘rinadi.
+            Sartaroshlar ro‘yxati tez orada shu yerda ko‘rinadi.
           </p>
         )}
       </div>
       <Link className="uh-location-link" to="/user/profile">
         {hasLocation ? "Manzilni o‘zgartirish" : "Manzil tanlash"}
-        <HomeIcon name="arrow" size={18} />
+        <UserIcon name="arrow" size={18} />
       </Link>
     </section>
   );

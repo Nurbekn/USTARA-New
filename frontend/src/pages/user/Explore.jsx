@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
-import HomeIcon from "./HomeIcon";
+import UserIcon from "./components/UserIcon";
 import ResultCard from "./explore/ResultCard";
 import {
   EMPTY_CATALOG,
@@ -124,7 +124,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
             </div>
           ) : (
             <div className="ex-state">
-              <HomeIcon name="search" size={32} />
+              <UserIcon name="search" size={32} />
               <h2>Profil topilmadi</h2>
               <p>Bu profil hali mavjud emas yoki ma’lumotlari yuklanmagan.</p>
             </div>
@@ -133,7 +133,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
       ) : (
         <>
           <div className="ex-search">
-            <HomeIcon name="search" />
+            <UserIcon name="search" />
             <input
               type="search"
               aria-label="Barber, salon yoki xizmat nomi"
@@ -147,7 +147,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
                 aria-label="Qidiruvni tozalash"
                 onClick={() => update({ q: null })}
               >
-                <HomeIcon name="close" size={19} />
+                <UserIcon name="close" size={19} />
               </button>
             )}
           </div>
@@ -313,7 +313,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
                   onClick={() => update({ [key]: null })}
                 >
                   {filterLabel(key)}
-                  <HomeIcon name="close" size={14} />
+                  <UserIcon name="close" size={14} />
                 </button>
               ))}
             </div>
@@ -352,7 +352,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog }) {
           ) : (
             <div className="ex-state">
               <span className="ex-state-icon">
-                <HomeIcon name="search" size={30} />
+                <UserIcon name="search" size={30} />
               </span>
               <h2>
                 {hasConstraints

@@ -1,6 +1,7 @@
+import "./UserHome.css";
 import { useState } from "react";
-import NearbyBarbers from "./NearbyBarbers";
-import HomeIcon from "./HomeIcon";
+import NearbyBarbers from "./components/NearbyBarbers";
+import UserIcon from "./components/UserIcon";
 
 const categories = [
   { label: "Soch olish", icon: "scissors" },
@@ -57,7 +58,7 @@ export default function UserHome() {
         </div>
         <form className="uh-search" onSubmit={handleSearch}>
           <div className="uh-query">
-            <HomeIcon name="search" />
+            <UserIcon name="search" />
             <input
               className="uh-search-input"
               type="search"
@@ -82,13 +83,13 @@ export default function UserHome() {
                   setNotice("");
                 }}
               >
-                <HomeIcon name="close" size={18} />
+                <UserIcon name="close" size={18} />
               </button>
             )}
           </div>
           <div className="uh-search-bottom">
             <label className="uh-region">
-              <HomeIcon name="pin" size={20} />
+              <UserIcon name="pin" size={20} />
               <select
                 aria-label="Viloyat"
                 value={region}
@@ -108,7 +109,7 @@ export default function UserHome() {
             </label>
             <button type="submit" className="uh-search-submit">
               Qidirish
-              <HomeIcon name="arrow" size={18} />
+              <UserIcon name="arrow" size={18} />
             </button>
           </div>
           {error && (
@@ -137,7 +138,7 @@ export default function UserHome() {
                 }
               >
                 <span className="uh-category-icon">
-                  <HomeIcon name={icon} size={27} />
+                  <UserIcon name={icon} size={27} />
                 </span>
                 <span>{label}</span>
               </button>
@@ -172,7 +173,7 @@ export default function UserHome() {
         </div>
         <div className="uh-empty" key={collection}>
           <span className="uh-empty-icon">
-            <HomeIcon
+            <UserIcon
               name={collection === "barbers" ? "star" : "comb"}
               size={26}
             />

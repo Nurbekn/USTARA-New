@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getSession } from "../pages/auth/utils/session";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import "../pages/user/User.css";
+import "./UserLayout.css";
 
 const navigation = [
   { to: "/user", label: "Home", icon: "home", end: true },

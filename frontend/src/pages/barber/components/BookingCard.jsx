@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar } from "../data/avatars";
+import { Avatar } from "../../../components/Avatar";
 import { STATUS, setBookingStatus } from "../data/store";
 import { addMinutes, bookingStart, formatMoney } from "../data/format";
 

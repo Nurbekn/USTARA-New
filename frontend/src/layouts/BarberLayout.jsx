@@ -1,9 +1,9 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import AvailabilityBadge from "./components/AvailabilityBadge";
-import { Avatar } from "./data/avatars";
-import { STATUS, useBarber } from "./data/store";
-import "./barber.css";
+import AvailabilityBadge from "../pages/barber/components/AvailabilityBadge";
+import { Avatar } from "../components/Avatar";
+import { STATUS, useBarber } from "../pages/barber/data/store";
+import "../pages/barber/barber.css";
 
 // Inline icons keep the nav dependency-free and colorable via currentColor
 const icon = (children) => (

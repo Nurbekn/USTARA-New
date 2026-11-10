@@ -4,8 +4,8 @@ import { clearSession } from "../auth/utils/session";
 import L from "leaflet";
 import LocationPicker from "../../components/LocationPicker";
 import { isValidLocation } from "../../components/locationSearch";
-import Avatar from "./UserAvatar";
-import { prepareProfilePhoto } from "../barber/data/profilePhoto";
+import Avatar from "./components/UserAvatar";
+import { prepareProfilePhoto } from "../../utils/media/profilePhoto";
 import "./Profile.css";
 
 const userMarker = L.divIcon({

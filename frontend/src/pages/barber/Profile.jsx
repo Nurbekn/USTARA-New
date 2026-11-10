@@ -4,14 +4,14 @@ import LocationPicker from "../../components/LocationPicker";
 import { isValidLocation } from "../../components/locationSearch";
 import { clearSession } from "../auth/utils/session";
 import PageHeader from "./components/PageHeader";
-import Sheet from "./components/Sheet";
+import Sheet from "../../components/Sheet";
 import MediaPicker from "./components/MediaPicker";
 import Stars from "./components/Stars";
 import { useToast } from "./components/Toast";
-import { Avatar, AvatarPicker } from "./data/avatars";
+import { Avatar, AvatarPicker } from "../../components/Avatar";
 import { STATUS, getRatingSummary, updateProfile, useBarber } from "./data/store";
 
-import { prepareProfilePhoto } from "./data/profilePhoto";
+import { prepareProfilePhoto } from "../../utils/media/profilePhoto";
 
 const FIELDS = ["firstName", "lastName", "username", "salonName", "telegram", "experience", "about", "address", "location"];
 

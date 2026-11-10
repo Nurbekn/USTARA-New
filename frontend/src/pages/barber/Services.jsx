@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PageHeader from "./components/PageHeader";
-import Sheet from "./components/Sheet";
+import Sheet from "../../components/Sheet";
 import { useToast } from "./components/Toast";
 import { updateProfile, useBarber } from "./data/store";
 import { formatDuration, formatMoney } from "./data/format";

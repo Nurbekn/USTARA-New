@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PortfolioImage from "./components/PortfolioImage";
-import { Avatar } from "./data/avatars";
+import { Avatar } from "../../components/Avatar";
 import PortfolioVideo from "./components/PortfolioVideo";
 import { mediaError } from "./data/portfolioMedia";
 import { publishPortfolioPost, deletePortfolioPost } from "./data/portfolioPosts";
-import Sheet from "./components/Sheet";
+import Sheet from "../../components/Sheet";
 import MediaPicker from "./components/MediaPicker";
 import EmojiPicker from "./components/EmojiPicker";
 import PostReactions from "./components/PostReactions";
 import { useToast } from "./components/Toast";
 import { useBarber } from "./data/store";
 import { longDate } from "./data/format";
-import { prepareImage, isImageFile, isVideoFile } from "./data/imageUpload";
+import { prepareImage, isImageFile, isVideoFile } from "../../utils/media/imageUpload";
 
 const MAX_FILE = 25 * 1024 * 1024;
 const MAX_VIDEO = 50 * 1024 * 1024;

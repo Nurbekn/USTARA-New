@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, AvatarPicker } from "../barber/data/avatars";
+import { Avatar, AvatarPicker } from "../../components/Avatar";
 import { AuthLayout, PhoneField, RoleSwitch } from "./components/AuthParts";
 import "./auth-ui.css";
 
@@ -12,7 +12,7 @@ const SPECIALTIES = [
 
 // Barber sign-up: avatar + name + phone + specialty -> OTP code.
 // Services are NOT asked here: the barber adds them later in the panel.
-export default function UstaSignup() {
+export default function BarberSignup() {
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState(1);
   const [name, setName] = useState("");

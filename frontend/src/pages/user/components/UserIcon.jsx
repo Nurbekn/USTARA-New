@@ -1,4 +1,4 @@
-export default function HomeIcon({ name, size = 22 }) {
+export default function UserIcon({ name, size = 22 }) {
   const paths = {
     search: (
       <>

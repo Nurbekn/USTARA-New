@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { addPostComment, togglePostLike, useBarber } from "../data/store";
-import { Avatar } from "../data/avatars";
+import { Avatar } from "../../../components/Avatar";
 import EmojiPicker from "./EmojiPicker";
 
 export default function PostReactions({ postId }) {
