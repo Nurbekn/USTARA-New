@@ -1,7 +1,7 @@
+import { Avatar } from "../../../components/Avatar";
 import ArrowIcon from "../../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
-import UserAvatar from "../components/UserAvatar";
-import UserIcon from "../components/UserIcon";
+import Icon from "../../../components/Icon";
 import { isImageFile, isVideoFile } from "../../../utils/media/imageUpload";
 
 const fileKey = (file) =>
@@ -243,7 +243,7 @@ export default function Composer({
       >
         {step === "select" ? (
           <label className="so-upload so-compose-drop">
-            <UserIcon name="comb" size={44} />
+            <Icon name="comb" size={44} />
             <strong>Rasm va videolaringizni tanlang</strong>
             <span>6 tagacha rasm yoki 1 ta video</span>
             <span className="so-button so-primary">Qurilmadan tanlash</span>
@@ -375,7 +375,7 @@ export default function Composer({
         {step === "details" && (
           <div className="so-compose-details">
             <div className="so-composer-author">
-              <UserAvatar
+              <Avatar className="up-user-avatar"
                 photo={profile.avatarPhoto}
                 id={profile.avatar}
                 name={profile.firstName}

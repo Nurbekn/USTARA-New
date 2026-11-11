@@ -1,10 +1,10 @@
+import { Avatar } from "../../components/Avatar";
 import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import Sheet from "../../components/Sheet";
 import { getSession } from "../auth/utils/session";
-import UserIcon from "./components/UserIcon";
-import UserAvatar from "./components/UserAvatar";
+import Icon from "../../components/Icon";
 import PostCard from "./social/PostCard";
 import Composer from "./social/Composer";
 import {
@@ -16,7 +16,6 @@ import {
   normalizePost,
   normalizeSocial,
   postTime,
-  profileUrl,
   publishSocialPost,
   reportSocialPost,
   searchPosts,
@@ -87,8 +86,7 @@ export default function Social({
   let posts = data.posts;
   if (tab === "following") posts = posts.filter(followed);
   if (tab === "saved") posts = posts.filter(saved);
-  if (tab === "discover")
-    posts = searchPosts(posts, data.services, query, category);
+  posts = searchPosts(posts, data.services, query, category);
   if (params.get("author"))
     posts = posts.filter((p) => authorKey(p.author) === params.get("author"));
   if (params.get("post"))
@@ -104,10 +102,6 @@ export default function Social({
       ].filter(Boolean),
     ),
   ];
-  const popular = data.posts
-    .filter((p) => knownCount(p.likeCount) && p.likeCount > 0)
-    .sort((a, b) => b.likeCount - a.likeCount)
-    .slice(0, 3);
   const role = getSession()?.role === "barber" ? "barber" : "customer";
   function update(patch) {
     const next = new URLSearchParams(params);
@@ -249,15 +243,9 @@ export default function Social({
         onLike={() => setLikes((v) => ({ ...v, [p.id]: !liked(p) }))}
         onSave={() => {
           setSaves((v) => ({ ...v, [p.id]: !saved(p) }));
-          setNotice(
-            saved(p)
-              ? "Post saqlanganlardan olib tashlandi."
-              : "Post vaqtinchalik saqlandi.",
-          );
+          setNotice(saved(p) ? "Post saqlanganlardan olib tashlandi." : "Post vaqtinchalik saqlandi.");
         }}
-        onFollow={() =>
-          setFollows((v) => ({ ...v, [authorKey(p.author)]: !followed(p) }))
-        }
+        onFollow={() => setFollows((v) => ({ ...v, [authorKey(p.author)]: !followed(p) }))}
         onComments={() => open("comments", p.id)}
         onShare={() => share(p)}
         onReport={() => open("report", p.id)}
@@ -274,8 +262,8 @@ export default function Social({
     <section className="so-page" aria-busy={status === "loading"}>
       <header className="so-heading">
         <div>
-          <h1>Social</h1>
-          <p>Yangi uslublar. Ustalar ishlari. Sizning ilhomingiz.</p>
+          <h1>Lenta</h1>
+          <p>Ustalar ishlari va yangi soch turmaklari.</p>
         </div>
         {role === "barber" && (
           <button
@@ -287,7 +275,7 @@ export default function Social({
           </button>
         )}
       </header>
-      <nav className="so-tabs" aria-label="Social bo‘limlari">
+      <nav className="so-tabs" aria-label="Lenta bo‘limlari">
         {Object.entries(TABS).map(([key, label]) => (
           <button
             type="button"
@@ -299,9 +287,6 @@ export default function Social({
           </button>
         ))}
       </nav>
-      <p className="so-local-note">
-        Like, Save va obunalar vaqtinchalik: sahifa qayta ochilsa tozalanadi.
-      </p>
       <p className="so-notice" role="status">
         {notice}
       </p>
@@ -332,125 +317,52 @@ export default function Social({
         />
       ) : (
         <>
-          {tab === "discover" && (
-            <>
-              <div className="so-search">
-                <UserIcon name="search" />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => update({ q: e.target.value })}
-                  placeholder="Uslub, xizmat yoki muallif"
-                  aria-label="Postlarni qidirish"
-                />
-                {query && (
-                  <button
-                    className="so-icon-button"
-                    type="button"
-                    aria-label="Qidiruvni tozalash"
-                    onClick={() => update({ q: null })}
-                  >
-                    <UserIcon name="close" size={18} />
-                  </button>
-                )}
-              </div>
-              {categories.length > 0 && (
-                <div
-                  className="so-categories"
-                  role="group"
-                  aria-label="Soch turmagi kategoriyasi"
+          <div className="so-search">
+            <Icon name="search" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => update({ q: e.target.value })}
+              placeholder="Uslub, xizmat yoki muallif"
+              aria-label="Postlarni qidirish"
+            />
+            {query && (
+              <button
+                className="so-icon-button"
+                type="button"
+                aria-label="Qidiruvni tozalash"
+                onClick={() => update({ q: null })}
+              >
+                <Icon name="close" size={18} />
+              </button>
+            )}
+          </div>
+          {categories.length > 0 && (
+            <div
+              className="so-categories"
+              role="group"
+              aria-label="Soch turmagi kategoriyasi"
+            >
+              <button
+                type="button"
+                aria-pressed={!category}
+                onClick={() => update({ category: null })}
+              >
+                Hammasi
+              </button>
+              {categories.map((c) => (
+                <button
+                  type="button"
+                  key={c}
+                  aria-pressed={category === c}
+                  onClick={() =>
+                    update({ category: category === c ? null : c })
+                  }
                 >
-                  <button
-                    type="button"
-                    aria-pressed={!category}
-                    onClick={() => update({ category: null })}
-                  >
-                    Hammasi
-                  </button>
-                  {categories.map((c) => (
-                    <button
-                      type="button"
-                      key={c}
-                      aria-pressed={category === c}
-                      onClick={() =>
-                        update({ category: category === c ? null : c })
-                      }
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <div className="so-discover-grid">
-                <section>
-                  <h2>Trenddagi uslublar</h2>
-                  {data.discover.trends.length ? (
-                    data.discover.trends.map((t) => (
-                      <button
-                        type="button"
-                        className="so-text-button"
-                        key={t.id}
-                        onClick={() => update({ q: t.name })}
-                      >
-                        {t.name}
-                      </button>
-                    ))
-                  ) : (
-                    <p>Trendlar hali mavjud emas.</p>
-                  )}
-                </section>
-                <section>
-                  <h2>Yangi barberlar</h2>
-                  {data.discover.barbers.length ? (
-                    data.discover.barbers.map((b) => (
-                      <Link
-                        key={b.id}
-                        to={profileUrl({ ...b, role: "barber" })}
-                      >
-                        {b.name}
-                      </Link>
-                    ))
-                  ) : (
-                    <p>Barberlar hali qo‘shilmagan.</p>
-                  )}
-                </section>
-                <section>
-                  <h2>Mashhur salonlar</h2>
-                  {data.discover.salons.length ? (
-                    data.discover.salons.map((s) => (
-                      <Link key={s.id} to={profileUrl({ ...s, role: "salon" })}>
-                        {s.name}
-                      </Link>
-                    ))
-                  ) : (
-                    <p>Salonlar hali qo‘shilmagan.</p>
-                  )}
-                </section>
-              </div>
-              {!query && !category && (
-                <section className="so-popular">
-                  <h2>Ommabop postlar</h2>
-                  <div>
-                    {popular.length ? (
-                      popular.map((p) => (
-                        <button
-                          type="button"
-                          key={p.id}
-                          onClick={() => update({ post: p.id })}
-                        >
-                          {p.caption || p.author.name || "Postni ko‘rish"}
-                          <UserIcon name="arrow" size={17} />
-                        </button>
-                      ))
-                    ) : (
-                      <p className="so-hint">
-                        Ommabop postlar hali mavjud emas.
-                      </p>
-                    )}
-                  </div>
-                </section>
-              )}
-            </>
+                  {c}
+                </button>
+              ))}
+            </div>
           )}
           <div className="so-feed">
             {posts.length ? (
@@ -464,15 +376,15 @@ export default function Social({
                       ? "Obunalaringiz shu yerda ko‘rinadi"
                       : tab === "saved"
                         ? "Saqlangan postlar yo‘q"
-                        : tab === "discover" && (query || category)
+                        : (query || category)
                           ? "Mos postlar topilmadi"
                           : "Lenta hali bo‘sh"
                 }
                 text={
                   tab === "following"
-                    ? "Barber yoki salonlarga obuna bo‘ling va yangi ishlarini kuzating."
+                    ? "Ustalarni kuzating va yangi ishlarini shu yerda ko‘ring."
                     : tab === "saved"
-                      ? "Yoqtirgan postlaringizdagi Save tugmasini bosing."
+                      ? "Yoqtirgan postlaringizdagi saqlash belgisini bosing."
                       : "Ma’lumotlar qo‘shilgach, soch turmaklari va ustalar ishlari shu yerda ko‘rinadi."
                 }
                 action={
@@ -481,12 +393,12 @@ export default function Social({
                       type="button"
                       className="so-button"
                       onClick={() =>
-                        update({ tab: "discover", post: null, author: null })
+                        update({ tab: "feed", post: null, author: null, q: null, category: null })
                       }
                     >
-                      Discover’ga o‘tish
+                      Lentaga qaytish
                     </button>
-                  ) : tab === "discover" && (query || category) ? (
+                  ) : (query || category) ? (
                     <button
                       type="button"
                       className="so-button"
@@ -512,7 +424,7 @@ export default function Social({
       >
         <Sheet
           open={!!modal}
-          title={titles[modal?.type] || "Social"}
+          title={titles[modal?.type] || "Lenta"}
           onClose={close}
         >
           {role === "barber" && modal?.type === "create" && (
@@ -549,7 +461,7 @@ export default function Social({
                 <ul>
                   {selected.comments.map((c) => (
                     <li key={c.id}>
-                      <UserAvatar
+                      <Avatar className="up-user-avatar"
                         photo={c.author?.avatarPhoto}
                         name={c.author?.name}
                         size={32}
@@ -677,7 +589,7 @@ function Empty({ title, text, action, error = false }) {
   return (
     <div className="so-empty" role={error ? "alert" : undefined}>
       <span className="so-empty-icon">
-        <UserIcon name="comb" size={30} />
+        <Icon name="comb" size={30} />
       </span>
       <h2>{title}</h2>
       <p>{text}</p>

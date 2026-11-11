@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Avatar } from "../../../components/Avatar";
-import UserAvatar from "../components/UserAvatar";
-import UserIcon from "../components/UserIcon";
+import Icon from "../../../components/Icon";
 import { knownCount, postTime, profileUrl } from "./model";
 
 export default function PostCard({
@@ -23,22 +22,14 @@ export default function PostCard({
   const author = post.author;
   const profile = profileUrl(author);
   const name = author.name || "Muallif nomi ko‘rsatilmagan";
-  const avatar =
-    author.role === "barber" ? (
-      <Avatar
-        id={author.avatar}
-        photo={author.avatarPhoto}
-        name={name}
-        size={44}
-      />
-    ) : (
-      <UserAvatar
-        id={author.avatar}
-        photo={author.avatarPhoto}
-        name={name}
-        size={44}
-      />
-    );
+  const avatar = (
+    <Avatar
+      className={author.role === "barber" ? "" : "up-user-avatar"}
+      photo={author.avatarPhoto}
+      name={name}
+      size={44}
+    />
+  );
   const likeCount = knownCount(post.likeCount)
     ? Math.max(0, post.likeCount + Number(liked) - Number(!!post.likedByMe))
     : null;
@@ -138,15 +129,7 @@ export default function PostCard({
             aria-pressed={liked}
             onClick={onLike}
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill={liked ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="1.7"
-              aria-hidden="true"
-            >
-              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
-            </svg>
+            <Icon name="heart" viewBox="0 0 24 24" fill={liked?"currentColor":"none"} stroke="currentColor" strokeWidth="1.7" aria-hidden="true" />
             {likeCount != null && <span>{likeCount}</span>}
           </button>
           <button
@@ -172,7 +155,7 @@ export default function PostCard({
             aria-label="Ulashish"
             onClick={onShare}
           >
-            <UserIcon name="arrow" />
+            <Icon name="arrow" />
           </button>
           <button
             type="button"
@@ -183,15 +166,7 @@ export default function PostCard({
             aria-pressed={saved}
             onClick={onSave}
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill={saved ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="1.7"
-              aria-hidden="true"
-            >
-              <path d="M6 3h12v18l-6-4-6 4Z" />
-            </svg>
+            <Icon name="bookmark" viewBox="0 0 24 24" fill={saved?"currentColor":"none"} stroke="currentColor" strokeWidth="1.7" aria-hidden="true" />
           </button>
         </div>
         {post.caption && <p className="so-caption">{post.caption}</p>}
@@ -206,7 +181,7 @@ export default function PostCard({
                 to={`/user/explore?type=services&q=${encodeURIComponent(s.name)}`}
               >
                 {s.name}
-                <UserIcon name="arrow" size={15} />
+                <Icon name="arrow" size={15} />
               </Link>
             ))}
         </div>
@@ -215,7 +190,7 @@ export default function PostCard({
             {author.role === "barber"
               ? "Barber profili va xizmatlari"
               : "Salon profili va xizmatlari"}
-            <UserIcon name="arrow" size={17} />
+            <Icon name="arrow" size={17} />
           </Link>
         )}
       </div>

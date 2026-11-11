@@ -1,15 +1,15 @@
+import { formatNumber } from "../../../utils/format";
 import { Link, useLocation } from "react-router-dom";
 import { sampleBarberDetails } from "../../home/sampleData";
 import { Avatar } from "../../../components/Avatar";
-import UserIcon from "../components/UserIcon";
+import Icon from "../../../components/Icon";
 import { knownNumber, nameOf, providersFor, servicesFor } from "./catalog";
 
-const money = (n) => new Intl.NumberFormat("uz-UZ").format(n);
 function Price({ min, max }) {
   return (
     <span className="ex-price">
       {knownNumber(min)
-        ? `${money(min)}${knownNumber(max) && max !== min ? ` – ${money(max)}` : ""} so‘m${max == null ? " dan" : ""}`
+        ? `${formatNumber(min)}${knownNumber(max) && max !== min ? ` – ${formatNumber(max)}` : ""} so‘m${max == null ? " dan" : ""}`
         : "Narx ko‘rsatilmagan"}
     </span>
   );
@@ -17,7 +17,7 @@ function Price({ min, max }) {
 function Rating({ item }) {
   return (
     <span className="ex-rating">
-      <UserIcon name="star" size={16} />
+      <Icon name="star" size={16} />
       {knownNumber(item.rating) ? item.rating.toFixed(1) : "Reyting yo‘q"}
       <span>
         {knownNumber(item.reviewCount) ? `(${item.reviewCount} sharh)` : ""}
@@ -56,7 +56,7 @@ export default function ResultCard({
           />
         ) : (
           <div className="ex-salon-image ex-image-placeholder">
-            <UserIcon name="pin" size={32} />
+            <Icon name="pin" size={32} />
             <span>Salon rasmi qo‘shilmagan</span>
           </div>
         ))}
@@ -72,7 +72,7 @@ export default function ResultCard({
           )}
           {service && (
             <span className="ex-service-icon">
-              <UserIcon name="scissors" />
+              <Icon name="scissors" />
             </span>
           )}
           <div>
@@ -85,7 +85,7 @@ export default function ResultCard({
           <>
             <Rating item={item} />
             <p className="ex-address">
-              <UserIcon name="pin" size={17} />
+              <Icon name="pin" size={17} />
               {item.address || "Manzil ko‘rsatilmagan"}
             </p>
           </>
@@ -101,10 +101,9 @@ export default function ResultCard({
                 <Link
                   key={s.id}
                   to={makeUrl({
-                    type: "services",
                     profile: null,
-                    q: s.name,
-                    service: null,
+                    q: null,
+                    service: s.id,
                   })}
                 >
                   {s.name}
@@ -133,13 +132,13 @@ export default function ResultCard({
           {!service && !detail && (
             <Link className="ex-action" to={makeUrl({ profile: item.id })}>
               {type === "barbers" ? "Profilni ko‘rish" : "Salonni ko‘rish"}
-              <UserIcon name="arrow" size={17} />
+              <Icon name="arrow" size={17} />
             </Link>
           )}
         </div>
         {detail && sampleDetails && <>
           <p className="ex-description">{sampleDetails.about}</p>
-          <Link className="ex-action" to={`${base}/barbers/${item.id}?demo=1`} state={{ from: location.pathname + location.search }}>Profilga o‘tish <UserIcon name="arrow" size={17} /></Link>
+          <Link className="ex-action" to={`${base}/barbers/${item.id}?demo=1`} state={{ from: location.pathname + location.search }}>Profilga o‘tish <Icon name="arrow" size={17} /></Link>
         </>}
         {service && (
           <div className="ex-provider-links">
@@ -154,7 +153,7 @@ export default function ResultCard({
               })}
             >
               Sartaroshlar ({providers.barbers.length})
-              <UserIcon name="arrow" size={17} />
+              <Icon name="arrow" size={17} />
             </Link>
             <Link
               className="ex-action"
@@ -167,7 +166,7 @@ export default function ResultCard({
               })}
             >
               Salonlar ({providers.salons.length})
-              <UserIcon name="arrow" size={17} />
+              <Icon name="arrow" size={17} />
             </Link>
           </div>
         )}

@@ -1,3 +1,5 @@
+import { formatDate, formatMoney } from "../../../utils/format";
+
 /**
  * Customer booking API boundary. No demo records or local status transitions.
  * Booking: { id, status, startsAt: ISO timestamp with timezone, timezone?,
@@ -40,7 +42,7 @@ export function normalizeBookings(value) {
   });
 }
 export const barberName = (b) => b.barber?.name || [b.barber?.firstName, b.barber?.lastName].filter(Boolean).join(' ') || 'Barber ma’lumoti kiritilmagan';
-export const money = (value) => known(value) ? `${new Intl.NumberFormat('uz-UZ').format(value)} so‘m` : 'Ko‘rsatilmagan';
+export const money = (value) => known(value) ? formatMoney(value) : 'Ko‘rsatilmagan';
 export function total(booking, field, serviceField = field) {
   if (known(booking[field])) return booking[field];
   return booking.services.length && booking.services.every((s) => known(s[serviceField])) ? booking.services.reduce((sum, s) => sum + s[serviceField], 0) : null;
@@ -48,7 +50,8 @@ export function total(booking, field, serviceField = field) {
 export function dateLabel(value, timezone = 'Asia/Tashkent', time = false) {
   const n = timestamp(value);
   if (n == null) return 'Belgilanmagan';
-  const options = time ? { hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'long', year: 'numeric' };
+  if (!time) return formatDate(n, timezone);
+  const options = { hour: '2-digit', minute: '2-digit', hour12: false };
   try { return new Intl.DateTimeFormat('uz-UZ', { ...options, timeZone: timezone }).format(n); }
   catch { return new Intl.DateTimeFormat('uz-UZ', { ...options, timeZone: 'Asia/Tashkent' }).format(n); }
 }

@@ -1,3 +1,4 @@
+import { formatDate, formatMoney } from "../../utils/format";
 import ArrowIcon from "../../components/ArrowIcon";
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useOutletContext } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { sampleBarbers, sampleCustomers, sampleBookings, sampleServices, sampleR
 import './Demo.css';
 
 const statusLabels = { confirmed: 'Tasdiqlangan', pending: 'Kutilmoqda', completed: 'Yakunlangan' };
-const money = (value) => `${value.toLocaleString('uz-UZ')} so‘m`;
 const initials = (name) => name.split(/\s+/).slice(0, 2).map((part) => part[0]).join('');
 function relatedBookings(account, role) {
   return sampleBookings.filter((booking) => booking[role === 'customer' ? 'customerId' : 'barberId'] === account.id);
@@ -19,7 +19,7 @@ function BookingRows({ bookings, role }) {
     const person = role === 'customer' ? barber : customer;
     const date = new Date();
     date.setDate(date.getDate() + booking.dayOffset);
-    return <article className="dm-booking" key={booking.id}><span className="dm-avatar" aria-hidden="true">{initials(person.name)}</span><div><h3>{person.name}</h3><p>{service.name} · {service.duration} daqiqa</p><p>{date.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' })} · {booking.time}</p></div><div className="dm-booking-end"><span className={`dm-status dm-status-${booking.status}`}>{statusLabels[booking.status]}</span><strong>{money(service.minPrice)}</strong></div></article>;
+    return <article className="dm-booking" key={booking.id}><span className="dm-avatar" aria-hidden="true">{initials(person.name)}</span><div><h3>{person.name}</h3><p>{service.name} · {service.duration} daqiqa</p><p>{formatDate(date)} · {booking.time}</p></div><div className="dm-booking-end"><span className={`dm-status dm-status-${booking.status}`}>{statusLabels[booking.status]}</span><strong>{formatMoney(service.minPrice)}</strong></div></article>;
   }) : <p className="dm-empty">Bu namuna hisobda hozircha bron yo‘q.</p>}</div>;
 }
 

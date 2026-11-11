@@ -1,3 +1,4 @@
+import Icon from "../../../components/Icon";
 import ArrowIcon from "../../../components/ArrowIcon";
 import { useRef, useState } from "react";
 import { addPostComment, togglePostLike, useBarber } from "../data/store";
@@ -33,7 +34,7 @@ export default function PostReactions({ postId }) {
         if (!togglePostLike(postId)) setError("Like saqlanmadi. Qayta urinib ko'ring.");
         else setError("");
       }}>
-        <svg viewBox="0 0 24 24" fill={post.likedByMe ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg>
+        <Icon name="heart" viewBox="0 0 24 24" fill={post.likedByMe?"currentColor":"none"} stroke="currentColor" strokeWidth="1.8" aria-hidden="true" />
       </button>
       <button type="button" className="bx-social-button" aria-label="Izoh yozish" onClick={() => { input.current?.focus(); input.current?.scrollIntoView({ block: "center", behavior: "smooth" }); }}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M21 11.5a9 9 0 0 1-9 9 10 10 0 0 1-4-.9L3 21l1.4-4.8A9 9 0 1 1 21 11.5Z" /></svg>

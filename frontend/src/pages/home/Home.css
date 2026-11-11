@@ -191,57 +191,6 @@
   letter-spacing: 0.14em;
 }
 
-/* Floating booking preview, overlaps the photo's bottom edge */
-.hm-booking {
-  position: absolute;
-  right: 14px;
-  bottom: 0;
-  left: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: rgba(20, 31, 51, 0.94);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-}
-.hm-booking-icon {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-}
-.hm-booking > div {
-  flex: 1;
-  min-width: 0;
-}
-.hm-booking strong {
-  display: block;
-  font-size: var(--font-small);
-}
-.hm-booking p {
-  overflow: hidden;
-  color: var(--muted);
-  font-size: var(--font-body);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.hm-booking em {
-  padding: 3px 8px;
-  border-radius: 99px;
-  background: rgba(148, 163, 184, 0.14);
-  color: var(--muted);
-  font-size: var(--font-small);
-  font-style: normal;
-  font-weight: 600;
-}
-
 /* Soft glow behind the hero (decorative) */
 .hm-hero::before {
   content: "";
@@ -258,10 +207,6 @@
 .hm-hero {
   position: relative;
 }
-/* ==========================================================
-   LIVELY LAYER: animations & hover effects
-   ========================================================== */
-
 /* ---------- Hover effects (faqat sichqonchali qurilmada) ---------- */
 @media (hover: hover) {
   .hm-perk,
@@ -513,9 +458,7 @@
 }
 .hm-step-icon {
   display: none;
-} /* shown from tablet up, phones need the room for text */
-
-/* ---------- For barbers ---------- */
+} /* ---------- For barbers ---------- */
 .hm-barber {
   padding: 24px 20px;
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -579,11 +522,6 @@
   .hm-photo {
     aspect-ratio: 16 / 10;
   }
-  .hm-booking {
-    right: auto;
-    left: 24px;
-    width: 340px;
-  }
   .hm-perks {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -612,12 +550,6 @@
   }
   .hm-photo {
     aspect-ratio: 5 / 4;
-  }
-  .hm-booking {
-    right: -16px;
-    left: auto;
-    bottom: 0;
-    width: 320px;
   }
 
   .hm-steps {

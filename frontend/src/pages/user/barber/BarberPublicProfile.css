@@ -42,7 +42,6 @@
 .bpv-section-title { margin-bottom: var(--space-4); }
 .bpv-section-title h2 { font-size: 18px; font-weight: 600; }
 .bpv-section-title > p { margin-top: var(--space-2); color: var(--muted); font-size: 13px; line-height: 1.6; }
-.bpv-page .bpv-note { margin-top: var(--space-4); color: var(--muted); font-size: 12px; line-height: 1.6; }
 .bpv-hours > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-4) 0; border-bottom: 1px solid var(--border); font-size: 14px; }
 .bpv-hours dd { font-variant-numeric: tabular-nums; }
 .bpv-hours .is-off { color: var(--muted); }

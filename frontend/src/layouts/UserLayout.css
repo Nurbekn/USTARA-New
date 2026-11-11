@@ -15,7 +15,7 @@
   min-height: 100svh;
   color: var(--uc-text);
   background: var(--page-background);
-  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .uc-header {
@@ -33,15 +33,15 @@
   width: 100%;
   max-width: 1120px;
   margin-inline: auto;
-  padding-left: max(20px, env(safe-area-inset-left, 0px));
-  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
 .uc-header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 80px;
+  min-height: 64px;
 }
 .uc-logo {
   font-family: var(--font-ui);
@@ -59,8 +59,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--uc-border);
   border-radius: 16px;
   background: var(--uc-card);
@@ -87,40 +87,9 @@
   font-size: var(--font-section);
 }
 .uc-main {
-  padding-top: 32px;
-  padding-bottom: 32px;
+  padding-top: 16px;
+  padding-bottom: 20px;
   scroll-margin-top: calc(100px + env(safe-area-inset-top, 0px));
-}
-.uc-eyebrow {
-  margin: 0 0 12px;
-  color: var(--uc-muted);
-  font-size: var(--font-small);
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-.uc-page-title {
-  margin: 0 0 28px;
-  font-size: var(--font-page);
-  letter-spacing: -1px;
-}
-.uc-card {
-  padding: 28px 24px;
-  border: 1px solid var(--uc-border);
-  border-radius: 24px;
-  background: var(--uc-card);
-}
-.uc-status {
-  display: inline-block;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--uc-primary-soft);
-  color: var(--uc-primary);
-  font-size: var(--font-small);
-  font-weight: 600;
-}
-.uc-card-title {
-  margin: 24px 0 12px;
-  font-size: var(--font-section);
 }
 .uc-description {
   max-width: 560px;
@@ -135,9 +104,7 @@
   left: 0;
   right: 0;
   z-index: 10;
-  padding: 8px max(8px, env(safe-area-inset-right, 0px))
-    calc(8px + env(safe-area-inset-bottom, 0px))
-    max(8px, env(safe-area-inset-left, 0px));
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--uc-border);
   background: rgba(16, 26, 44, 0.94);
   backdrop-filter: blur(14px);
@@ -154,9 +121,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 60px;
-  padding: 8px 2px;
+  gap: 4px;
+  min-height: 52px;
+  padding: 6px 2px;
   border-radius: 14px;
   color: var(--uc-muted);
 }
@@ -197,13 +164,10 @@
 
 @media (min-width: 768px) {
   .uc-app {
-    padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
   }
   .uc-main {
-    padding-top: 48px;
-  }
-  .uc-card {
-    padding: 40px;
+    padding-top: 24px;
   }
   .uc-nav {
     left: 50%;

@@ -1,3 +1,5 @@
+import { formatDate } from "../../../utils/format";
+
 /** Social API boundary. Replace functions here with authenticated API requests.
  * Post: {id, author:{id,role:'barber'|'salon',name,avatar?,avatarPhoto?},
  * createdAt, caption, kind:'standard'|'beforeAfter', media:[{type:'image'|'video',url,alt?}],
@@ -33,10 +35,9 @@ export async function reportSocialPost() {
   throw new Error("Shikoyat yuborish xizmati hali ulanmagan.");
 }
 export const TABS = {
-  feed: "Feed",
-  discover: "Discover",
-  following: "Following",
-  saved: "Saved",
+  feed: "Lenta",
+  following: "Kuzatilgan",
+  saved: "Saqlangan",
 };
 export const authorKey = (author) =>
   `${author?.role || "customer"}:${author?.id ?? ""}`;
@@ -126,15 +127,7 @@ export function profileUrl(author) {
   return null;
 }
 export function postTime(value) {
-  const n = Date.parse(value);
-  return Number.isFinite(n)
-    ? new Intl.DateTimeFormat("uz-UZ", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(n)
-    : "Vaqt ko‘rsatilmagan";
+  return Number.isFinite(Date.parse(value)) ? formatDate(value) : "Vaqt ko‘rsatilmagan";
 }
 export function shareUrl(id) {
   return `${location.origin}${import.meta.env.BASE_URL}user/social?post=${encodeURIComponent(id)}`;

@@ -1,3 +1,4 @@
+import Icon from "../../components/Icon";
 import ArrowIcon from "../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import { AuthLayout } from "../auth/components/AuthParts";
@@ -17,10 +18,7 @@ export default function ApprovalPending() {
         <div className="au-pending-icon" aria-hidden="true">
           <span />
           <span />
-          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 7v5l3 2" />
-          </svg>
+          <Icon name="clock" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </div>
 
         <h1 className="au-title">Admin tasdiqlashi kutilmoqda</h1>

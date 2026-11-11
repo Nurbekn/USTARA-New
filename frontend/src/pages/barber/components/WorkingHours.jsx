@@ -1,3 +1,4 @@
+import Icon from "../../../components/Icon";
 import { useState } from "react";
 import { WEEKDAYS } from "../data/format";
 import "./working-hours.css";
@@ -30,7 +31,7 @@ export default function WorkingHours({ value, onChange }) {
       <div className="wh-tools">
         <p>Kunlarni yoqing va ish vaqtini tanlang. Toshkent vaqti.</p>
         <button type="button" className={appliedNow ? "is-applied" : ""} disabled={!first || first.start >= first.end} onClick={applyToWorkdays}>
-          {appliedNow && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>}
+          {appliedNow && <Icon name="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" />}
           {appliedNow ? "Ish kunlariga qo‘llanildi" : first ? `${WEEKDAYS[first.day]} vaqtini ish kunlariga qo'llash` : "Avval ish kunini tanlang"}
         </button>
         <p className="wh-apply-status" role="status" aria-live="polite">{appliedNow ? `${applied.start}–${applied.end} vaqti ${applied.count} ta ish kuniga qo‘llandi.` : ""}</p>

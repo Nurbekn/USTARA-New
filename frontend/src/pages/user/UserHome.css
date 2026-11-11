@@ -9,10 +9,10 @@
 .uh-search input::placeholder { color: var(--muted); opacity: 1; }
 .uh-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .uh-search button { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; margin: 2px; padding: 0; border: 0; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-hover); font-size: 20px; }
-.uh-section-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: var(--space-5) 0 var(--space-4); }
+.uh-section-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: var(--space-4) 0 var(--space-3); }
 .uh-section-heading h1 { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -.02em; }
-.uh-barber-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
-.uh-barber-card { display: grid; gap: var(--space-3); min-width: 0; padding: var(--space-4); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(115deg, var(--surface-hover), var(--surface) 65%); color: var(--text); }
+.uh-barber-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+.uh-barber-card { display: grid; gap: var(--space-2); min-width: 0; padding: var(--space-4); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(115deg, var(--surface-hover), var(--surface) 65%); color: var(--text); }
 .uh-ad-label { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); color: var(--muted); font-size: 11px; }
 .uh-availability { color: var(--accent-hover); font-size: 11px; }
 .uh-ad-identity { display: flex; align-items: center; gap: var(--space-3); }
@@ -31,8 +31,8 @@
 .uh-ad-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-hover); font-size: 14px; font-weight: 500; }
 .uh-home .uh-sample-note { margin-top: var(--space-3); color: var(--muted); font-size: 12px; line-height: 1.6; }
 .uh-all-barbers { display: flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 44px; margin-top: var(--space-2); color: var(--accent-hover); font-size: 14px; }
-.uh-style-disclosure { margin-top: var(--space-5); overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--surface); }
-.uh-style-disclosure > summary { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; padding: var(--space-4); list-style: none; cursor: pointer; }
+.uh-style-disclosure { margin-top: var(--space-4); overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--surface); }
+.uh-style-disclosure > summary { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-3); list-style: none; cursor: pointer; }
 .uh-style-disclosure > summary::-webkit-details-marker { display: none; }
 .uh-style-disclosure > summary > svg { flex-shrink: 0; color: var(--accent-hover); }
 .uh-style-disclosure > summary > span:not(.uh-disclosure-mark) { display: grid; min-width: 0; gap: var(--space-1); }
@@ -63,7 +63,7 @@
 .uh-home :is(a, button, summary) { touch-action: manipulation; }
 .uh-home :is(a, button, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (min-width: 640px) {
-  .uh-barber-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .uh-barber-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
   .uh-style-viewer { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .uh-style-options { max-width: 420px; }
   .uh-style-option, .uh-view-tabs button { font-size: 14px; }
@@ -71,7 +71,7 @@
 @media (min-width: 900px) {
   .uh-search { max-width: 640px; }
   .uh-section-heading { margin-top: var(--space-6); }
-  .uh-style-disclosure { margin-top: var(--space-6); }
+  .uh-style-disclosure { margin-top: var(--space-4); }
   .uh-style-content { padding: var(--space-5); }
 }
 @media (min-width: 1200px) {

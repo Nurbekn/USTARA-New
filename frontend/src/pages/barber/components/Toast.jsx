@@ -1,10 +1,13 @@
-import { useRef, useState } from "react";
+import "../../../components/overlays.css";
+import { useEffect, useRef, useState } from "react";
 
 // const { toast, show } = useToast();
 // show("Saqlandi!");   ...   {toast}
 export function useToast() {
   const [message, setMessage] = useState("");
   const timer = useRef(null);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const show = (text) => {
     clearTimeout(timer.current);

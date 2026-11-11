@@ -1,8 +1,9 @@
-// Legacy avatar IDs can still be passed by existing callers.
+import "./Avatar.css";
+
 export function Avatar({ photo, name = '', size = 40, className = '' }) {
   const classes = `bx-avatar ${className}`.trim();
   if (photo) {
-    return <img className={classes} src={photo} alt={name || 'Profil rasmi'} width={size} height={size} style={{ objectFit: 'cover', borderRadius: '50%' }} />;
+    return <img className={classes} src={photo} alt={name || 'Profil rasmi'} width={size} height={size} />;
   }
 
   const initial = Array.from(name.trim())[0]?.toLocaleUpperCase('uz') || 'U';

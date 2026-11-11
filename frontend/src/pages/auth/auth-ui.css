@@ -90,12 +90,13 @@
 .au-seg a.is-active { background: var(--primary); color: #fff; }
 
 /* ---------- Form ---------- */
-.au-form { display: flex; flex-direction: column; gap: 18px; }
+.au-form { display: flex; flex-direction: column; gap: 18px; min-width: 0; max-width: 100%; }
 .au-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .au-label { color: var(--text); font-size: 14px; line-height: 1.5; font-weight: 500; letter-spacing: normal; text-transform: none; }
 
 .au-input,
-.au-phone {
+.au-phone,
+.au-password {
   width: 100%;
   min-height: 54px;
   border: 1.5px solid var(--border);
@@ -103,8 +104,8 @@
   background: var(--bg);
   color: var(--text);
   font-size: var(--font-input); /* 16px: iOS does not zoom the page */
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
+.au-input, .au-phone { transition: border-color 0.2s, box-shadow 0.2s; }
 .au-input { padding: 0 16px; }
 .au-input:focus,
 .au-phone:focus-within {
@@ -116,7 +117,7 @@
 .au-phone.has-error { border-color: #ef4444; animation: au-shake 0.35s; }
 @keyframes au-shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-.au-phone { display: flex; align-items: center; overflow: hidden; }
+.au-phone, .au-password { display: flex; align-items: center; min-width: 0; max-width: 100%; overflow: hidden; }
 .au-prefix {
   display: flex;
   align-items: center;
@@ -147,7 +148,7 @@
 }
 .au-phone input:focus { outline: none; }
 
-.au-error { margin: 0; color: #f87171; font-size: var(--font-small); font-weight: 600; }
+.au-error { margin: 0; font-size: var(--font-small); font-weight: 600; padding: 10px 12px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 10px; background: #ef44440d; color: #fca5a5; line-height: 1.5; overflow-wrap: anywhere; }
 .au-error a { color: #93c5fd; text-decoration: underline; }
 .au-info { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #bfdbfe; font-size: var(--font-body); line-height: 1.55; }
 
@@ -179,19 +180,6 @@
 .au-text-btn { color: #60a5fa; font-weight: 700; font-size: var(--font-button); }
 .au-text-btn:disabled { color: var(--muted); }
 
-/* ---------- Specialty chips ---------- */
-.au-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.au-chip {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 99px;
-  background: transparent;
-  color: var(--muted);
-  font-weight: 600;
-}
-.au-chip.is-active { border-color: var(--primary); background: rgba(59, 130, 246, 0.16); color: #bfdbfe; }
-
 /* ---------- OTP ---------- */
 .au-otp { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
 .au-otp input {
@@ -215,40 +203,6 @@
 .au-otp + .au-error { margin-bottom: 14px; }
 .au-otp.is-error + .au-error { margin-top: -4px; }
 .au-dev { margin: 14px 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; opacity: 0.7; }
-
-/* ---------- Setup blocks ---------- */
-.au-block {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: rgba(11, 17, 32, 0.55);
-}
-.au-block h2 { margin: 0; font-size: var(--font-section); }
-
-.au-day { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.au-day:last-of-type { border-bottom: 0; }
-.au-day strong.is-off { color: var(--muted); font-weight: 500; }
-.au-day-times { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; color: var(--muted); }
-.au-day-times .au-input { min-height: 46px; }
-
-.au-switch { position: relative; width: 50px; height: 30px; border: 0; border-radius: 99px; background: rgba(148, 163, 184, 0.3); transition: background 0.2s; }
-.au-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
-.au-switch.is-on { background: #22c55e; }
-.au-switch.is-on::after { transform: translateX(20px); }
-
-/* Leaflet map (LocationPicker) scoped to the setup page */
-.au-map { --accent: #3b82f6; }
-.au-map .location-picker { display: flex; flex-direction: column; gap: 10px; }
-.au-map .add-btn { min-height: 48px; border: 1.5px dashed var(--primary); border-radius: 12px; background: transparent; color: #93c5fd; font-weight: 700; }
-.au-map .map { z-index: 0; width: 100%; height: 260px; border: 1px solid var(--border); border-radius: 14px; }
-.au-map .location-hint, .au-map .location-address, .au-map .location-coordinates { margin: 0; color: var(--muted); font-size: var(--font-small); }
-.au-map .location-hint.is-set { color: #4ade80; }
-.au-map .error { margin: 0; color: #f87171; font-size: var(--font-small); }
-.au-map .barber-map-marker { width: 80px; padding: 6px 0; border-radius: 8px; background: #3b82f6; color: #fff; font-size: var(--font-small); font-weight: 700; text-align: center; }
-@media (min-width: 640px) { .au-map .map { height: 300px; } }
 
 /* ---------- Approval pending ---------- */
 .au-pending { display: flex; flex-direction: column; align-items: stretch; gap: 14px; text-align: center; }
@@ -276,17 +230,13 @@
   .au-card, .au-pending-icon span, .au-input.has-error, .au-phone.has-error, .au-otp.is-error input { animation: none; }
 }
 
-/* Validation messages should be easy to spot on small screens. */
-.au-error { padding: 10px 12px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 10px; background: #ef44440d; color: #fca5a5; line-height: 1.5; overflow-wrap: anywhere; }
 
 /* Shared phone-and-password registration, with a separate centered OTP screen. */
 .au-registration-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); min-width: 0; width: 100%; margin: 0; padding: 0; border: 0; }
-.au-password { display: flex; align-items: center; min-height: 54px; overflow: hidden; border: 1.5px solid var(--border); border-radius: 14px; background: var(--bg); }
 .au-password input { flex: 1; min-width: 0; width: 100%; height: 52px; padding: 0 var(--space-4); border: 0; background: transparent; color: var(--text); font: inherit; font-size: 16px; }
 .au-password input:focus { outline: none; }
 .au-password:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.au-password.has-error { border-color: var(--danger); }
-.au-password button { display: grid; place-items: center; flex-shrink: 0; min-width: 48px; min-height: 48px; padding: var(--space-3); border: 0; background: transparent; color: var(--muted); }
+.au-password button { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; min-height: 48px; padding: var(--space-3); border: 0; background: transparent; color: var(--muted); }
 .au-password button:focus-visible { outline-offset: -4px; }
 .au-password-hint { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .au-page--otp .au-card { text-align: center; }
@@ -306,7 +256,7 @@
 .au-password-match.is-mismatch { color: var(--danger); }
 
 /* Keep a real password input for editing/autofill; the overlay briefly reveals one character. */
-.au-password-entry { position: relative; flex: 1; min-width: 0; }
+.au-password-entry { position: relative; flex: 1 1 0%; width: 0; min-width: 0; max-width: 100%; height: 52px; overflow: hidden; }
 .au-password-entry input { display: block; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; line-height: 52px; }
 .au-password-entry .au-password-concealed { color: transparent; -webkit-text-fill-color: transparent; caret-color: var(--text); }
 .au-password-mask { position: absolute; inset: 0 var(--space-4); display: flex; align-items: center; overflow: hidden; pointer-events: none; color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 16px; line-height: 52px; white-space: pre; }
@@ -314,7 +264,7 @@
 
 /* Clearer sign-up/login typography and steady, well-defined form surfaces. */
 .au-page--entry { --border: rgba(148, 163, 184, 0.24); }
-.au-page--entry .au-card { background: var(--bg-soft); border-color: var(--border-strong); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; }
+.au-page--entry .au-card { margin-block: 0; background: var(--bg-soft); border-color: var(--border-strong); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; }
 .au-page--entry .au-title { margin-bottom: var(--space-3); font-family: var(--font-ui); font-size: clamp(28px, 4vw, 32px); font-weight: 600; line-height: 1.25; letter-spacing: -.02em; text-align: center; }
 .au-page--entry .au-sub { max-width: 34ch; margin: 0 auto var(--space-6); line-height: 1.65; text-align: center; }
 .au-page--entry .au-label { font-size: 16px; font-weight: 600; line-height: 1.5; }
@@ -324,3 +274,8 @@
 .au-page--entry .au-password-hint { font-size: 14px; line-height: 1.6; }
 .au-page--entry .au-foot { font-size: 15px; line-height: 1.6; text-align: center; }
 .au-page--entry .au-foot a { color: var(--accent-hover); font-weight: 600; }
+
+/* Keep phone forms anchored when the software keyboard changes viewport height. */
+@media (min-width: 900px) and (pointer: fine) {
+  .au-page--entry .au-card { margin-block: auto; }
+}

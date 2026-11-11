@@ -1,3 +1,4 @@
+import { formatNumber } from "../../utils/format";
 import ArrowIcon from "../../components/ArrowIcon";
 import { Link } from 'react-router-dom';
 import { sampleBarbers } from './sampleData';
@@ -14,7 +15,7 @@ export default function SampleBarbers() {
         {sampleBarbers.map((barber) => (
           <Link key={barber.id} to={`/demo/explore?type=barbers&profile=${barber.id}`} className="hm-sample-card">
             <div className="hm-sample-work" style={{ backgroundImage: `url(${barber.workPhoto})`, backgroundPosition: `${barber.position} center` }} role="img" aria-label="Soch turmagi uchun yaratilgan namuna" />
-            <div className="hm-sample-info"><div><h3>{barber.name}</h3><p>{barber.area} · {barber.salonName}</p></div><p className="hm-sample-rating" aria-label={`Namuna reytingi: ${barber.rating}`}>★ {barber.rating.toFixed(1)}</p><p className="hm-sample-price">{barber.startingPrice.toLocaleString('uz-UZ')} so‘mdan <span className="ui-arrow-inline">Profilni ko‘rish <ArrowIcon /></span></p></div>
+            <div className="hm-sample-info"><div><h3>{barber.name}</h3><p>{barber.area} · {barber.salonName}</p></div><p className="hm-sample-rating" aria-label={`Namuna reytingi: ${barber.rating}`}>★ {barber.rating.toFixed(1)}</p><p className="hm-sample-price">{formatNumber(barber.startingPrice)} so‘mdan <span className="ui-arrow-inline">Profilni ko‘rish <ArrowIcon /></span></p></div>
           </Link>
         ))}
       </div>

@@ -1,14 +1,14 @@
+import { formatNumber } from "../../utils/format";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ArrowIcon from "../../components/ArrowIcon";
 import VerifiedBadge from "../../components/VerifiedBadge";
-import UserIcon from "./components/UserIcon";
+import Icon from "../../components/Icon";
 import { sampleBarbers, sampleBarberDetails, sampleHairstyles, sampleHairAtlas } from "../home/sampleData";
 import "./UserHome.css";
 
 const VIEWS = ["Oldidan", "Yonidan", "Orqadan"];
 const atlasPosition = (row, column) => `${column * 50}% ${row * 50}%`;
-const money = (price) => new Intl.NumberFormat("uz-UZ").format(price);
 
 export default function UserHome() {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export default function UserHome() {
     <div className="uh-home">
       <form className="uh-search" role="search" onSubmit={search}>
         <label className="uh-sr-only" htmlFor="uh-search-input">Usta yoki xizmat qidirish</label>
-        <UserIcon name="search" size={20} />
+        <Icon name="search" size={20} />
         <input id="uh-search-input" type="search" placeholder="Usta yoki xizmat izlang" value={query} onChange={(event) => setQuery(event.target.value)} />
         <button type="submit" aria-label="Qidirish"><ArrowIcon /></button>
       </form>
@@ -51,7 +51,7 @@ export default function UserHome() {
                 <div><h2>{barber.name}<VerifiedBadge verification={barber.verification} /></h2><p className="uh-barber-area">{barber.salonName} · {barber.area}</p></div>
               </div>
               <p className="uh-ad-offer">{sampleBarberDetails[barber.id].services.map((service) => service.name).join(' · ')}</p>
-              <div className="uh-ad-meta"><p className="uh-barber-rating"><UserIcon name="star" size={14} /><strong>{barber.rating.toFixed(1)}</strong><span>({barber.reviewCount} sharh)</span></p><p className="uh-barber-price">{money(barber.startingPrice)} <span>so‘mdan</span></p></div>
+              <div className="uh-ad-meta"><p className="uh-barber-rating"><Icon name="star" size={14} /><strong>{barber.rating.toFixed(1)}</strong><span>({barber.reviewCount} sharh)</span></p><p className="uh-barber-price">{formatNumber(barber.startingPrice)} <span>so‘mdan</span></p></div>
               <span className="uh-ad-cta">Profilni ko‘rish <ArrowIcon /></span>
             </Link>
           ))}
@@ -60,7 +60,7 @@ export default function UserHome() {
       </section>
 
       <details className="uh-style-disclosure">
-        <summary><UserIcon name="scissors" size={20} /><span><strong>Soch stillari</strong><small>Uslubni old, yon va orqa tomondan ko‘ring</small></span><span className="uh-disclosure-mark" aria-hidden="true" /></summary>
+        <summary><Icon name="scissors" size={20} /><span><strong>Soch stillari</strong><small>Uslubni old, yon va orqa tomondan ko‘ring</small></span><span className="uh-disclosure-mark" aria-hidden="true" /></summary>
         <div className="uh-style-content">
           <div className="uh-style-options" role="group" aria-label="Soch stilini tanlang">
             {sampleHairstyles.map((style) => (

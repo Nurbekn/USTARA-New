@@ -1,7 +1,7 @@
 import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
-import UserIcon from "./components/UserIcon";
+import Icon from "../../components/Icon";
 import ResultCard from "./explore/ResultCard";
 import {
   EMPTY_CATALOG,
@@ -44,7 +44,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
     };
   }, [loadCatalog, attempt, sampleMode]);
 
-  const type = Object.hasOwn(TYPES, params.get("type"))
+  const type = ["barbers", "salons"].includes(params.get("type"))
     ? params.get("type")
     : "barbers";
   const { catalog, status } = request;
@@ -57,9 +57,6 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
   );
   const detailId = params.get("profile");
   const detail = catalog[type].find((item) => String(item.id) === detailId);
-  const categories = [
-    ...new Set(catalog.services.map((s) => s.category).filter(Boolean)),
-  ];
   const min = params.get("min"),
     max = params.get("max");
   const badRange = min && max && Number(min) > Number(max);
@@ -107,7 +104,6 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
       aria-label="Explore"
       aria-busy={status === "loading"}
     >
-      {sampleMode && <p className="ex-sample-notice">Namuna ustalar · Ismlar, narxlar va reytinglar to‘qima. Haqiqiy bron yaratilmaydi.</p>}
       {detailId ? (
         <>
           <Link className="ex-back" to={makeUrl({ profile: null })}>
@@ -129,7 +125,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
             </div>
           ) : (
             <div className="ex-state">
-              <UserIcon name="search" size={32} />
+              <Icon name="search" size={32} />
               <h2>Profil topilmadi</h2>
               <p>Bu profil hali mavjud emas yoki ma’lumotlari yuklanmagan.</p>
             </div>
@@ -138,11 +134,11 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
       ) : (
         <>
           <div className="ex-search">
-            <UserIcon name="search" />
+            <Icon name="search" />
             <input
               type="search"
-              aria-label="Barber, salon yoki xizmat nomi"
-              placeholder="Barber, salon yoki xizmat nomi"
+              aria-label="Usta yoki salonni qidiring"
+              placeholder="Usta yoki salonni qidiring"
               value={query}
               onChange={(e) => update({ q: e.target.value })}
             />
@@ -152,7 +148,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                 aria-label="Qidiruvni tozalash"
                 onClick={() => update({ q: null })}
               >
-                <UserIcon name="close" size={19} />
+                <Icon name="close" size={19} />
               </button>
             )}
           </div>
@@ -162,7 +158,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
               role="group"
               aria-label="Qidiruv kategoriyasi"
             >
-              {Object.entries(TYPES).map(([key, label]) => (
+              {Object.entries(TYPES).filter(([key]) => key !== "services").map(([key, label]) => (
                 <button
                   type="button"
                   key={key}
@@ -173,7 +169,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                       profile: null,
                       category: null,
                       service:
-                        key === "services" ? null : params.get("service"),
+                        params.get("service"),
                     })
                   }
                 >
@@ -250,7 +246,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                   </div>
                 </fieldset>
                 <label>
-                  {type === "services" ? "Taklif qiluvchi reytingi" : "Reyting"}
+                  Reyting
                   <select
                     value={params.get("rating") || ""}
                     onChange={(e) => update({ rating: e.target.value })}
@@ -275,20 +271,16 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                     <option value="10">10 km gacha</option>
                   </select>
                 </label>
-                {type === "services" && (
-                  <label className="ex-category-filter">
-                    Xizmat kategoriyasi
-                    <select
-                      value={params.get("category") || ""}
-                      onChange={(e) => update({ category: e.target.value })}
-                    >
-                      <option value="">Barcha kategoriyalar</option>
-                      {categories.map((category) => (
-                        <option key={category}>{category}</option>
-                      ))}
-                    </select>
-                  </label>
-                )}
+                <label className="ex-service-filter">
+                  Xizmat <small>(ixtiyoriy)</small>
+                  <select
+                    value={params.get("service") || ""}
+                    onChange={(event) => update({ service: event.target.value, category: null })}
+                  >
+                    <option value="">Barcha xizmatlar</option>
+                    {catalog.services.map((service) => <option key={service.id} value={service.id}>{service.name}</option>)}
+                  </select>
+                </label>
                 <label className="ex-checkbox">
                   <input
                     type="checkbox"
@@ -318,7 +310,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                   onClick={() => update({ [key]: null })}
                 >
                   {filterLabel(key)}
-                  <UserIcon name="close" size={14} />
+                  <Icon name="close" size={14} />
                 </button>
               ))}
             </div>
@@ -357,7 +349,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
           ) : (
             <div className="ex-state">
               <span className="ex-state-icon">
-                <UserIcon name="search" size={30} />
+                <Icon name="search" size={30} />
               </span>
               <h2>
                 {hasConstraints

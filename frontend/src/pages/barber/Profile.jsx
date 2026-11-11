@@ -1,5 +1,6 @@
+import Icon from "../../components/Icon";
 import ArrowIcon from "../../components/ArrowIcon";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LocationPicker from "../../components/LocationPicker";
 import { isValidLocation } from "../../components/locationSearch";
@@ -11,7 +12,7 @@ import { useToast } from "./components/Toast";
 import { Avatar } from "../../components/Avatar";
 import { STATUS, getRatingSummary, updateProfile, useBarber } from "./data/store";
 
-import ProfilePhotoField from "../../components/ProfilePhotoField";
+import ProfilePhotoSheet from "../../components/ProfilePhotoSheet";
 
 const FIELDS = ["firstName", "lastName", "salonName", "telegram", "experience", "about", "address", "location"];
 
@@ -24,9 +25,6 @@ export default function Profile() {
   const [pickingAvatar, setPickingAvatar] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [editingLocation, setEditingLocation] = useState(false);
-  const photoBusyRef = useRef(false);
-  const [photoBusy, setPhotoBusy] = useState(false);
-  const [photoError, setPhotoError] = useState("");
   const [error, setError] = useState("");
 
   const dirty = FIELDS.some((k) => JSON.stringify(form[k]) !== JSON.stringify(profile[k] ?? (k === "location" ? null : "")));
@@ -60,9 +58,9 @@ export default function Profile() {
       <PageHeader title="Profil" />
 
       <section className="bx-card bx-hero">
-        <button type="button" className="bx-hero-avatar" onClick={() => { setPhotoError(""); setPickingAvatar(true); }} aria-label="Profil rasmini o‘zgartirish">
+        <button type="button" className="bx-hero-avatar" onClick={() => { setPickingAvatar(true); }} aria-label="Profil rasmini o‘zgartirish">
           <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={92} />
-          <span aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M4 7h4l2-3h4l2 3h4v13H4Z" /><circle cx="12" cy="13" r="3" /></svg></span>
+          <span aria-hidden="true"><Icon name="cameraUpload" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></span>
         </button>
         <h2>
           {profile.firstName} {profile.lastName}
@@ -177,28 +175,15 @@ export default function Profile() {
         </div>
       </Sheet>
 
-      <Sheet compact open={pickingAvatar} title="Profil rasmi" onClose={() => { if (!photoBusyRef.current) setPickingAvatar(false); }}>
-        <div className="bx-form" aria-busy={photoBusy}>
-          <ProfilePhotoField
-            compact
-            value={profile.avatarPhoto || ""}
-            name={`${profile.firstName} ${profile.lastName}`}
-            onBusyChange={(busy) => { photoBusyRef.current = busy; setPhotoBusy(busy); }}
-            onChange={(avatarPhoto) => {
-              setPhotoError("");
-              if (!updateProfile({ avatarPhoto, avatar: null })) {
-                setPhotoError("Rasm saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
-                return;
-              }
-              photoBusyRef.current = false;
-              setPhotoBusy(false);
-              setPickingAvatar(false);
-              show(avatarPhoto ? "Profil rasmi yangilandi" : "Profil rasmi olib tashlandi");
-            }}
-          />
-          {photoError && <p className="bx-error" role="alert">{photoError}</p>}
-        </div>
-      </Sheet>
+      <ProfilePhotoSheet
+        open={pickingAvatar}
+        value={profile.avatarPhoto || ""}
+        name={`${profile.firstName} ${profile.lastName}`}
+        errorClassName="bx-error"
+        onClose={() => setPickingAvatar(false)}
+        onSave={(avatarPhoto) => updateProfile({ avatarPhoto, avatar: null })}
+        onSaved={(avatarPhoto) => show(avatarPhoto ? "Profil rasmi yangilandi" : "Profil rasmi olib tashlandi")}
+      />
       {toast}
     </div>
   );

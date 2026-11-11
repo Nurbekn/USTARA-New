@@ -153,177 +153,12 @@ h4 {
   padding-block: var(--space-8);
 }
 
-.ui-prose {
-  max-width: 60ch;
-}
-
-.ui-hero-title,
-.ui-section-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-}
-
-.ui-hero-title {
-  font-size: var(--font-hero);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-}
-
-.ui-section-title {
-  font-size: var(--font-heading);
-  line-height: 1.08;
-}
-
-.ui-card-title {
-  margin: 0;
-  font-family: var(--font-ui);
-  font-size: var(--font-section);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
 .ui-eyebrow {
   color: var(--accent);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-.ui-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-width: 44px;
-  min-height: 52px;
-  max-width: 100%;
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-weight: 600;
-  line-height: 1.4;
-  text-align: center;
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-.ui-button--primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
-.ui-button--dense {
-  min-height: 48px;
-  padding-block: var(--space-2);
-}
-
-.ui-button--ghost {
-  border-color: transparent;
-}
-
-.ui-button:disabled,
-.ui-button[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.ui-field {
-  display: grid;
-  min-width: 0;
-  gap: var(--space-2);
-}
-
-.ui-label {
-  display: block;
-  color: var(--text);
-  font-size: var(--font-small);
-  font-weight: 500;
-}
-
-.ui-input {
-  width: 100%;
-  min-width: 0;
-  min-height: 52px;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--font-input);
-}
-
-.ui-input::placeholder {
-  color: var(--muted);
-  opacity: 1;
-}
-
-.ui-input:focus {
-  border-color: var(--accent);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.ui-input[aria-invalid="true"] {
-  border-color: var(--danger);
-}
-
-/* Use for repeating items such as barbers, services, bookings, and reviews. */
-.ui-card {
-  min-width: 0;
-  padding: var(--space-5);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-}
-
-.ui-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-button.ui-chip,
-a.ui-chip {
-  min-width: 44px;
-  min-height: 44px;
-}
-
-.ui-chip[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
-@media (hover: hover) {
-  .ui-button--primary:not(:disabled):not([aria-disabled="true"]):hover {
-    border-color: var(--accent-hover);
-    background: var(--accent-hover);
-  }
-
-  .ui-button:not(.ui-button--primary):not(:disabled):not([aria-disabled="true"]):hover {
-    border-color: var(--accent);
-  }
-
-  .ui-button--ghost:not(:disabled):not([aria-disabled="true"]):hover {
-    border-color: transparent;
-    text-decoration: underline;
-    text-underline-offset: var(--space-1);
-  }
 }
 
 @media (min-width: 640px) {
@@ -351,29 +186,13 @@ a.ui-chip {
   }
 }
 
-/* Content is visible by default; useReveal opts observed elements into motion. */
+/* Enable smooth scrolling only when motion is allowed. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 
-  .ui-button,
-  .ui-input,
-  .ui-chip {
-    transition: color 150ms ease-out, background-color 150ms ease-out,
-      border-color 150ms ease-out;
-  }
 
-  .ui-reveal-pending {
-    opacity: 0;
-    transform: translateY(var(--space-2));
-  }
-
-  .ui-reveal-visible {
-    opacity: 1;
-    transform: none;
-    transition: opacity 400ms ease-out, transform 400ms ease-out;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

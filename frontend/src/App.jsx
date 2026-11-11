@@ -4,8 +4,7 @@ import Home from "./pages/home/Home";
 import SampleBarbers from "./pages/home/SampleBarbers";
 import { loadSampleCatalog } from "./pages/home/sampleData";
 import { DemoLayout, DemoHome, DemoBookings, DemoProfile } from "./pages/demo/Demo";
-import Signup from "./pages/auth/Signup";
-import BarberSignup from "./pages/auth/BarberSignup";
+import RegistrationForm from "./pages/auth/components/RegistrationForm";
 import Login from "./pages/auth/Login";
 import Otp from "./pages/auth/Otp";
 import CompleteProfile from "./pages/auth/CompleteProfile";
@@ -49,8 +48,8 @@ function App() {
         <Route path="profile" element={<DemoProfile />} />
       </Route>
 
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/signup/usta" element={<BarberSignup />} />
+      <Route path="/signup" element={<RegistrationForm role="customer" />} />
+      <Route path="/signup/usta" element={<RegistrationForm role="barber" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/otp" element={<Otp />} />
       <Route path="/complete-profile" element={<CompleteProfile />} />

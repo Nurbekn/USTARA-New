@@ -1,3 +1,4 @@
+import Icon from "./Icon";
 import { useEffect, useId, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { prepareProfilePhoto } from "../utils/media/profilePhoto";
@@ -39,17 +40,14 @@ export default function ProfilePhotoField({ value = "", name = "", onChange, onB
       <input ref={inputRef} id={inputId} type="file" accept="image/*" hidden onChange={choosePhoto} disabled={busy} aria-describedby={`${inputId}-hint${error ? ` ${inputId}-error` : ""}`} />
       {compact ? (
         <button type="button" className="profile-photo-upload" disabled={busy} onClick={() => inputRef.current?.click()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h4l2-3h4l2 3h4v13H4Z" /><circle cx="12" cy="13" r="3" /></svg>
+          <Icon name="cameraUpload" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" />
           {busy ? "Rasm tayyorlanmoqda…" : value ? "Rasmni almashtirish" : "Rasm qo‘shish"}
         </button>
       ) : (
       <button type="button" className="profile-photo-trigger" onClick={() => inputRef.current?.click()} disabled={busy} aria-label={value ? "Profil rasmini almashtirish" : "Profil rasmi qo‘shish"} aria-describedby={`${inputId}-hint`}>
         <Avatar photo={value} name={name} size={100} />
         <span className="profile-photo-add" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 7h4l2-3h4l2 3h4v13H4Z" />
-            <circle cx="12" cy="13" r="3" />
-          </svg>
+          <Icon name="cameraUpload" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
         </span>
       </button>
       )}
