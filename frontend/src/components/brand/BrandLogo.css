@@ -5,7 +5,12 @@
 
 .au-logo .brand-lockup { color: var(--text); }
 
-.brand-symbol--approved { position: relative; }
+.brand-symbol--approved {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask: var(--brand-mark) center / contain no-repeat;
+  mask: var(--brand-mark) center / contain no-repeat;
+}
 .brand-symbol--approved > img { display: block; width: 100%; height: 100%; }
 .brand-symbol--approved::after {
   content: "";
@@ -13,17 +18,16 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, .95) 50%, transparent 60%) 100% 0 / 300% 100%;
-  -webkit-mask: var(--brand-mark) center / contain no-repeat;
-  mask: var(--brand-mark) center / contain no-repeat;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .95) 50%, transparent 70%);
+  transform: translateX(-120%);
   opacity: 0;
 }
 @media (prefers-reduced-motion: no-preference) {
   .brand-symbol--approved::after { animation: brand-shine 4s ease-in-out infinite; }
   @keyframes brand-shine {
-    0% { background-position: 100% 0; opacity: 0; }
+    0% { transform: translateX(-120%); opacity: 0; }
     8% { opacity: 1; }
-    45% { background-position: 0% 0; opacity: 1; }
-    55%, 100% { background-position: 0% 0; opacity: 0; }
+    45% { transform: translateX(120%); opacity: 1; }
+    55%, 100% { transform: translateX(120%); opacity: 0; }
   }
 }

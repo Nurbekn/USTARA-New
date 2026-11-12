@@ -2,9 +2,10 @@ import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import { loadSampleCatalog } from "./pages/home/sampleData";
-import RequireSession from "./pages/auth/components/RequireSession";
-import BarberLayout from "./layouts/BarberLayout";
-import UserLayout from "./layouts/UserLayout";
+
+const RequireSession = lazy(() => import("./pages/auth/components/RequireSession"));
+const BarberLayout = lazy(() => import("./layouts/BarberLayout"));
+const UserLayout = lazy(() => import("./layouts/UserLayout"));
 
 const LogoShowcase = lazy(() => import("./pages/logos/LogoShowcase"));
 const Home = lazy(() => import("./pages/home/Home"));

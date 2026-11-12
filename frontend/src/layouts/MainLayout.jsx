@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import Loading from "../components/Loading";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,7 +9,7 @@ function MainLayout() {
     <>
       <Navbar />
       <main>
-        <Outlet />
+        <Suspense fallback={<Loading />}><Outlet /></Suspense>
       </main>
       <Footer />
     </>

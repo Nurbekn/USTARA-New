@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import Loading from "../components/Loading";
 import { BrandSymbol } from "../components/brand/BrandLogo";
 import Icon from "../components/Icon";
 import { useEffect, useState } from "react";
@@ -58,7 +60,7 @@ export default function UserLayout() {
       </header>
 
       <main id="uc-content" className="uc-main" tabIndex={-1}>
-        <Outlet context={{ profile, setProfile }} />
+        <Suspense fallback={<Loading />}><Outlet context={{ profile, setProfile }} /></Suspense>
       </main>
 
       <nav className="uc-nav" aria-label="Mijoz navigatsiyasi">

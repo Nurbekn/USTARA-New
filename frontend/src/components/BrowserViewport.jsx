@@ -23,9 +23,12 @@ export default function BrowserViewport() {
       const height = viewport?.height ?? window.innerHeight;
       // Pinch zoom is not a keyboard. Keep zoom available for accessibility.
       const keyboard = editing && (viewport?.scale ?? 1) < 1.1 && fullHeight - height > 150;
-      root.style.setProperty("--visible-height", `${Math.round(height)}px`);
-      root.style.setProperty("--visible-top", `${Math.round(viewport?.offsetTop ?? 0)}px`);
-      root.dataset.keyboard = keyboard ? "open" : "closed";
+      const nextHeight = `${Math.round(height)}px`;
+      const nextTop = `${Math.round(viewport?.offsetTop ?? 0)}px`;
+      const nextKeyboard = keyboard ? "open" : "closed";
+      if (root.style.getPropertyValue("--visible-height") !== nextHeight) root.style.setProperty("--visible-height", nextHeight);
+      if (root.style.getPropertyValue("--visible-top") !== nextTop) root.style.setProperty("--visible-top", nextTop);
+      if (root.dataset.keyboard !== nextKeyboard) root.dataset.keyboard = nextKeyboard;
     };
     const schedule = () => {
       cancelAnimationFrame(frame);

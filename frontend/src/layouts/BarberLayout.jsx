@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import Loading from "../components/Loading";
 import { BrandSymbol } from "../components/brand/BrandLogo";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
@@ -107,7 +109,7 @@ export default function BarberLayout() {
       </header>
 
       <main className="bx-main">
-        <Outlet />
+        <Suspense fallback={<Loading />}><Outlet /></Suspense>
       </main>
 
       <nav className="bx-nav" aria-label="Asosiy menyu">
