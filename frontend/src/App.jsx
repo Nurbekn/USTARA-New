@@ -1,36 +1,44 @@
+import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/home/Home";
-import SampleBarbers from "./pages/home/SampleBarbers";
 import { loadSampleCatalog } from "./pages/home/sampleData";
-import { DemoLayout, DemoHome, DemoBookings, DemoProfile } from "./pages/demo/Demo";
-import RegistrationForm from "./pages/auth/components/RegistrationForm";
-import Login from "./pages/auth/Login";
-import Otp from "./pages/auth/Otp";
-import CompleteProfile from "./pages/auth/CompleteProfile";
 import RequireSession from "./pages/auth/components/RequireSession";
-import BarberProfileEdit from "./pages/barber/BarberProfileEdit";
-import ApprovalPending from "./pages/barber/ApprovalPending";
 import BarberLayout from "./layouts/BarberLayout";
-import Dashboard from "./pages/barber/Dashboard";
-import Bookings from "./pages/barber/Bookings";
-import Schedule from "./pages/barber/Schedule";
-import Portfolio from "./pages/barber/Portfolio";
-import Earnings from "./pages/barber/Earnings";
-import Reviews from "./pages/barber/Reviews";
-import Services from "./pages/barber/Services";
-import Profile from "./pages/barber/Profile";
 import UserLayout from "./layouts/UserLayout";
-import UserHome from "./pages/user/UserHome";
-import Explore from "./pages/user/Explore";
-import UserBookings from "./pages/user/Bookings";
-import Social from "./pages/user/Social";
-import UserProfile from "./pages/user/Profile";
-import BarberPublicProfile from "./pages/user/barber/BarberPublicProfile";
+
+const LogoShowcase = lazy(() => import("./pages/logos/LogoShowcase"));
+const Home = lazy(() => import("./pages/home/Home"));
+const SampleBarbers = lazy(() => import("./pages/home/SampleBarbers"));
+const DemoLayout = lazy(() => import("./pages/demo/Demo").then((module) => ({ default: module.DemoLayout })));
+const DemoHome = lazy(() => import("./pages/demo/Demo").then((module) => ({ default: module.DemoHome })));
+const DemoBookings = lazy(() => import("./pages/demo/Demo").then((module) => ({ default: module.DemoBookings })));
+const DemoProfile = lazy(() => import("./pages/demo/Demo").then((module) => ({ default: module.DemoProfile })));
+const RegistrationForm = lazy(() => import("./pages/auth/components/RegistrationForm"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const Login = lazy(() => import("./pages/auth/Login"));
+const Otp = lazy(() => import("./pages/auth/Otp"));
+const CompleteProfile = lazy(() => import("./pages/auth/CompleteProfile"));
+const BarberProfileEdit = lazy(() => import("./pages/barber/BarberProfileEdit"));
+const ApprovalPending = lazy(() => import("./pages/barber/ApprovalPending"));
+const Dashboard = lazy(() => import("./pages/barber/Dashboard"));
+const Bookings = lazy(() => import("./pages/barber/Bookings"));
+const Schedule = lazy(() => import("./pages/barber/Schedule"));
+const Portfolio = lazy(() => import("./pages/barber/Portfolio"));
+const Earnings = lazy(() => import("./pages/barber/Earnings"));
+const Reviews = lazy(() => import("./pages/barber/Reviews"));
+const Services = lazy(() => import("./pages/barber/Services"));
+const Profile = lazy(() => import("./pages/barber/Profile"));
+const UserHome = lazy(() => import("./pages/user/UserHome"));
+const Explore = lazy(() => import("./pages/user/Explore"));
+const UserBookings = lazy(() => import("./pages/user/Bookings"));
+const Social = lazy(() => import("./pages/user/Social"));
+const UserProfile = lazy(() => import("./pages/user/Profile"));
+const BarberPublicProfile = lazy(() => import("./pages/user/barber/BarberPublicProfile"));
 
 function App() {
   return (
     <Routes>
+      <Route path="/logos" element={<LogoShowcase />} />
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route
@@ -51,6 +59,7 @@ function App() {
       <Route path="/signup" element={<RegistrationForm role="customer" />} />
       <Route path="/signup/usta" element={<RegistrationForm role="barber" />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/otp" element={<Otp />} />
       <Route path="/complete-profile" element={<CompleteProfile />} />
       <Route element={<RequireSession role="customer" />}>

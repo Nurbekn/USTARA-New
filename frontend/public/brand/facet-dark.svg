@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="Ustara"><g transform="scale(.5)">
+  <defs>
+    <linearGradient id="head" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#70F2FA"/><stop offset=".45" stop-color="#00B9FF"/><stop offset="1" stop-color="#0645ED"/></linearGradient>
+    <linearGradient id="left" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#8BF6F8"/><stop offset=".45" stop-color="#079EFF"/><stop offset="1" stop-color="#1247EB"/></linearGradient>
+    <linearGradient id="inner" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#102CAC"/><stop offset=".4" stop-color="#0757F5"/><stop offset="1" stop-color="#51E5F4"/></linearGradient>
+    <linearGradient id="front" x1=".1" y1=".8" x2=".8" y2=".3"><stop stop-color="#8AF6F6"/><stop offset=".4" stop-color="#11CBF4"/><stop offset=".75" stop-color="#067AFF"/><stop offset="1" stop-color="#092AEA"/></linearGradient>
+    <linearGradient id="right" x1=".4" y1="0" x2=".7" y2="1"><stop stop-color="#6BE8F9"/><stop offset="1" stop-color="#059AFF"/></linearGradient>
+  </defs>
+  <circle cx="29" cy="20" r="10.5" fill="url(#head)"/>
+  <circle cx="99" cy="20" r="10.5" fill="url(#head)"/>
+  <path d="M57 38C39 23 11 39 5 58C-3 79 15 99 34 105C14 93 17 78 24 64C33 47 44 33 57 38Z" fill="url(#left)"/>
+  <path d="M49 37C56 42 54 55 55 63C55 78 63 85 75 80C87 75 98 62 100 55C99 73 84 90 66 94C48 98 33 86 33 68V54C37 47 43 40 49 37Z" fill="url(#inner)"/>
+  <path d="M73 38C94 25 120 39 122 57C121 66 112 73 102 79C110 68 111 56 106 48C100 38 87 34 73 38Z" fill="url(#right)"/>
+  <path d="M21 98C40 111 63 97 82 80C98 67 111 45 122 57C135 81 96 107 73 115C53 122 34 115 21 98Z" fill="url(#front)"/>
+  <path d="M66 46A2.5 2.5 0 0 1 68.5 48.5V57H76A2.5 2.5 0 0 1 76 62H66A2.5 2.5 0 0 1 63.5 59.5V48.5A2.5 2.5 0 0 1 66 46Z" fill="url(#head)"/>
+</g><g transform="translate(78 20) scale(.44)"><g fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round"><path d="M4 4V25Q4 42 24 42Q44 42 44 25V4"/><path d="M104 4H78Q64 4 64 14Q64 24 78 24H90Q104 24 104 33Q104 42 90 42H62"/><path d="M120 4H168M144 4V44"/><path d="M181 43L201 9Q205 2 209 9L229 43"/><path d="M246 44V4H270Q287 4 287 15Q287 26 270 26H250M268 26L291 43"/><path d="M308 43L328 9Q332 2 336 9L356 43"/></g><circle cx="205" cy="36" r="4.5" fill="#00B9FF"/></g></svg>

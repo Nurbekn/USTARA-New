@@ -35,13 +35,11 @@
   backdrop-filter: blur(12px);
 }
 .bx-logo {
-  font-family: var(--font-ui);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-.bx-logo span {
-  color: var(--bx-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 .bx-top-right {
   display: flex;
@@ -1043,6 +1041,10 @@ textarea.bx-input {
   text-align: left;
 }
 
+.bp-setup .bp-head h1 {
+  text-align: center;
+}
+
 .bp-head h1 {
   margin: 0 0 6px;
   font-size: var(--font-page);
@@ -1349,19 +1351,9 @@ textarea.bx-input {
   border-radius: 50%;
   background: var(--bx-surface);
 }
-.bx-portfolio-avatar .bx-avatar,
-.bx-portfolio-avatar-empty {
-  width: clamp(64px, 19vw, 88px);
-  height: clamp(64px, 19vw, 88px);
-}
-.bx-portfolio-avatar-empty {
-  display: grid;
-  place-items: center;
-  color: var(--bx-muted);
-}
-.bx-portfolio-avatar-empty svg {
-  width: 32px;
-  height: 32px;
+.bx-portfolio-avatar .bx-avatar {
+  width: clamp(80px, 22vw, 96px);
+  height: clamp(80px, 22vw, 96px);
 }
 .bx-portfolio-stats {
   display: grid;
@@ -1378,13 +1370,14 @@ textarea.bx-input {
   min-width: 0;
 }
 .bx-portfolio-stats dt {
-  color: #cbd5e1;
-  font-size: var(--font-small);
-  line-height: 1.35;
+  color: var(--text);
+  font-size: clamp(12px, 3.4vw, 15px);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 .bx-portfolio-stats dd {
   margin: 0;
-  font-size: var(--font-small);
+  font-size: 22px;
   line-height: 1.2;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -1662,16 +1655,15 @@ textarea.bx-input {
   .bx-portfolio-overview {
     gap: 32px;
   }
-  .bx-portfolio-avatar .bx-avatar,
-  .bx-portfolio-avatar-empty {
-    width: 104px;
-    height: 104px;
+  .bx-portfolio-avatar .bx-avatar {
+    width: 112px;
+    height: 112px;
   }
   .bx-portfolio-stats dt {
-    font-size: var(--font-small);
+    font-size: 16px;
   }
   .bx-portfolio-stats dd {
-    font-size: var(--font-small);
+    font-size: 26px;
   }
   .bx-portfolio-details h2 {
     font-size: var(--font-section);

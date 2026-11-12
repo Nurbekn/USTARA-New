@@ -1,3 +1,4 @@
+import PageLoading from "../../components/Loading";
 import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
@@ -374,20 +375,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
   );
 }
 function Loading() {
-  return (
-    <div className="ex-loading" role="status">
-      <span>Ma’lumotlar yuklanmoqda…</span>
-      <div className="ex-results" aria-hidden="true">
-        {[0, 1, 2].map((id) => (
-          <div className="ex-skeleton" key={id}>
-            <i />
-            <i />
-            <i />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <PageLoading label="Ustalar yuklanmoqda…" />;
 }
 function ErrorState({ onRetry }) {
   return (

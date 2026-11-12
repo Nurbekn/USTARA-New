@@ -48,6 +48,12 @@ export const sampleHairstyles = [
   { id: 'fade', name: 'Toza fade', row: 0, serviceId: 'demo-fade', description: 'Qisqa yonlar, silliq o‘tish va aniq kontur. Kundalik parvarishi oson.' },
   { id: 'texture', name: 'Tekstura', row: 1, serviceId: 'demo-texture', description: 'Tabiiy hajm va erkin turmak. Sochning tabiiy shaklini ochib beradi.' },
   { id: 'classic', name: 'Klassik', row: 2, serviceId: 'demo-classic', description: 'Tartibli ajrim va yumshoq chiziqlar. Har kuni uchun qulay ko‘rinish.' },
+  { id: 'buzz', name: 'Buzz cut', atlas: image('haircuts-short.webp'), row: 0, serviceId: 'demo-fade', description: 'Bir tekis juda qisqa tepa va toza fade. Ixcham, qulay va kundalik turmaklashni talab qilmaydi.' },
+  { id: 'french-crop', name: 'French crop', atlas: image('haircuts-short.webp'), row: 1, serviceId: 'demo-texture', description: 'Qisqa teksturali tepa va peshonaga tushgan tekis kokil. Yonlari toza, shakli aniq.' },
+  { id: 'curly-taper', name: 'Jingalak taper', atlas: image('haircuts-short.webp'), row: 2, serviceId: 'demo-texture', description: 'Tabiiy jingalaklar tepada saqlanadi. Chakka va ensadagi yumshoq taper turmakka tartib beradi.' },
+  { id: 'quiff', name: 'Quiff', atlas: image('haircuts-long.webp'), row: 0, serviceId: 'demo-classic', description: 'Old qismi yuqoriga ko‘tarilgan hajmli turmak. Qisqa yonlar va orqaga yo‘naltirilgan tekstura.' },
+  { id: 'curtains', name: 'Curtains', atlas: image('haircuts-long.webp'), row: 1, serviceId: 'demo-classic', description: 'O‘rtadan ajratilgan o‘rta uzunlikdagi soch. Yuzning ikki tomoniga tabiiy tushadigan yumshoq to‘lqinlar.' },
+  { id: 'mullet', name: 'Modern mullet', atlas: image('haircuts-long.webp'), row: 2, serviceId: 'demo-texture', description: 'Qisqaroq yonlar, teksturali tepa va uzunroq ensa. Erkin xarakterli zamonaviy turmak.' },
 ];
 
 const sampleWeekdays = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];

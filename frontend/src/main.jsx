@@ -1,4 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
+import Loading from "./components/Loading";
+import AppErrorBoundary from "./components/AppErrorBoundary";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
@@ -10,7 +12,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <BrowserViewport />
-      <App />
+      <AppErrorBoundary>
+        <Suspense fallback={<Loading screen />}>
+          <App />
+        </Suspense>
+      </AppErrorBoundary>
     </BrowserRouter>
   </React.StrictMode>,
 );

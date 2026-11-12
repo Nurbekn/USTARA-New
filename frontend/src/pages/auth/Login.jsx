@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthLayout, PhoneField } from "./components/AuthParts";
 import { getAccount, setSession } from "./utils/session";
 import "./auth-ui.css";
@@ -9,7 +9,8 @@ import { hasPasswordRecord, verifyPassword } from "./credentials";
 // Local test login verifies the stored password and restores the existing session.
 export default function Login() {
   const navigate = useNavigate();
-  const [phone, setPhone] = useState("");
+  const location = useLocation();
+  const [phone, setPhone] = useState(() => typeof location.state?.phone === "string" ? location.state.phone : "");
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -73,6 +74,8 @@ export default function Login() {
         />
 
         <PasswordField value={password} error={passwordError} onChange={(value) => { setPassword(value); setPasswordError(""); }} />
+
+        <Link to="/forgot-password" state={{ phone }} className="au-forgot-link">Parolni unutdingizmi?</Link>
 
         {notFound && (
           <p className="au-error" role="alert">

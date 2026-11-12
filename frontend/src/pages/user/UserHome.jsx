@@ -65,7 +65,7 @@ export default function UserHome() {
           <div className="uh-style-options" role="group" aria-label="Soch stilini tanlang">
             {sampleHairstyles.map((style) => (
               <button type="button" key={style.id} className="uh-style-option" aria-pressed={style.id === styleId} aria-controls="uh-style-preview" onClick={() => { setStyleId(style.id); setView(0); }}>
-                <span className="uh-style-thumbnail" style={{ backgroundImage: `url(${sampleHairAtlas})`, backgroundPosition: atlasPosition(style.row, 0) }} />
+                <span className="uh-style-thumbnail" aria-hidden="true" style={{ backgroundImage: `url(${style.atlas || sampleHairAtlas})`, backgroundPosition: atlasPosition(style.row, 0) }} />
                 <span>{style.name}</span>
               </button>
             ))}
@@ -82,7 +82,7 @@ export default function UserHome() {
               const dy = event.clientY - start.y;
               if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) changeView(dx < 0 ? 1 : -1);
             }}>
-              <div className="uh-view-photo" role="img" aria-label={`${selectedStyle.name} — ${VIEWS[view].toLowerCase()} ko‘rinish`} style={{ backgroundImage: `url(${sampleHairAtlas})`, backgroundPosition: atlasPosition(selectedStyle.row, view) }} />
+              <div className="uh-view-photo" role="img" aria-label={`${selectedStyle.name} — ${VIEWS[view].toLowerCase()} ko‘rinish`} style={{ backgroundImage: `url(${selectedStyle.atlas || sampleHairAtlas})`, backgroundPosition: atlasPosition(selectedStyle.row, view) }} />
               <button type="button" className="uh-view-arrow uh-view-prev" aria-label="Oldingi ko‘rinish" onClick={() => changeView(-1)}><ArrowIcon direction="left" /></button>
               <button type="button" className="uh-view-arrow uh-view-next" aria-label="Keyingi ko‘rinish" onClick={() => changeView(1)}><ArrowIcon /></button>
               <span className="uh-view-counter" aria-hidden="true">{view + 1} / {VIEWS.length}</span>

@@ -26,8 +26,12 @@ export default function Bookings() {
   const byTime = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
   const lists = {
     pending: bookings.filter((b) => b.status === STATUS.PENDING).sort(byTime),
-    confirmed: bookings.filter((b) => b.status === STATUS.CONFIRMED).sort(byTime),
-    history: bookings.filter((b) => HISTORY.includes(b.status)).sort((a, b) => byTime(b, a)),
+    confirmed: bookings
+      .filter((b) => b.status === STATUS.CONFIRMED)
+      .sort(byTime),
+    history: bookings
+      .filter((b) => HISTORY.includes(b.status))
+      .sort((a, b) => byTime(b, a)),
   };
 
   // Open on "Kutilmoqda" if there is something to answer
@@ -59,7 +63,9 @@ export default function Bookings() {
             }}
           >
             {t.label}
-            {t.id !== "history" && lists[t.id].length > 0 && <em>{lists[t.id].length}</em>}
+            {t.id !== "history" && lists[t.id].length > 0 && (
+              <em>{lists[t.id].length}</em>
+            )}
           </button>
         ))}
       </div>

@@ -41,7 +41,10 @@ export default function Dashboard() {
       {profile.services.length === 0 && (
         <Link to="/barber/services" className="bx-todo">
           <strong>Xizmat qo'shing</strong>
-          <span className="ui-arrow-inline">Mijozlar bron qila olishi uchun kamida bitta xizmat va narx kerak <ArrowIcon /></span>
+          <span className="ui-arrow-inline">
+            Mijozlar bron qila olishi uchun kamida bitta xizmat va narx kerak{" "}
+            <ArrowIcon />
+          </span>
         </Link>
       )}
 
@@ -49,7 +52,9 @@ export default function Dashboard() {
         <Link to="/barber/earnings" className="bx-stat bx-stat-main">
           <span>Bugungi daromad</span>
           <strong>{formatMoney(earnedToday)}</strong>
-          <small className="ui-arrow-inline">Batafsil <ArrowIcon /></small>
+          <small className="ui-arrow-inline">
+            Batafsil <ArrowIcon />
+          </small>
         </Link>
         <Link to="/barber/reviews" className="bx-stat">
           <span>Reyting</span>
@@ -67,7 +72,10 @@ export default function Dashboard() {
               {next.customer} · {next.service}
             </p>
           </div>
-          <a href={`tel:${next.phone}`} className="bx-btn bx-btn-sm bx-btn-primary">
+          <a
+            href={`tel:${next.phone}`}
+            className="bx-btn bx-btn-sm bx-btn-primary"
+          >
             Qo'ng'iroq
           </a>
         </section>

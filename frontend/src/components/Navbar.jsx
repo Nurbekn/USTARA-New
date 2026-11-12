@@ -1,3 +1,4 @@
+import BrandLogo from "./brand/BrandLogo";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
@@ -33,10 +34,7 @@ function Navbar() {
     <header className="navbar">
       <div className="navbar-inner container">
         <Link to="/" className="navbar-logo" onClick={closeMenu}>
-          <span className="navbar-logo-icon">U</span>
-          <span>
-            USTARA<span className="logo-dot">.</span>
-          </span>
+          <BrandLogo />
         </Link>
 
         {/* Phones: sign-up stays visible, right in front of the burger */}

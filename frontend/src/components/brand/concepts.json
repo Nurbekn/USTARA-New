@@ -1,0 +1,70 @@
+[
+  {
+    "id": "facet",
+    "name": "Ustara — tanlangan logo",
+    "direction": "Insonlar + uchrashuv + vaqt",
+    "description": "Ikki inson — mijoz va mutaxassis. Ularni tutashtiruvchi umumiy oqim — xizmatlar ekotizimi, markazdagi soat esa kelishilgan uchrashuv vaqti.",
+    "paths": [
+      "M18 12V8A3 3 0 0 1 24 8V12H40V8A3 3 0 0 1 46 8V12H48A10 10 0 0 1 58 22V48A10 10 0 0 1 48 58H16A10 10 0 0 1 6 48V22A10 10 0 0 1 16 12ZM16 18A4 4 0 0 0 12 22V48A4 4 0 0 0 16 52H48A4 4 0 0 0 52 48V22A4 4 0 0 0 48 18Z",
+      "M9 24H55V29H9Z",
+      "M21 38A3 3 0 0 1 25.2 38L30 42.8L39.8 33A3 3 0 0 1 44 37.2L32.1 49.1A3 3 0 0 1 27.9 49.1L21 42.2A3 3 0 0 1 21 38Z"
+    ],
+    "faviconPaths": [
+      "M18 12V8A3 3 0 0 1 24 8V12H40V8A3 3 0 0 1 46 8V12H48A10 10 0 0 1 58 22V48A10 10 0 0 1 48 58H16A10 10 0 0 1 6 48V22A10 10 0 0 1 16 12ZM16 18A4 4 0 0 0 12 22V48A4 4 0 0 0 16 52H48A4 4 0 0 0 52 48V22A4 4 0 0 0 48 18Z",
+      "M9 24H55V29H9Z",
+      "M21 38A3 3 0 0 1 25.2 38L30 42.8L39.8 33A3 3 0 0 1 44 37.2L32.1 49.1A3 3 0 0 1 27.9 49.1L21 42.2A3 3 0 0 1 21 38Z"
+    ]
+  },
+  {
+    "id": "meet",
+    "name": "Tutashuv",
+    "direction": "Bog‘lanish",
+    "description": "Ikki mustaqil shakl o‘rtadagi ochiq yo‘lak orqali tutashadi. Mijoz va ustaning bir vaqtda uchrashishi.",
+    "paths": [
+      "M8 16Q8 8 16 8H36V20H20V36H8Z",
+      "M56 48Q56 56 48 56H28V44H44V28H56Z",
+      "M26 26H38V38H26Z"
+    ]
+  },
+  {
+    "id": "flow",
+    "name": "Oqim",
+    "direction": "Harakat",
+    "description": "Bir yo‘nalishda siljigan uchta yumshoq kesim. Qidiruvdan brongacha bo‘lgan sodda va tez yo‘l.",
+    "paths": [
+      "M8 17Q10 10 18 10H50L40 22H6Z",
+      "M14 27H58L48 39H4Z",
+      "M12 44H44L34 56H4Z"
+    ]
+  },
+  {
+    "id": "caliber",
+    "name": "Mezon",
+    "direction": "Aniqlik",
+    "description": "Siljigan romb ichidagi aniq markaz. Tanlangan vaqt va xizmatning tartibli, o‘lchangan muvozanati.",
+    "paths": [
+      "M32 4 59 31 48 42 32 26 16 42 5 31Z",
+      "M21 47 32 36 43 47 32 58Z"
+    ]
+  },
+  {
+    "id": "passage",
+    "name": "Oraliq",
+    "direction": "Manfiy bo‘shliq",
+    "description": "Yaxlit olti qirrali shakl ichidan o‘tadigan ochiq yo‘lak. Ramzni chiziq emas, uning orasidagi bo‘shliq yaratadi.",
+    "paths": [
+      "M32 4 58 19V45L32 60 6 45V19ZM18 20V42L29 48V32L46 42V22L35 16V32Z"
+    ]
+  },
+  {
+    "id": "crest",
+    "name": "Tutash nuqta",
+    "direction": "Ustara uchun yangi taklif",
+    "description": "Uchta turli yo‘l bitta ochiq markaz atrofida tutashadi. Turli mutaxassislar, mijoz va kelishilgan vaqtni birlashtiradigan ekotizim ramzi. Harf yoki kasb asbobiga asoslanmagan.",
+    "paths": [
+      "M7 29C4 18 12 8 24 7C34 6 42 10 48 17L39 24C35 19 30 17 25 18C20 18 17 21 18 25L24 36L14 42Z",
+      "M48 17C59 21 63 33 57 44C53 53 45 57 36 57L35 46C42 46 47 43 48 39C51 34 50 31 46 30L34 29L35 17Z",
+      "M36 57C27 64 14 60 8 50C3 42 3 34 7 29L17 34C14 39 15 44 18 47C21 51 25 52 28 49L34 39L44 45Z"
+    ]
+  }
+]

@@ -1,3 +1,4 @@
+import PageLoading from "../../components/Loading";
 import { Avatar } from "../../components/Avatar";
 import ArrowIcon from "../../components/ArrowIcon";
 import { useEffect, useRef, useState } from "react";
@@ -300,10 +301,7 @@ export default function Social({
         </button>
       )}
       {status === "loading" ? (
-        <div className="so-loading" role="status">
-          <p>Postlar yuklanmoqda…</p>
-          <div className="so-skeleton" aria-hidden="true" />
-        </div>
+        <PageLoading label="Postlar yuklanmoqda…" />
       ) : status === "error" ? (
         <Empty
           title="Lentani yuklab bo‘lmadi"

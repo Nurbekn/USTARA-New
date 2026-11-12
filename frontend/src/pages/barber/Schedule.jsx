@@ -14,7 +14,8 @@ export default function Schedule() {
 
   const save = () => {
     if (invalid) return show("Tugash vaqti boshlanishdan keyin bo'lishi kerak");
-    if (!updateProfile({ hours: draft })) return show("Jadval saqlanmadi. Qayta urinib ko‘ring.");
+    if (!updateProfile({ hours: draft }))
+      return show("Jadval saqlanmadi. Qayta urinib ko‘ring.");
     show("Jadval saqlandi");
   };
 
@@ -26,7 +27,9 @@ export default function Schedule() {
         <div>
           <strong>Bron qabul qilish</strong>
           <p className="bx-muted">
-            {profile.isAvailable ? "Mijozlar sizga bron qila oladi" : "Hozir yangi bronlar yopiq"}
+            {profile.isAvailable
+              ? "Mijozlar sizga bron qila oladi"
+              : "Hozir yangi bronlar yopiq"}
           </p>
         </div>
         <button

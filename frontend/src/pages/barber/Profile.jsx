@@ -10,34 +10,65 @@ import Sheet from "../../components/Sheet";
 import Stars from "./components/Stars";
 import { useToast } from "./components/Toast";
 import { Avatar } from "../../components/Avatar";
-import { STATUS, getRatingSummary, updateProfile, useBarber } from "./data/store";
+import {
+  STATUS,
+  getRatingSummary,
+  updateProfile,
+  useBarber,
+} from "./data/store";
 
 import ProfilePhotoSheet from "../../components/ProfilePhotoSheet";
 
-const FIELDS = ["firstName", "lastName", "salonName", "telegram", "experience", "about", "address", "location"];
+const FIELDS = [
+  "firstName",
+  "lastName",
+  "salonName",
+  "telegram",
+  "experience",
+  "about",
+  "address",
+  "location",
+];
 
 export default function Profile() {
   const { profile, bookings, reviews } = useBarber();
   const navigate = useNavigate();
   const { toast, show } = useToast();
 
-  const [form, setForm] = useState(() => Object.fromEntries(FIELDS.map((k) => [k, profile[k] ?? (k === "location" ? null : "")])));
+  const [form, setForm] = useState(() =>
+    Object.fromEntries(
+      FIELDS.map((k) => [k, profile[k] ?? (k === "location" ? null : "")]),
+    ),
+  );
   const [pickingAvatar, setPickingAvatar] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [editingLocation, setEditingLocation] = useState(false);
   const [error, setError] = useState("");
 
-  const dirty = FIELDS.some((k) => JSON.stringify(form[k]) !== JSON.stringify(profile[k] ?? (k === "location" ? null : "")));
+  const dirty = FIELDS.some(
+    (k) =>
+      JSON.stringify(form[k]) !==
+      JSON.stringify(profile[k] ?? (k === "location" ? null : "")),
+  );
   const set = (patch) => setForm((previous) => ({ ...previous, ...patch }));
 
-  const completed = bookings.filter((b) => b.status === STATUS.COMPLETED).length;
+  const completed = bookings.filter(
+    (b) => b.status === STATUS.COMPLETED,
+  ).length;
   const { average, count } = getRatingSummary(reviews);
 
   const save = () => {
     if (form.firstName.trim().length < 2) return setError("Ismni kiriting");
-    if (form.salonName.trim() && form.salonName.trim().length < 2) return setError("Salon nomi kamida 2 belgi bo'lsin");
-    if ((form.address !== (profile.address || "") || JSON.stringify(form.location) !== JSON.stringify(profile.location)) && !isValidLocation(form.location)) {
-      return setError("Manzilni qidirib, topilgan natijani tanlang yoki xaritada joyni belgilang.");
+    if (form.salonName.trim() && form.salonName.trim().length < 2)
+      return setError("Salon nomi kamida 2 belgi bo'lsin");
+    if (
+      (form.address !== (profile.address || "") ||
+        JSON.stringify(form.location) !== JSON.stringify(profile.location)) &&
+      !isValidLocation(form.location)
+    ) {
+      return setError(
+        "Manzilni qidirib, topilgan natijani tanlang yoki xaritada joyni belgilang.",
+      );
     }
     setError("");
     const saved = updateProfile({
@@ -46,9 +77,15 @@ export default function Profile() {
       lastName: form.lastName.trim(),
       salonName: form.salonName.trim(),
       telegram: form.telegram.replace("@", "").trim(),
-      experience: form.experience === "" ? null : Math.max(0, Number(form.experience) || 0),
+      experience:
+        form.experience === ""
+          ? null
+          : Math.max(0, Number(form.experience) || 0),
     });
-    if (!saved) return setError("Profil saqlanmadi. Brauzer xotirasi to‘lgan yoki saqlash bloklangan. Qayta urinib ko‘ring.");
+    if (!saved)
+      return setError(
+        "Profil saqlanmadi. Brauzer xotirasi to‘lgan yoki saqlash bloklangan. Qayta urinib ko‘ring.",
+      );
     setEditingLocation(false);
     show("Profil saqlandi");
   };
@@ -58,9 +95,32 @@ export default function Profile() {
       <PageHeader title="Profil" />
 
       <section className="bx-card bx-hero">
-        <button type="button" className="bx-hero-avatar" onClick={() => { setPickingAvatar(true); }} aria-label="Profil rasmini o‘zgartirish">
-          <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={92} />
-          <span aria-hidden="true"><Icon name="cameraUpload" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></span>
+        <button
+          type="button"
+          className="bx-hero-avatar"
+          onClick={() => {
+            setPickingAvatar(true);
+          }}
+          aria-label="Profil rasmini o‘zgartirish"
+        >
+          <Avatar
+            photo={profile.avatarPhoto}
+            id={profile.avatar}
+            name={profile.firstName}
+            size={92}
+          />
+          <span aria-hidden="true">
+            <Icon
+              name="cameraUpload"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            />
+          </span>
         </button>
         <h2>
           {profile.firstName} {profile.lastName}
@@ -83,9 +143,24 @@ export default function Profile() {
       </section>
 
       <nav className="bx-links" aria-label="Bo'limlar">
-        <Link to="/barber/earnings">Daromad <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
-        <Link to="/barber/reviews">Sharhlar <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
-        <Link to="/barber/services">Xizmatlar va narxlar <span className="ui-arrow-inline"><ArrowIcon variant="chevron" /></span></Link>
+        <Link to="/barber/earnings">
+          Daromad{" "}
+          <span className="ui-arrow-inline">
+            <ArrowIcon variant="chevron" />
+          </span>
+        </Link>
+        <Link to="/barber/reviews">
+          Sharhlar{" "}
+          <span className="ui-arrow-inline">
+            <ArrowIcon variant="chevron" />
+          </span>
+        </Link>
+        <Link to="/barber/services">
+          Xizmatlar va narxlar{" "}
+          <span className="ui-arrow-inline">
+            <ArrowIcon variant="chevron" />
+          </span>
+        </Link>
       </nav>
 
       <section className="bx-card bx-form">
@@ -93,16 +168,28 @@ export default function Profile() {
         <div className="bx-grid-2">
           <label className="bx-field">
             Ism
-            <input className="bx-input" value={form.firstName} onChange={(e) => set({ firstName: e.target.value })} />
+            <input
+              className="bx-input"
+              value={form.firstName}
+              onChange={(e) => set({ firstName: e.target.value })}
+            />
           </label>
           <label className="bx-field">
             Familiya
-            <input className="bx-input" value={form.lastName} onChange={(e) => set({ lastName: e.target.value })} />
+            <input
+              className="bx-input"
+              value={form.lastName}
+              onChange={(e) => set({ lastName: e.target.value })}
+            />
           </label>
         </div>
         <label className="bx-field">
           Salon nomi
-          <input className="bx-input" value={form.salonName} onChange={(e) => set({ salonName: e.target.value })} />
+          <input
+            className="bx-input"
+            value={form.salonName}
+            onChange={(e) => set({ salonName: e.target.value })}
+          />
         </label>
         <label className="bx-field">
           Telefon
@@ -111,65 +198,130 @@ export default function Profile() {
         <div className="bx-grid-2">
           <label className="bx-field">
             Telegram
-            <input className="bx-input" value={form.telegram} placeholder="username" onChange={(e) => set({ telegram: e.target.value })} />
+            <input
+              className="bx-input"
+              value={form.telegram}
+              placeholder="username"
+              onChange={(e) => set({ telegram: e.target.value })}
+            />
           </label>
           <label className="bx-field">
             Tajriba (yil)
-            <input className="bx-input" inputMode="numeric" value={form.experience}
-              onChange={(e) => set({ experience: e.target.value.replace(/\D/g, "").slice(0, 2) })} />
+            <input
+              className="bx-input"
+              inputMode="numeric"
+              value={form.experience}
+              onChange={(e) =>
+                set({
+                  experience: e.target.value.replace(/\D/g, "").slice(0, 2),
+                })
+              }
+            />
           </label>
         </div>
         <label className="bx-field">
           O'zingiz haqingizda ({form.about.length}/200)
-          <textarea className="bx-input" rows={3} maxLength={200} value={form.about} onChange={(e) => set({ about: e.target.value })} />
+          <textarea
+            className="bx-input"
+            rows={3}
+            maxLength={200}
+            value={form.about}
+            onChange={(e) => set({ about: e.target.value })}
+          />
         </label>
       </section>
 
       <section className="bx-card bx-form bx-map">
         <div className="bx-location-head">
           <h3>Manzil</h3>
-          <button type="button" className="bx-btn bx-btn-ghost bx-btn-sm bx-location-edit" aria-expanded={editingLocation} aria-controls="profile-location-map" onClick={() => {
-            if (editingLocation && !isValidLocation(form.location)) return setError("Avval topilgan manzilni tanlang yoki xaritada joyni belgilang.");
-            setError("");
-            setEditingLocation((previous) => !previous);
-          }}>
+          <button
+            type="button"
+            className="bx-btn bx-btn-ghost bx-btn-sm bx-location-edit"
+            aria-expanded={editingLocation}
+            aria-controls="profile-location-map"
+            onClick={() => {
+              if (editingLocation && !isValidLocation(form.location))
+                return setError(
+                  "Avval topilgan manzilni tanlang yoki xaritada joyni belgilang.",
+                );
+              setError("");
+              setEditingLocation((previous) => !previous);
+            }}
+          >
             {editingLocation ? "Tayyor" : "Joylashuvni o‘zgartirish"}
           </button>
         </div>
-        {!editingLocation && <p className="bx-muted">{form.address || (isValidLocation(form.location) ? "Joylashuv xaritada belgilangan." : "Manzil hali belgilanmagan.")}</p>}
+        {!editingLocation && (
+          <p className="bx-muted">
+            {form.address ||
+              (isValidLocation(form.location)
+                ? "Joylashuv xaritada belgilangan."
+                : "Manzil hali belgilanmagan.")}
+          </p>
+        )}
         <div id="profile-location-map" hidden={!editingLocation}>
-          {editingLocation && <LocationPicker
-            showEmptySummary={false}
-            value={form.location}
-            address={form.address}
-            onAddressChange={(address) => set({ address })}
-            onChange={(location) => { set({ location }); setError(""); }}
-          />}
+          {editingLocation && (
+            <LocationPicker
+              showEmptySummary={false}
+              value={form.location}
+              address={form.address}
+              onAddressChange={(address) => set({ address })}
+              onChange={(location) => {
+                set({ location });
+                setError("");
+              }}
+            />
+          )}
         </div>
       </section>
 
-      {error && <p className="bx-error" role="alert">{error}</p>}
+      {error && (
+        <p className="bx-error" role="alert">
+          {error}
+        </p>
+      )}
 
       <div className="bx-savebar">
-        <button type="button" className="bx-btn bx-btn-primary bx-btn-block" disabled={!dirty} onClick={save}>
+        <button
+          type="button"
+          className="bx-btn bx-btn-primary bx-btn-block"
+          disabled={!dirty}
+          onClick={save}
+        >
           {dirty ? "Saqlash" : "Saqlangan"}
         </button>
       </div>
 
-      <button type="button" className="bx-btn bx-btn-danger bx-btn-block" onClick={() => setConfirmLogout(true)}>
+      <button
+        type="button"
+        className="bx-btn bx-btn-danger bx-btn-block"
+        onClick={() => setConfirmLogout(true)}
+      >
         Chiqish
       </button>
 
-      <Sheet open={confirmLogout} title="Hisobdan chiqish" onClose={() => setConfirmLogout(false)}>
+      <Sheet
+        open={confirmLogout}
+        title="Hisobdan chiqish"
+        onClose={() => setConfirmLogout(false)}
+      >
         <div className="bx-form">
           <p>Hisobingizdan aniq chiqmoqchimisiz?</p>
-          <button type="button" className="bx-btn bx-btn-ghost bx-btn-block" onClick={() => setConfirmLogout(false)}>
+          <button
+            type="button"
+            className="bx-btn bx-btn-ghost bx-btn-block"
+            onClick={() => setConfirmLogout(false)}
+          >
             Bekor qilish
           </button>
-          <button type="button" className="bx-btn bx-btn-danger bx-btn-block" onClick={() => {
-            clearSession();
-            navigate("/login", { replace: true });
-          }}>
+          <button
+            type="button"
+            className="bx-btn bx-btn-danger bx-btn-block"
+            onClick={() => {
+              clearSession();
+              navigate("/login", { replace: true });
+            }}
+          >
             Ha, chiqish
           </button>
         </div>
@@ -182,7 +334,13 @@ export default function Profile() {
         errorClassName="bx-error"
         onClose={() => setPickingAvatar(false)}
         onSave={(avatarPhoto) => updateProfile({ avatarPhoto, avatar: null })}
-        onSaved={(avatarPhoto) => show(avatarPhoto ? "Profil rasmi yangilandi" : "Profil rasmi olib tashlandi")}
+        onSaved={(avatarPhoto) =>
+          show(
+            avatarPhoto
+              ? "Profil rasmi yangilandi"
+              : "Profil rasmi olib tashlandi",
+          )
+        }
       />
       {toast}
     </div>

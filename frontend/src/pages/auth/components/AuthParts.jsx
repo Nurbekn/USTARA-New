@@ -1,3 +1,4 @@
+import BrandLogo from "../../../components/brand/BrandLogo";
 import ArrowIcon from "../../../components/ArrowIcon";
 import { Link } from "react-router-dom";
 import { formatPhone } from "../utils/phone";
@@ -11,7 +12,7 @@ export function AuthLayout({ children, wide = false, className = "" }) {
           <ArrowIcon direction="left" /> Bosh sahifa
         </Link>
         <Link to="/" className="au-logo" aria-label="Ustara">
-          USTARA<span>.</span>
+          <BrandLogo />
         </Link>
       </header>
       <main className="au-card">{children}</main>

@@ -14,7 +14,9 @@
   padding: 12px 16px calc(28px + env(safe-area-inset-bottom));
   background: var(--page-background);
 }
-.au-page.is-wide { --au-width: 580px; }
+.au-page.is-wide {
+  --au-width: 580px;
+}
 
 /* ---------- Top row + card ---------- */
 .au-top {
@@ -39,7 +41,9 @@
   font-weight: 700;
   letter-spacing: 0.08em;
 }
-.au-logo span { color: var(--accent); }
+.au-logo span {
+  color: var(--accent);
+}
 
 .au-card {
   width: 100%;
@@ -54,17 +58,48 @@
   animation: au-rise 0.45s ease both;
 }
 @media (min-width: 480px) {
-  .au-page { padding-inline: 24px; }
-  .au-card { padding: 32px 30px; }
+  .au-page {
+    padding-inline: 24px;
+  }
+  .au-card {
+    padding: 32px 30px;
+  }
 }
-@keyframes au-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes au-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
 
-.au-title { margin: 0 0 8px; font-size: var(--font-page); line-height: 1.15; letter-spacing: -0.02em; }
-.au-sub { margin: 0 0 22px; color: var(--muted); font-size: var(--font-body); line-height: 1.6; }
-.au-sub b { color: var(--text); }
-.au-foot { margin: 20px 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; }
-.au-foot a { color: #60a5fa; font-weight: 700; }
-.au-center { text-align: center; }
+.au-title {
+  margin: 0 0 8px;
+  font-size: var(--font-page);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.au-sub {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: var(--font-body);
+  line-height: 1.6;
+}
+.au-sub b {
+  color: var(--text);
+}
+.au-foot {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  text-align: center;
+}
+.au-foot a {
+  color: #60a5fa;
+  font-weight: 700;
+}
+.au-center {
+  text-align: center;
+}
 
 /* ---------- Role switch (Mijoz | Usta) ---------- */
 .au-seg {
@@ -85,14 +120,37 @@
   color: var(--muted);
   font-size: var(--font-button);
   font-weight: 700;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
-.au-seg a.is-active { background: var(--primary); color: #fff; }
+.au-seg a.is-active {
+  background: var(--primary);
+  color: #fff;
+}
 
 /* ---------- Form ---------- */
-.au-form { display: flex; flex-direction: column; gap: 18px; min-width: 0; max-width: 100%; }
-.au-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.au-label { color: var(--text); font-size: 14px; line-height: 1.5; font-weight: 500; letter-spacing: normal; text-transform: none; }
+.au-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  max-width: 100%;
+}
+.au-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.au-label {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
 
 .au-input,
 .au-phone,
@@ -105,8 +163,15 @@
   color: var(--text);
   font-size: var(--font-input); /* 16px: iOS does not zoom the page */
 }
-.au-input, .au-phone { transition: border-color 0.2s, box-shadow 0.2s; }
-.au-input { padding: 0 16px; }
+.au-input,
+.au-phone {
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.au-input {
+  padding: 0 16px;
+}
 .au-input:focus,
 .au-phone:focus-within {
   outline: none;
@@ -114,10 +179,27 @@
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 .au-input.has-error,
-.au-phone.has-error { border-color: #ef4444; animation: au-shake 0.35s; }
-@keyframes au-shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.au-phone.has-error {
+  border-color: #ef4444;
+  animation: au-shake 0.35s;
+}
+@keyframes au-shake {
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
 
-.au-phone, .au-password { display: flex; align-items: center; min-width: 0; max-width: 100%; overflow: hidden; }
+.au-phone,
+.au-password {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
 .au-prefix {
   display: flex;
   align-items: center;
@@ -146,11 +228,36 @@
   font-size: var(--font-input);
   letter-spacing: 0.02em;
 }
-.au-phone input:focus { outline: none; }
+.au-phone input:focus {
+  outline: none;
+}
 
-.au-error { margin: 0; font-size: var(--font-small); font-weight: 600; padding: 10px 12px; border: 1px solid #f871714d; border-left: 3px solid #f87171; border-radius: 10px; background: #ef44440d; color: #fca5a5; line-height: 1.5; overflow-wrap: anywhere; }
-.au-error a { color: #93c5fd; text-decoration: underline; }
-.au-info { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: #bfdbfe; font-size: var(--font-body); line-height: 1.55; }
+.au-error {
+  margin: 0;
+  font-size: var(--font-small);
+  font-weight: 600;
+  padding: 10px 12px;
+  border: 1px solid #f871714d;
+  border-left: 3px solid #f87171;
+  border-radius: 10px;
+  background: #ef44440d;
+  color: #fca5a5;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.au-error a {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+.au-info {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #bfdbfe;
+  font-size: var(--font-body);
+  line-height: 1.55;
+}
 
 /* ---------- Buttons ---------- */
 .au-btn {
@@ -168,25 +275,97 @@
   font-weight: 700;
   box-shadow: 0 10px 28px rgba(37, 99, 235, 0.28);
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.15s, background 0.2s;
+  transition:
+    transform 0.15s,
+    background 0.2s;
 }
-.au-btn:active { transform: scale(0.98); }
-.au-btn:disabled { opacity: 0.45; box-shadow: none; cursor: not-allowed; }
-.au-btn-ghost { border-color: var(--border); background: transparent; box-shadow: none; color: var(--text); }
-@media (hover: hover) { .au-btn:not(:disabled):not(.au-btn-ghost):hover { background: var(--primary-hover); } }
+.au-btn:active {
+  transform: scale(0.98);
+}
+.au-btn-ghost:active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.au-btn-ghost:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.au-btn:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.au-btn-ghost {
+  border-color: var(--border);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+}
+@media (hover: hover) {
+  .au-btn:not(:disabled):not(.au-btn-ghost):hover {
+    background: var(--primary-hover);
+  }
+}
 
-.au-link-back, .au-text-btn { padding: 0; border: 0; background: none; color: var(--muted); font-weight: 600; }
-.au-link-back { min-height: 44px; margin-bottom: 4px; font-size: var(--font-button); }
-.au-text-btn { color: #60a5fa; font-weight: 700; font-size: var(--font-button); }
-.au-text-btn:disabled { color: var(--muted); }
+.au-link-back,
+.au-text-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+.au-link-back {
+  min-height: 44px;
+  margin-bottom: 4px;
+  font-size: var(--font-button);
+}
+.au-text-btn {
+  color: #60a5fa;
+  font-weight: 700;
+  font-size: var(--font-button);
+}
+.au-text-btn:disabled {
+  color: var(--muted);
+}
+
+/* Visible feedback for auth navigation on touch and keyboard. */
+.au-back,
+.au-link-back {
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.au-back:active,
+.au-link-back:active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.au-back:focus-visible,
+.au-link-back:focus-visible {
+  color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .au-back:hover,
+  .au-link-back:hover {
+    color: var(--accent);
+  }
+}
 
 /* ---------- OTP ---------- */
-.au-otp { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
+.au-otp {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
 .au-otp input {
-  flex: 1;
+  width: 100%;
   min-width: 0;
-  max-width: 60px;
-  aspect-ratio: 1 / 1.2;
+  height: 56px;
+  padding: 0;
   border: 1.5px solid var(--border);
   border-radius: 14px;
   background: var(--bg);
@@ -195,87 +374,550 @@
   font-size: var(--font-input);
   font-weight: 700;
   text-align: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
-.au-otp input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-.au-otp input.is-filled { border-color: rgba(96, 165, 250, 0.6); }
-.au-otp.is-error input { border-color: #ef4444; animation: au-shake 0.35s; }
-.au-otp + .au-error { margin-bottom: 14px; }
-.au-otp.is-error + .au-error { margin-top: -4px; }
-.au-dev { margin: 14px 0 0; color: var(--muted); font-size: var(--font-small); text-align: center; opacity: 0.7; }
+.au-otp input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+.au-otp input.is-filled {
+  border-color: rgba(96, 165, 250, 0.6);
+}
+.au-otp.is-error input {
+  border-color: #ef4444;
+  animation: au-shake 0.35s;
+}
+.au-otp + .au-error {
+  margin-bottom: 14px;
+}
+.au-otp.is-error + .au-error {
+  margin-top: -4px;
+}
+.au-dev {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  text-align: center;
+  opacity: 0.7;
+}
 
 /* ---------- Approval pending ---------- */
-.au-pending { display: flex; flex-direction: column; align-items: stretch; gap: 14px; text-align: center; }
-.au-pending .au-sub { margin-bottom: 4px; }
-.au-pending-icon { position: relative; display: grid; place-items: center; width: 84px; height: 84px; margin: 4px auto 8px; border-radius: 50%; background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
-.au-pending-icon span { position: absolute; inset: 0; border: 2px solid rgba(96, 165, 250, 0.5); border-radius: 50%; animation: au-ring 2.4s ease-out infinite; }
-.au-pending-icon span:nth-child(2) { animation-delay: 1.2s; }
-@keyframes au-ring { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.7); opacity: 0; } }
-
-.au-steps { display: grid; grid-template-columns: repeat(3, 1fr); margin: 4px 0; padding: 0; list-style: none; }
-.au-steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: var(--font-small); font-weight: 600; }
-.au-steps li + li::before { content: ""; position: absolute; top: 15px; right: calc(50% + 20px); width: calc(100% - 36px); height: 2px; background: var(--border); }
-.au-steps li span { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid var(--border); border-radius: 50%; background: var(--surface); }
-.au-steps li.done { color: #4ade80; }
-.au-steps li.done span { border-color: #22c55e; background: rgba(34, 197, 94, 0.16); }
-.au-steps li.done + li::before { background: #22c55e; }
-.au-steps li.active { color: #93c5fd; }
-.au-steps li.active span { border-color: var(--primary); background: rgba(59, 130, 246, 0.18); }
-
-.au-contact { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--border); }
-.au-contact h2 { margin: 0 0 4px; color: var(--muted); font-size: var(--font-small); letter-spacing: 0.1em; text-transform: uppercase; }
-.au-contact a { display: grid; place-items: center; min-height: 48px; border: 1px solid var(--border); border-radius: 12px; font-weight: 600; font-size: var(--font-button); }
-
-@media (prefers-reduced-motion: reduce) {
-  .au-card, .au-pending-icon span, .au-input.has-error, .au-phone.has-error, .au-otp.is-error input { animation: none; }
+.au-pending {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  text-align: center;
+}
+.au-pending .au-sub {
+  margin-bottom: 4px;
+}
+.au-pending-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin: 4px auto 8px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+.au-pending-icon span {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(96, 165, 250, 0.5);
+  border-radius: 50%;
+  animation: au-ring 2.4s ease-out infinite;
+}
+.au-pending-icon span:nth-child(2) {
+  animation-delay: 1.2s;
+}
+@keyframes au-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
 }
 
+.au-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.au-steps li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: var(--font-small);
+  font-weight: 600;
+}
+.au-steps li + li::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  right: calc(50% + 20px);
+  width: calc(100% - 36px);
+  height: 2px;
+  background: var(--border);
+}
+.au-steps li span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.au-steps li.done {
+  color: #4ade80;
+}
+.au-steps li.done span {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.16);
+}
+.au-steps li.done + li::before {
+  background: #22c55e;
+}
+.au-steps li.active {
+  color: #93c5fd;
+}
+.au-steps li.active span {
+  border-color: var(--primary);
+  background: rgba(59, 130, 246, 0.18);
+}
+
+.au-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.au-contact h2 {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: var(--font-small);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.au-contact a {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: var(--font-button);
+}
+
+.au-contact a:active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.au-contact a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .au-contact a:hover {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .au-card,
+  .au-pending-icon span,
+  .au-input.has-error,
+  .au-phone.has-error,
+  .au-otp.is-error input {
+    animation: none;
+  }
+}
 
 /* Shared phone-and-password registration, with a separate centered OTP screen. */
-.au-registration-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); min-width: 0; width: 100%; margin: 0; padding: 0; border: 0; }
-.au-password input { flex: 1; min-width: 0; width: 100%; height: 52px; padding: 0 var(--space-4); border: 0; background: transparent; color: var(--text); font: inherit; font-size: 16px; }
-.au-password input:focus { outline: none; }
-.au-password:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.au-password button { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; min-height: 48px; padding: var(--space-3); border: 0; background: transparent; color: var(--muted); }
-.au-password button:focus-visible { outline-offset: -4px; }
-.au-password-hint { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
-.au-page--otp .au-card { text-align: center; }
-.au-page--otp .au-link-back { display: flex; align-items: center; justify-content: center; margin-inline: auto; margin-bottom: var(--space-5); }
-.au-page--otp .au-sub { max-width: 34ch; margin-inline: auto; }
-.au-page--otp .au-otp { width: 100%; max-width: 340px; margin-inline: auto; margin-block: var(--space-6); }
-.au-page--otp .au-otp input { font-family: var(--font-ui); font-size: 24px; font-weight: 500; }
+.au-registration-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.au-password input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 52px;
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+.au-password input:focus {
+  outline: none;
+}
+.au-password:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.au-password button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+.au-password button:focus-visible {
+  outline-offset: -4px;
+}
+.au-password-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.au-page--otp .au-card {
+  text-align: center;
+}
+.au-page--otp .au-link-back {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-inline: 0;
+  margin-bottom: var(--space-5);
+}
+.au-page--otp .au-sub {
+  max-width: 34ch;
+  margin-inline: auto;
+}
+.au-page--otp .au-otp {
+  width: 100%;
+  max-width: 300px;
+  margin-inline: auto;
+  margin-block: var(--space-5);
+}
+.au-page--otp .au-otp input {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 500;
+}
 
 /* Matching changes the outline only; the password field keeps its dark fill. */
-.au-password.is-match:not(.has-error) { border-color: var(--success); }
-.au-password.is-match:not(.has-error):focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 18%, transparent); }
-.au-password.is-mismatch, .au-password.has-error { border-color: var(--danger); }
-.au-password.is-mismatch:focus-within, .au-password.has-error:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
-.au-password-match { margin: 0; font-size: 13px; line-height: 1.5; }
-.au-password-match:empty { display: none; }
-.au-password-match.is-match { color: var(--success); }
-.au-password-match.is-mismatch { color: var(--danger); }
+.au-password.is-match:not(.has-error) {
+  border-color: var(--success);
+}
+.au-password.is-match:not(.has-error):focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 18%, transparent);
+}
+.au-password.is-mismatch,
+.au-password.has-error {
+  border-color: var(--danger);
+}
+.au-password.is-mismatch:focus-within,
+.au-password.has-error:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent);
+}
+.au-password-match {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.au-password-match:empty {
+  display: none;
+}
+.au-password-match.is-match {
+  color: var(--success);
+}
+.au-password-match.is-mismatch {
+  color: var(--danger);
+}
 
 /* Keep a real password input for editing/autofill; the overlay briefly reveals one character. */
-.au-password-entry { position: relative; flex: 1 1 0%; width: 0; min-width: 0; max-width: 100%; height: 52px; overflow: hidden; }
-.au-password-entry input { display: block; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; line-height: 52px; }
-.au-password-entry .au-password-concealed { color: transparent; -webkit-text-fill-color: transparent; caret-color: var(--text); }
-.au-password-mask { position: absolute; inset: 0 var(--space-4); display: flex; align-items: center; overflow: hidden; pointer-events: none; color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 16px; line-height: 52px; white-space: pre; }
-.au-password-mask > span { display: block; flex-shrink: 0; }
+.au-password-entry {
+  position: relative;
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+  max-width: 100%;
+  height: 52px;
+  overflow: hidden;
+}
+.au-password-entry input {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  line-height: 52px;
+}
+.au-password-entry .au-password-concealed {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--text);
+}
+.au-password-mask {
+  position: absolute;
+  inset: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 16px;
+  line-height: 52px;
+  white-space: pre;
+}
+.au-password-mask > span {
+  display: block;
+  flex-shrink: 0;
+}
 
 /* Clearer sign-up/login typography and steady, well-defined form surfaces. */
-.au-page--entry { --border: rgba(148, 163, 184, 0.24); }
-.au-page--entry .au-card { margin-block: 0; background: var(--bg-soft); border-color: var(--border-strong); backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; }
-.au-page--entry .au-title { margin-bottom: var(--space-3); font-family: var(--font-ui); font-size: clamp(28px, 4vw, 32px); font-weight: 600; line-height: 1.25; letter-spacing: -.02em; text-align: center; }
-.au-page--entry .au-sub { max-width: 34ch; margin: 0 auto var(--space-6); line-height: 1.65; text-align: center; }
-.au-page--entry .au-label { font-size: 16px; font-weight: 600; line-height: 1.5; }
-.au-page--entry :is(.au-input, .au-phone, .au-password) { background: #0e1829; }
-.au-page--entry :is(.au-input, .au-phone input, .au-password input) { font-size: 17px; font-weight: 400; }
-.au-page--entry .au-password-mask { font-size: 17px; }
-.au-page--entry .au-password-hint { font-size: 14px; line-height: 1.6; }
-.au-page--entry .au-foot { font-size: 15px; line-height: 1.6; text-align: center; }
-.au-page--entry .au-foot a { color: var(--accent-hover); font-weight: 600; }
+.au-page--entry {
+  --border: rgba(148, 163, 184, 0.24);
+}
+.au-page--entry .au-card {
+  margin-block: 0;
+  background: var(--bg-soft);
+  border-color: var(--border-strong);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  animation: none;
+}
+.au-page--entry .au-title {
+  margin-bottom: var(--space-3);
+  font-family: var(--font-ui);
+  font-size: clamp(28px, 4vw, 32px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+.au-page--entry .au-sub {
+  max-width: 34ch;
+  margin: 0 auto var(--space-6);
+  line-height: 1.65;
+  text-align: center;
+}
+.au-page--entry .au-label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.au-page--entry :is(.au-input, .au-phone, .au-password) {
+  background: #0e1829;
+}
+.au-page--entry :is(.au-input, .au-phone input, .au-password input) {
+  font-size: 17px;
+  font-weight: 400;
+}
+.au-page--entry .au-password-mask {
+  font-size: 17px;
+}
+.au-page--entry .au-password-hint {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.au-page--entry .au-foot {
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+}
+.au-page--entry .au-foot a {
+  color: var(--accent-hover);
+  font-weight: 600;
+}
 
-/* Keep phone forms anchored when the software keyboard changes viewport height. */
-@media (min-width: 900px) and (pointer: fine) {
-  .au-page--entry .au-card { margin-block: auto; }
+/* Center entry forms on larger screens, with room above and below the card. */
+@media (min-width: 640px) {
+  .au-page--entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    justify-items: center;
+    min-height: 100dvh;
+    padding-block: 24px max(48px, env(safe-area-inset-bottom));
+  }
+  .au-page--entry .au-top {
+    align-self: start;
+  }
+  .au-page--entry .au-card {
+    align-self: center;
+    margin-block: 24px;
+  }
+}
+/* Compact signup spacing on phones; keep readable text and full touch targets. */
+@media (max-width: 639px) {
+  .au-page--signup {
+    padding: 4px 12px max(8px, env(safe-area-inset-bottom));
+  }
+  .au-page--signup .au-top {
+    padding-bottom: 4px;
+  }
+  .au-page--signup .au-card {
+    padding: 16px;
+  }
+  .au-page--signup .au-seg {
+    margin-bottom: 12px;
+  }
+  .au-page--signup .au-title {
+    margin-bottom: 8px;
+  }
+  .au-page--signup .au-sub {
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .au-page--signup :is(.au-form, .au-registration-fields) {
+    gap: 12px;
+  }
+  .au-page--signup .au-field {
+    gap: 4px;
+  }
+  .au-page--signup :is(.au-input, .au-phone, .au-password, .au-btn) {
+    min-height: 48px;
+  }
+  .au-page--signup .au-password-entry,
+  .au-page--signup .au-password input {
+    height: 46px;
+  }
+  .au-page--signup :is(.au-password-entry input, .au-password-mask) {
+    line-height: 46px;
+  }
+  .au-page--signup .au-password button {
+    height: 44px;
+    min-height: 44px;
+  }
+  .au-page--signup .au-password-hint {
+    line-height: 1.4;
+  }
+  .au-page--signup .au-foot {
+    margin-top: 12px;
+  }
+}
+
+/* OTP-only controls must not change signup/login footer layout. */
+.au-page--otp .au-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+.au-page--otp .au-otp-help { color: var(--muted); font-weight: 500; }
+.au-page--otp .au-text-btn:not(:disabled):hover { text-decoration: underline; }
+.au-page--otp .au-text-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.au-page--otp .au-text-btn { min-height: 44px; padding: 8px 0; font-size: 14px; }
+.au-page--otp .au-foot > .au-text-btn:not(.au-otp-help) {
+  padding-inline: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.au-page--otp .au-text-btn:disabled { opacity: 1; color: var(--muted); cursor: not-allowed; }
+.au-otp-form { min-width: 0; width: 100%; }
+.au-otp-form > .au-btn { margin-top: 16px; }
+
+.au-help-dialog {
+  width: min(380px, calc(100% - 32px));
+  max-height: calc(var(--visible-height, 100dvh) - 32px);
+  overflow-y: auto;
+  margin: auto;
+  padding: 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+}
+.au-help-dialog::backdrop { background: rgba(2, 6, 14, .75); }
+.au-help-dialog h2 { margin: 0 0 12px; font-size: 22px; line-height: 1.3; }
+.au-help-dialog p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.au-help-dialog .au-help-code { padding: 12px; border-radius: var(--radius-md); background: var(--bg-soft); color: var(--text); font-size: 28px; font-weight: 600; letter-spacing: .25em; text-align: center; }
+.au-help-dialog .au-btn { min-height: 48px; }
+
+/* Password recovery shares existing form controls without affecting signup/OTP. */
+.au-forgot-link { display: inline-flex; align-items: center; align-self: flex-end; min-height: 44px; margin-top: -12px; color: var(--accent-hover); font-size: 14px; font-weight: 600; }
+.au-forgot-link:hover { text-decoration: underline; }
+.au-forgot-link:active { color: var(--text); }
+.au-forgot-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.au-page--recovery {
+  font-family: var(--font-ui);
+}
+.au-recovery-back {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.au-page--recovery .au-recovery-back .au-link-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: auto;
+  margin: 0;
+  padding: 0 8px 0 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
+}
+.au-page--recovery .au-title {
+  font-family: var(--font-ui);
+  font-size: 28px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+.au-page--recovery .au-title:focus { outline: none; }
+.au-page--recovery .au-sub {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.au-page--recovery .au-sub b { display: block; margin-bottom: 8px; font-weight: 600; }
+.au-page--recovery :is(button, input, .au-password-mask) { font-family: var(--font-ui); }
+.au-page--recovery :is(.au-sub, .au-label, .au-password-hint) { letter-spacing: normal; }
+.au-page--recovery .au-sub { font-weight: 400; }
+.au-page--recovery .au-label { font-weight: 500; }
+.au-page--recovery .au-btn { font-size: 16px; font-weight: 600; }
+.au-page--recovery .au-otp input {
+  font-size: 24px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 639px) {
+  .au-page--recovery { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .au-page--recovery .au-card { padding: 24px 20px; }
 }

@@ -2,7 +2,11 @@ import { useState } from "react";
 import PageHeader from "./components/PageHeader";
 import { STATUS, addDays, toISODate, useBarber } from "./data/store";
 import {
-  SHORT_MONTHS, SHORT_WEEKDAYS, formatMoney, groupDigits, shortMoney,
+  SHORT_MONTHS,
+  SHORT_WEEKDAYS,
+  formatMoney,
+  groupDigits,
+  shortMoney,
 } from "./data/format";
 
 const VIEWS = [
@@ -13,7 +17,8 @@ const VIEWS = [
 
 // Sums price of completed bookings between two ISO dates (inclusive).
 // ISO dates compare correctly as plain strings.
-const inRange = (list, from, to) => list.filter((b) => b.date >= from && b.date <= to);
+const inRange = (list, from, to) =>
+  list.filter((b) => b.date >= from && b.date <= to);
 const sum = (list) => list.reduce((total, b) => total + b.price, 0);
 
 // Builds the chart buckets + the "current" and "previous" period for a view
@@ -54,7 +59,11 @@ function buildReport(view, done) {
     for (let m = -11; m <= 0; m++) {
       const first = new Date(now.getFullYear(), now.getMonth() + m, 1);
       const last = new Date(now.getFullYear(), now.getMonth() + m + 1, 0);
-      buckets.push({ label: SHORT_MONTHS[first.getMonth()], from: toISODate(first), to: toISODate(last) });
+      buckets.push({
+        label: SHORT_MONTHS[first.getMonth()],
+        from: toISODate(first),
+        to: toISODate(last),
+      });
     }
     current = { from: buckets[0].from, to: buckets[11].to };
     const prevFirst = new Date(now.getFullYear() - 1, now.getMonth() - 11, 1);
@@ -63,7 +72,10 @@ function buildReport(view, done) {
     periodName = "Oxirgi 12 oy";
   }
 
-  const withValue = buckets.map((b) => ({ ...b, value: sum(inRange(done, b.from, b.to)) }));
+  const withValue = buckets.map((b) => ({
+    ...b,
+    value: sum(inRange(done, b.from, b.to)),
+  }));
   const currentList = inRange(done, current.from, current.to);
   const previousTotal = sum(inRange(done, previous.from, previous.to));
 
@@ -84,12 +96,15 @@ export default function Earnings() {
   const done = bookings.filter((b) => b.status === STATUS.COMPLETED);
   const report = buildReport(view, done);
 
-  const selected = picked ?? (view === "year" ? null : report.buckets.length - 1);
+  const selected =
+    picked ?? (view === "year" ? null : report.buckets.length - 1);
   const max = Math.max(...report.buckets.map((b) => b.value), 1);
 
   // Change vs previous period (hidden when there is nothing to compare)
   const change = report.previousTotal
-    ? Math.round(((report.total - report.previousTotal) / report.previousTotal) * 100)
+    ? Math.round(
+        ((report.total - report.previousTotal) / report.previousTotal) * 100,
+      )
     : null;
 
   // Income per service in the current period
@@ -106,7 +121,11 @@ export default function Earnings() {
 
   return (
     <div className="bx-page">
-      <PageHeader back title="Daromad" subtitle="Faqat bajarilgan bronlar hisoblanadi" />
+      <PageHeader
+        back
+        title="Daromad"
+        subtitle="Faqat bajarilgan bronlar hisoblanadi"
+      />
 
       <div className="bx-seg" role="tablist">
         {VIEWS.map((v) => (
@@ -131,7 +150,8 @@ export default function Earnings() {
         <strong>{formatMoney(report.total)}</strong>
         {change !== null && (
           <span className={`bx-change ${change >= 0 ? "up" : "down"}`}>
-            {change >= 0 ? "▲" : "▼"} {Math.abs(change)}% oldingi davrga nisbatan
+            {change >= 0 ? "▲" : "▼"} {Math.abs(change)}% oldingi davrga
+            nisbatan
           </span>
         )}
       </section>
@@ -153,7 +173,9 @@ export default function Earnings() {
               aria-label={`${b.label}: ${formatMoney(b.value)}`}
             >
               <em>{b.value ? shortMoney(b.value) : ""}</em>
-              <span style={{ height: `${Math.max((b.value / max) * 100, 3)}%` }} />
+              <span
+                style={{ height: `${Math.max((b.value / max) * 100, 3)}%` }}
+              />
               <small>{b.label}</small>
             </button>
           ))}
@@ -188,7 +210,11 @@ export default function Earnings() {
                   <b>{formatMoney(s.total)}</b>
                 </div>
                 <div className="bx-meter">
-                  <i style={{ width: `${(s.total / byService[0].total) * 100}%` }} />
+                  <i
+                    style={{
+                      width: `${(s.total / byService[0].total) * 100}%`,
+                    }}
+                  />
                 </div>
               </div>
             ))}

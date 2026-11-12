@@ -18,7 +18,17 @@ export default function ApprovalPending() {
         <div className="au-pending-icon" aria-hidden="true">
           <span />
           <span />
-          <Icon name="clock" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <Icon
+            name="clock"
+            viewBox="0 0 24 24"
+            width="30"
+            height="30"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </div>
 
         <h1 className="au-title">Admin tasdiqlashi kutilmoqda</h1>
@@ -36,7 +46,8 @@ export default function ApprovalPending() {
         </ol>
 
         <p className="au-info">
-          Kutish vaqtida panelga kirib, xizmat va narxlaringizni qo'shib qo'yishingiz mumkin.
+          Kutish vaqtida panelga kirib, xizmat va narxlaringizni qo'shib
+          qo'yishingiz mumkin.
         </p>
 
         <Link to="/barber/services" className="au-btn">

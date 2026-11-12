@@ -39,7 +39,11 @@ export default function BarberProfileEdit() {
     setErrors(next);
 
     if (Object.keys(next).length > 0) {
-      requestAnimationFrame(() => document.querySelector(".bp-page [role='alert']")?.scrollIntoView({ behavior: "smooth", block: "center" }));
+      requestAnimationFrame(() =>
+        document
+          .querySelector(".bp-page [role='alert']")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      );
       return;
     }
 
@@ -75,8 +79,12 @@ export default function BarberProfileEdit() {
 
         <section className="bp-card" aria-label="Ish joyingiz">
           <div className="bp-card-head">
-            <h2><span className="bp-step">1</span> Ish joyingiz</h2>
-            <span className={`bp-badge ${isValidLocation(location) ? "is-ok" : "is-warning"}`}>
+            <h2>
+              <span className="bp-step">1</span> Ish joyingiz
+            </h2>
+            <span
+              className={`bp-badge ${isValidLocation(location) ? "is-ok" : "is-warning"}`}
+            >
               {isValidLocation(location) ? "Belgilandi" : "Tanlash kerak"}
             </span>
           </div>
@@ -96,14 +104,25 @@ export default function BarberProfileEdit() {
 
         <section className="bp-card">
           <div className="bp-card-head">
-            <h2><span className="bp-step">2</span> Ish vaqti</h2>
-            <span className={`bp-badge ${workingCount === 0 ? "is-warning" : ""}`}>{workingCount === 0 ? "Ish kunini tanlang" : `${workingCount} kun ishlaydi`}</span>
+            <h2>
+              <span className="bp-step">2</span> Ish vaqti
+            </h2>
+            <span
+              className={`bp-badge ${workingCount === 0 ? "is-warning" : ""}`}
+            >
+              {workingCount === 0
+                ? "Ish kunini tanlang"
+                : `${workingCount} kun ishlaydi`}
+            </span>
           </div>
 
-          <WorkingHours value={hours} onChange={(value) => {
-            setHours(value);
-            setErrors((previous) => ({ ...previous, hours: "" }));
-          }} />
+          <WorkingHours
+            value={hours}
+            onChange={(value) => {
+              setHours(value);
+              setErrors((previous) => ({ ...previous, hours: "" }));
+            }}
+          />
 
           {errors.hours && (
             <p className="bp-note is-error" role="alert">

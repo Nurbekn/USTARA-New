@@ -1,3 +1,4 @@
+import { BrandSymbol } from "../components/brand/BrandLogo";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import AvailabilityBadge from "../pages/barber/components/AvailabilityBadge";
@@ -94,8 +95,8 @@ export default function BarberLayout() {
   return (
     <div className={`bx-app ${pathname.replace(/\/+$/, "") === "/barber/portfolio" ? "bx-app-portfolio" : ""}`}>
       <header className="bx-top">
-        <Link to="/barber" className="bx-logo">
-          USTARA<span>.</span>
+        <Link to="/barber" className="bx-logo" aria-label="Ustara — bosh sahifa">
+          <BrandSymbol size={40} />
         </Link>
         <div className="bx-top-right">
           <AvailabilityBadge profile={profile} />

@@ -15,12 +15,22 @@
       content="Ustara — o'zingga mos sartaroshni top va navbatingni oldindan band qil."
     />
 
+    <link rel="stylesheet" href="/loading.css" />
+    <link rel="icon" type="image/svg+xml" href="/brand/ustara.svg" />
     <title>Ustara — Sartarosh bron qilish</title>
 
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="app-loading app-loading--screen" role="status" aria-live="polite">
+        <span class="app-loading__mark" aria-hidden="true">
+          <img src="/brand/ustara.svg" width="48" height="48" alt="" />
+        </span>
+        <p>Yuklanmoqda…</p>
+        <small>Iltimos, biroz kuting</small>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -1,3 +1,4 @@
+import BrandLogo from "./brand/BrandLogo";
 
 import { Link } from "react-router-dom";
 import "./Footer.css";
@@ -8,8 +9,7 @@ function Footer() {
       <div className="footer-main container">
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
-            <span className="footer-logo-icon">U</span>
-            <span>USTARA<span className="footer-logo-dot">.</span></span>
+            <BrandLogo />
           </Link>
 
           <p>
@@ -22,6 +22,7 @@ function Footer() {
         <div className="footer-column">
           <h3>Platforma</h3>
           <Link to="/barbers">Sartaroshlar</Link>
+          <Link to="/logos">Brend konsepsiyalari</Link>
           <a href="/#how-it-works">Qanday ishlaydi?</a>
           <a href="/#about">Biz haqimizda</a>
         </div>

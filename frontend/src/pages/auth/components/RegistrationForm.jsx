@@ -46,7 +46,7 @@ export default function RegistrationForm({ role }) {
   }
 
   return (
-    <AuthLayout className="au-page--entry">
+    <AuthLayout className="au-page--entry au-page--signup">
       <RoleSwitch role={role} />
       <h1 className="au-title">Ro‘yxatdan o‘tish</h1>
       <p className="au-sub">Telefon raqamingizni kiriting va parol yarating.</p>

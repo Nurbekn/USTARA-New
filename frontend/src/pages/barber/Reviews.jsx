@@ -22,7 +22,9 @@ export default function Reviews() {
 
   const { average, count, distribution } = getRatingSummary(reviews);
   const active = FILTERS.find((f) => f.id === filter);
-  const list = reviews.filter(active.test).sort((a, b) => b.date.localeCompare(a.date));
+  const list = reviews
+    .filter(active.test)
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   const startReply = (review) => {
     setReplying(review.id);
@@ -50,7 +52,11 @@ export default function Reviews() {
             <div key={n}>
               <span>{n}</span>
               <div className="bx-meter">
-                <i style={{ width: `${count ? (distribution[n] / count) * 100 : 0}%` }} />
+                <i
+                  style={{
+                    width: `${count ? (distribution[n] / count) * 100 : 0}%`,
+                  }}
+                />
               </div>
               <small>{distribution[n]}</small>
             </div>
@@ -101,10 +107,18 @@ export default function Reviews() {
                     onChange={(e) => setText(e.target.value)}
                   />
                   <div className="bx-inline-actions">
-                    <button type="button" className="bx-btn bx-btn-sm bx-btn-primary" onClick={() => sendReply(r.id)}>
+                    <button
+                      type="button"
+                      className="bx-btn bx-btn-sm bx-btn-primary"
+                      onClick={() => sendReply(r.id)}
+                    >
                       Yuborish
                     </button>
-                    <button type="button" className="bx-btn bx-btn-sm bx-btn-ghost" onClick={() => setReplying(null)}>
+                    <button
+                      type="button"
+                      className="bx-btn bx-btn-sm bx-btn-ghost"
+                      onClick={() => setReplying(null)}
+                    >
                       Bekor
                     </button>
                   </div>
@@ -117,7 +131,11 @@ export default function Reviews() {
                       <p>{r.reply}</p>
                     </div>
                   )}
-                  <button type="button" className="bx-link" onClick={() => startReply(r)}>
+                  <button
+                    type="button"
+                    className="bx-link"
+                    onClick={() => startReply(r)}
+                  >
                     {r.reply ? "Javobni tahrirlash" : "Javob yozish"}
                   </button>
                 </>

@@ -1,3 +1,4 @@
+import { BrandSymbol } from "../components/brand/BrandLogo";
 import Icon from "../components/Icon";
 import { useEffect, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -42,7 +43,7 @@ export default function UserLayout() {
       <header className="uc-header">
         <div className="uc-header-inner">
           <Link to="/user" className="uc-logo" aria-label="USTARA — bosh sahifa">
-            USTARA<span className="uc-logo-dot">.</span>
+            <BrandSymbol size={40} />
           </Link>
           <details className="uc-notifications" key={pathname}>
             <summary className="uc-notification-trigger" aria-label="Bildirishnomalar">

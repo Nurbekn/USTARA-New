@@ -5,7 +5,14 @@ import { useToast } from "./components/Toast";
 import { updateProfile, useBarber } from "./data/store";
 import { formatDuration, formatMoney } from "./data/format";
 
-const SUGGESTIONS = ["Soch olish", "Soqol olish", "Soch + soqol", "Bolalar soch olish", "Yuz parvarishi"];
+const SUGGESTIONS = [
+  "Soch olish",
+  "Soqol olish",
+  "Soch + soqol",
+  "Bolalar soch olish",
+  "Yuz parvarishi",
+  "Soch yuvish"
+];
 const DURATIONS = [15, 30, 45, 60, 75, 90];
 const EMPTY = { id: null, name: "", price: 50000, duration: 45 };
 
@@ -47,7 +54,11 @@ export default function Services() {
         title="Xizmatlar"
         subtitle="Narx va davomiylik"
         action={
-          <button type="button" className="bx-btn bx-btn-sm bx-btn-primary" onClick={() => setForm(EMPTY)}>
+          <button
+            type="button"
+            className="bx-btn bx-btn-sm bx-btn-primary"
+            onClick={() => setForm(EMPTY)}
+          >
             + Qo'shish
           </button>
         }
@@ -57,7 +68,11 @@ export default function Services() {
         <div className="bx-empty">
           <strong>Hali xizmat yo'q</strong>
           <p>Soch olish, soqol olish kabi xizmatlar va narxlarni qo'shing.</p>
-          <button type="button" className="bx-btn bx-btn-primary" onClick={() => setForm(EMPTY)}>
+          <button
+            type="button"
+            className="bx-btn bx-btn-primary"
+            onClick={() => setForm(EMPTY)}
+          >
             Birinchi xizmatni qo'shish
           </button>
         </div>
@@ -74,19 +89,35 @@ export default function Services() {
               <b>{formatMoney(s.price)}</b>
               {deleting === s.id ? (
                 <div className="bx-inline-actions">
-                  <button type="button" className="bx-btn bx-btn-sm bx-btn-danger" onClick={() => remove(s.id)}>
+                  <button
+                    type="button"
+                    className="bx-btn bx-btn-sm bx-btn-danger"
+                    onClick={() => remove(s.id)}
+                  >
                     O'chirish
                   </button>
-                  <button type="button" className="bx-btn bx-btn-sm bx-btn-ghost" onClick={() => setDeleting(null)}>
+                  <button
+                    type="button"
+                    className="bx-btn bx-btn-sm bx-btn-ghost"
+                    onClick={() => setDeleting(null)}
+                  >
                     Yo'q
                   </button>
                 </div>
               ) : (
                 <div className="bx-inline-actions">
-                  <button type="button" className="bx-btn bx-btn-sm bx-btn-ghost" onClick={() => setForm(s)}>
+                  <button
+                    type="button"
+                    className="bx-btn bx-btn-sm bx-btn-ghost"
+                    onClick={() => setForm(s)}
+                  >
                     Tahrirlash
                   </button>
-                  <button type="button" className="bx-btn bx-btn-sm bx-btn-ghost" onClick={() => setDeleting(s.id)}>
+                  <button
+                    type="button"
+                    className="bx-btn bx-btn-sm bx-btn-ghost"
+                    onClick={() => setDeleting(s.id)}
+                  >
                     ✕
                   </button>
                 </div>
@@ -100,7 +131,11 @@ export default function Services() {
         Narxni o'zgartirsangiz, eski bronlar va daromad hisoboti o'zgarmaydi.
       </p>
 
-      <Sheet open={!!form} title={form?.id ? "Xizmatni tahrirlash" : "Yangi xizmat"} onClose={() => setForm(null)}>
+      <Sheet
+        open={!!form}
+        title={form?.id ? "Xizmatni tahrirlash" : "Yangi xizmat"}
+        onClose={() => setForm(null)}
+      >
         {form && (
           <div className="bx-form">
             <label className="bx-field">
@@ -115,7 +150,12 @@ export default function Services() {
             </label>
             <div className="bx-chips">
               {SUGGESTIONS.map((name) => (
-                <button key={name} type="button" className="bx-chip" onClick={() => set({ name })}>
+                <button
+                  key={name}
+                  type="button"
+                  className="bx-chip"
+                  onClick={() => set({ name })}
+                >
                   {name}
                 </button>
               ))}
@@ -124,17 +164,29 @@ export default function Services() {
             <div className="bx-field">
               Narxi
               <div className="bx-stepper">
-                <button type="button" onClick={() => set({ price: Math.max(1000, form.price - 5000) })} aria-label="Kamaytirish">
+                <button
+                  type="button"
+                  onClick={() =>
+                    set({ price: Math.max(1000, form.price - 5000) })
+                  }
+                  aria-label="Kamaytirish"
+                >
                   −
                 </button>
                 <input
                   className="bx-input"
                   inputMode="numeric"
                   value={form.price}
-                  onChange={(e) => set({ price: Number(e.target.value.replace(/\D/g, "")) })}
+                  onChange={(e) =>
+                    set({ price: Number(e.target.value.replace(/\D/g, "")) })
+                  }
                   aria-label="Narx (so'm)"
                 />
-                <button type="button" onClick={() => set({ price: form.price + 5000 })} aria-label="Oshirish">
+                <button
+                  type="button"
+                  onClick={() => set({ price: form.price + 5000 })}
+                  aria-label="Oshirish"
+                >
                   +
                 </button>
               </div>
@@ -157,7 +209,11 @@ export default function Services() {
               </div>
             </div>
 
-            <button type="button" className="bx-btn bx-btn-primary bx-btn-block" onClick={save}>
+            <button
+              type="button"
+              className="bx-btn bx-btn-primary bx-btn-block"
+              onClick={save}
+            >
               Saqlash
             </button>
           </div>
