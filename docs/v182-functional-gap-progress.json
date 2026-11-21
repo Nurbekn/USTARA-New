@@ -1,0 +1,25 @@
+{
+  "version": "v182",
+  "basis": "USTARA v181 final source audit",
+  "decisionRegisterReviewed": 185,
+  "decisionRegisterTotal": 185,
+  "decision179": {
+    "label": "Private Booking Note",
+    "status": "PARTIAL_IMPLEMENTATION_TESTED",
+    "implemented": ["barber-only get/save/delete", "revision concurrency", "transfer invalidation", "90 day read expiry", "lazy private frontend editor", "three UI languages"],
+    "unverified": ["live PostgreSQL migration", "concurrent DB transaction integration", "live browser", "scheduled physical purge", "production backup/restore", "at-rest encryption policy"]
+  },
+  "tests": {
+    "frontend": {"pass":1714,"total":1714},
+    "backend": {"pass":1692,"total":1721,"blockedOrFailed":29},
+    "targetedFrontend": {"pass":4,"total":4},
+    "targetedBackend": {"pass":8,"total":8}
+  },
+  "forwardMigrations":57,
+  "rollbackMigrationFiles":2,
+  "postgresqlIntegration":"NOT_RUN",
+  "browserE2E":"NOT_RUN",
+  "telegramLive":"NOT_RUN",
+  "productionBuild":"NOT_RUN",
+  "productionReady":false
+}

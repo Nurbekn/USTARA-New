@@ -895,7 +895,7 @@ textarea.bx-input {
   color: rgba(148, 163, 184, 0.35);
 }
 .bx-stars .on {
-  color: var(--accent-hover);
+  color: #fbbf24;
 }
 .bx-review {
   display: flex;
@@ -2398,3 +2398,100 @@ textarea.bx-input {
 
 .bx-nav-avatar { display: block; width: 24px; height: 24px; border-radius: 50%; object-fit: cover; outline: 2px solid transparent; outline-offset: 2px; }
 .bx-nav-item.active .bx-nav-avatar { outline-color: var(--accent); }
+/* Portfolio: uch ustunli galereya va ochilgan post. */
+.bx-verified { display: inline-grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; background: #2385ff; color: white; font-size: 13px; font-weight: 800; }
+.bx-grid-engagement { opacity: 0; transition: opacity .15s; }
+.bx-portfolio-post:hover .bx-grid-engagement, .bx-portfolio-post:focus-visible .bx-grid-engagement { opacity: 1; }
+.bx-portfolio-grid { gap: 3px; }
+.bx-portfolio-post { aspect-ratio: 1 / 1; }
+.bx-portfolio-viewer { gap: 0; }
+.bx-portfolio-post-author { padding-bottom: 14px; }
+.bx-portfolio-viewer .bx-portfolio-image { width: 100%; background: #080b12; }
+.bx-portfolio-viewer .bx-post-full { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 0; }
+.bx-portfolio-viewer .bx-caption { padding: 12px 0; }
+.bx-reactions { margin-top: 12px; border-top: 0; gap: 12px; }
+.bx-reaction-actions { display: flex; gap: 16px; }
+.bx-reaction-actions button { display: grid; place-items: center; min-width: 36px; min-height: 40px; padding: 0; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.bx-reaction-actions button:last-child { margin-left: auto; }
+.bx-reaction-actions button[aria-pressed="true"] { color: var(--accent); }
+.bx-comment-form { display: flex; gap: 8px; }
+.bx-comment-form input { min-width: 0; }
+.bx-post-comments { display: grid; gap: 8px; max-height: 160px; overflow: auto; font-size: 14px; }
+.bx-earn-period { display: flex; gap: 8px; }
+.bx-earn-period [aria-pressed="true"] { color: var(--accent-hover); background: var(--accent-soft); border-color: var(--accent); }
+.bx-earn-total { background: linear-gradient(130deg, #173879, var(--surface)); display: grid; gap: 12px; }
+.bx-earn-total > strong { font-size: clamp(28px, 6vw, 46px); line-height: 1.2; overflow-wrap: anywhere; }
+.bx-earn-total > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--muted); }
+.bx-earnings h2 { font-size: 17px; margin-bottom: 20px; }
+.bx-income-bars { display: flex; align-items: end; gap: clamp(3px, 1vw, 12px); min-height: 210px; padding-top: 20px; border-bottom: 1px solid var(--border-strong); margin-bottom: 14px; }
+.bx-income-day { display: grid; flex: 1; min-width: 0; text-align: center; gap: 10px; }
+.bx-income-day small { font-size: 10px; color: var(--muted); }
+.bx-income-track { display: flex; align-items: end; height: 160px; background: var(--bg-soft); border-radius: 6px 6px 0 0; overflow: hidden; }
+.bx-income-track i { display: block; width: 100%; min-height: 3px; background: linear-gradient(#5eafff,#3275ef); border-radius: 5px 5px 0 0; }
+.bx-income-breakdown { display: flex; align-items: center; flex-wrap: wrap; gap: 28px; }
+.bx-income-ring { flex-shrink: 0; width: 138px; height: 138px; padding: 12px; border-radius: 50%; background: conic-gradient(var(--accent) var(--share), var(--border-strong) 0); }
+.bx-income-ring > div { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); }
+.bx-income-ring strong { font-size: 28px; }
+.bx-income-ring small { color: var(--muted); }
+.bx-income-legend { display: grid; gap: 12px; flex: 1; min-width: 150px; }
+.bx-income-legend > div { display: flex; gap: 12px; justify-content: space-between; font-size: 13px; }
+.bx-post-view-back .bx-sheet { width: min(100%, 560px); padding: 18px; border-radius: 20px; }
+@media (max-width: 599px) { .bx-post-view-back { padding: 0; align-items: stretch; } .bx-post-view-back .bx-sheet { width: 100%; max-height: 100dvh; border-radius: 0; } }
+@media (max-width: 599px) {
+  .bx-sheet-back.bx-post-view-back { align-items: stretch; }
+  .bx-sheet-back.bx-post-view-back .bx-sheet { height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
+}
+.bx-reactions .bx-caption { padding: 0; margin: 0; line-height: 1.6; }
+.bx-reactions time { font-size: 12px; }
+/* Ish holati tasdiq belgisidan alohida. */
+.bx-status .bx-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #fb7185; box-shadow: 0 0 0 4px rgb(251 113 133 / .10); }
+.bx-status.is-open .bx-status-dot { background: #34d399; box-shadow: 0 0 0 4px rgb(52 211 153 / .12); }
+.bx-status.is-open { color: #6ee7b7; border-color: rgb(52 211 153 / .35); background: rgb(16 185 129 / .08); }
+.bx-app { --bx-success: #34d399; background-image: radial-gradient(ellipse at 100% 20%, rgb(16 185 129 / .035), transparent 65%); }
+.bx-portfolio-publish { background: #07835f; border-color: #159c76; color: #fff; }
+.bx-portfolio-publish:hover { background: #06966c; }
+.bx-comment-form button:not(:disabled) { color: #6ee7b7; }
+.bx-reaction-actions button[aria-label="Yoqtirish"][aria-pressed="true"] { color: #fb7185; }
+.bx-reaction-actions button[aria-label="Postni saqlash"][aria-pressed="true"] { color: #34d399; }
+.bx-post-comments { padding: 12px 0; border-top: 1px solid var(--border); }
+.bx-income-track i { background: linear-gradient(#6ee7b7,#079b74); }
+@media (prefers-reduced-motion: no-preference) {
+  .bx-status-dot { animation: bx-status-heartbeat 1.5s ease-in-out infinite; }
+  @keyframes bx-status-heartbeat { 0%, 40%, 100% { transform: scale(1); } 15% { transform: scale(1.28); } 28% { transform: scale(1); } 34% { transform: scale(1.18); } }
+}
+
+.bx-home-shortcuts{display:flex;gap:8px;overflow-x:auto;margin:14px 0 20px;padding:4px 0}.bx-home-shortcuts a{flex-shrink:0;padding:8px 12px;border:1px solid #334155;border-radius:12px;font-size:13px;background:#1e293b}.bx-home-services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}.bx-home-service{display:grid;gap:6px;min-width:0;padding:12px;border-radius:14px;background:#1e293b;border:1px solid #334155}.bx-home-service strong{overflow-wrap:anywhere}.bx-home-service span{font-size:12px;color:#94a3b8}.bx-service-active{color:#22c55e}
+
+/* v133: public customer-view link and profile readiness; compact on mobile. */
+.bx-public-preview { display: grid; gap: 10px; min-width: 0; margin: 12px 0; }
+.bx-public-preview h2 { margin: 0; font-size: var(--font-section); }
+.bx-public-preview p { margin: 0; overflow-wrap: anywhere; }
+.bx-public-preview-link { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; text-align: center; overflow-wrap: anywhere; }
+.bx-preview-warning { color: #fbbf24; }
+.bx-preview-count { font-weight: 600; }
+.bx-preview-checks { margin: 0; padding-left: 0; display: grid; gap: 8px; list-style: none; }
+.bx-preview-checks li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-height: 44px; border-top: 1px solid var(--bx-line); padding-top: 8px; }
+.bx-preview-checks li a { margin-left: auto; min-height: 40px; display: inline-flex; align-items: center; }
+.bx-public-preview.is-compact .bx-public-preview-link { width: 100%; }
+@media(max-width: 480px) { .bx-public-preview { padding: 14px; } .bx-preview-checks li { gap: 7px; } }
+
+/* v134 owner share fallback, uses same public-only share component */
+.bx-public-preview .bpv-share { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.bx-public-preview .bpv-share-trigger { min-height:44px; border:1px solid var(--border, #777); border-radius:8px; padding:9px 12px; background:var(--surface, transparent); color:inherit; font:inherit; cursor:pointer; }
+.bx-public-preview .bpv-share-notice { font-size:13px; color:var(--muted, inherit); }
+.bx-public-preview .bpv-share-manual { display:grid; gap:4px; min-width:0; flex:1 1 100%; }
+.bx-public-preview .bpv-share-manual input { width:100%; min-width:0; min-height:44px; font-size:14px; }
+
+/* v167: author-only comment pin is displayed in the barber portfolio view. */
+.bx-comment-pinned { display: block; font-size: .78rem; font-weight: 650; color: var(--text-secondary, #49648b); margin-bottom: 4px; }
+.bx-post-comment > button { margin-top: 4px; font-size: .8rem; }
+
+/* v168: distinguish the six featured works without masking the media. */
+.bx-portfolio-post { position:relative; }
+.bx-featured-mark { position:absolute; top:7px; left:7px; z-index:1; padding:1px 6px; border-radius:8px; background:#12233acc; color:#ffe19a; font-weight:700; }
+
+/* v171: optional self-reported certificate editor, mobile-safe and separate from badges. */
+.bx-certificates-v171 { display:grid; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--bx-line); }
+.bx-certificates-v171 > .bx-card { display:grid; gap:10px; padding:12px; }
+.bx-certificates-v171 .bx-field { min-width:0; }
+.bx-certificates-v171 .bx-field input { width:100%; }

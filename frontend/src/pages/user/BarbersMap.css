@@ -1,0 +1,16 @@
+/* Mobile-first barber map */
+.ex-map-section { margin: 16px 0 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 12px; }
+.ex-map-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 12px; }
+.ex-map-header span { color: var(--muted); font-size: 13px; }
+.ex-barbers-map { width: 100%; height: min(56vh, 470px); min-height: 280px; border-radius: 12px; z-index: 0; }
+.ex-map-empty { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.ustara-barber-map-pin span { width: 38px; height: 38px; border-radius: 50% 50% 50% 4px; display: grid; place-items: center; background: #2563eb; transform: rotate(-45deg); box-shadow: 0 3px 12px #0005; color: white; font-size: 22px; border: 2px solid white; }
+.ustara-user-map-pin span { display: grid; place-items: center; border-radius: 50%; background: #38bdf8; color: white; border: 3px solid white; box-shadow: 0 2px 8px #0006; }
+.leaflet-popup-content { color: #111827; }
+.leaflet-popup-content p { margin: 6px 0; }
+.leaflet-popup-content a { color: #1d4ed8; font-weight: 650; }
+
+.ex-map-popup { display: grid; gap: 6px; min-width: 140px; }
+.ex-map-popup a { display: inline-flex; padding: 7px 0; min-height: 38px; align-items: center; }
+.ex-map-popup a:focus-visible, .ex-map-empty button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.ex-map-empty button { margin-top: 8px; min-height: 44px; padding: 8px 14px; border-radius: 9px; border: 1px solid var(--border); color: var(--text); background: var(--surface); font: inherit; cursor: pointer; }

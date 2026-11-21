@@ -1,0 +1,175 @@
+name: USTARA v193 - opt-in isolated PostgreSQL booking concurrency
+
+# Manual only. Never runs on a push, pull request, deployment or schedule.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  booking-concurrency:
+    name: Disposable database bootstrap and booking concurrency proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: v193_disposable_admin_only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Verify manual CI and checked-out commit BEFORE dependency install
+        # Built-in Node modules only: no npm install scripts can run before this gate.
+        run: node backend/scripts/v219-preinstall-ci-gate.cjs
+      - name: Verify CI-critical source tree matches checked-out commit BEFORE installation
+        run: node backend/scripts/v220-checked-source-tree-gate.cjs
+      - name: Install backend dependencies exactly as locked
+        working-directory: backend
+        run: npm ci --no-audit --no-fund
+      - name: Offline v213 baseline commit-bound evidence, subprocess-tree, TAP and database guard tests
+        working-directory: backend
+        run: npm run test:v213:unit
+      - name: Offline v214 descriptor-anchored writer and legacy TAP log safety tests
+        working-directory: backend
+        run: npm run test:v214:unit
+      - name: Offline v215 verified evidence filename and directory binding tests
+        working-directory: backend
+        run: npm run test:v215:unit
+      - name: Offline v216 CI run ID/attempt provenance binding before database operations
+        working-directory: backend
+        run: npm run test:v216:unit
+      - name: Offline v217 reject ambiguous local/GitHub Actions execution context
+        working-directory: backend
+        run: npm run test:v217:unit
+      - name: Offline v218 pre-bootstrap safety tests
+        working-directory: backend
+        run: npm run test:v218:unit
+      - name: Offline v219 checked-out commit and preinstall order tests
+        working-directory: backend
+        run: npm run test:v219:unit
+      - name: Offline v220 guarded source tree tests
+        working-directory: backend
+        run: npm run test:v220:unit
+      - name: Verify manual CI identity again before disposable database setup
+        run: node backend/scripts/v219-preinstall-ci-gate.cjs
+      - name: Verify CI-critical source tree still clean before database operations
+        run: node backend/scripts/v220-checked-source-tree-gate.cjs
+      - name: Offline bootstrap plan (no SQL executed)
+        run: node backend/scripts/bootstrap-plan.js
+      - name: Create disposable non-superuser DB and extension
+        shell: bash
+        run: |
+          set -euo pipefail
+          PG_ID='${{ job.services.postgres.id }}'
+          test -n "$PG_ID"
+          # These constants belong ONLY to the short-lived job service.
+          docker exec -u postgres -e PGPASSWORD=v193_disposable_admin_only "$PG_ID" \
+            psql -X -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c "CREATE ROLE ustara_account_test LOGIN PASSWORD 'v193_disposable_user_only' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION"
+          docker exec -u postgres -e PGPASSWORD=v193_disposable_admin_only "$PG_ID" \
+            psql -X -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c 'CREATE DATABASE ustara_test_db OWNER ustara_account_test'
+          docker exec -u postgres -e PGPASSWORD=v193_disposable_admin_only "$PG_ID" \
+            psql -X -h 127.0.0.1 -U postgres -d ustara_test_db -v ON_ERROR_STOP=1 \
+            -c 'CREATE EXTENSION btree_gist WITH SCHEMA public'
+      - name: Verify test URL and explicit fixture authorization (no DB operation)
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: node scripts/v193-isolated-db-gate.cjs
+      - name: Verify PostgreSQL 18 runtime and limited role BEFORE migrations (read-only)
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: node scripts/v218-prebootstrap-runtime-proof.cjs
+      - name: Bootstrap ONLY the disposable CI database inside its container
+        shell: bash
+        run: |
+          set -euo pipefail
+          PG_ID='${{ job.services.postgres.id }}'
+          # Copy SQL to PostgreSQL container: relative psql \ir includes work.
+          # Running inside the container makes bootstrap's loopback guard meaningful.
+          docker cp backend/database "$PG_ID:/tmp/ustara-v193-database"
+          docker exec -u postgres -e PGPASSWORD=v193_disposable_user_only "$PG_ID" \
+            psql -X -h 127.0.0.1 -U ustara_account_test -d ustara_test_db \
+            -v ON_ERROR_STOP=1 -f /tmp/ustara-v193-database/bootstrap.sql
+      - name: Verify disposable bootstrap catalog without modifying test rows
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: |
+          node scripts/v193-isolated-db-gate.cjs
+          node scripts/v194-bootstrap-proof.cjs
+      - name: Verify PostgreSQL 18 runtime identity and role permissions (read-only)
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: |
+          node scripts/v193-isolated-db-gate.cjs
+          node scripts/v198-postgres-runtime-proof.cjs
+      - name: Require fresh and empty account/booking fixtures before write tests (read-only)
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: |
+          node scripts/v193-isolated-db-gate.cjs
+          node scripts/v205-empty-fixtures-proof.cjs
+      - name: Booking overlap and concurrency integration (real disposable PostgreSQL)
+        id: booking_integration
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: |
+          node scripts/v193-isolated-db-gate.cjs
+          node scripts/v208-integration-exit-gate.cjs
+      - name: Prove test fixture cleanup after integration (read-only)
+        # Run even if the integration script failed, to report leftover fixtures.
+        # Do not touch DB if the integration step never ran or the job was cancelled.
+        # The job remains failed on any test error; evidence upload stays success-only.
+        if: ${{ !cancelled() && (steps.booking_integration.outcome == 'success' || steps.booking_integration.outcome == 'failure') }}
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          USTARA_BOOKING_CONCURRENCY_TESTS: I_AUTHORIZE_TEST_DATA
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:v193_disposable_user_only@127.0.0.1:5432/ustara_test_db
+        run: |
+          node scripts/v193-isolated-db-gate.cjs
+          node scripts/v206-postrun-cleanup-proof.cjs
+      - name: Verify artifact schema and bind evidence to this CI attempt
+        working-directory: backend
+        run: node scripts/v197-verify-evidence.cjs
+      - name: Upload verified booking integration evidence (no credentials or raw TAP)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ustara-v220-checked-source-tree-evidence
+          path: backend/artifacts/v196-booking-integration-evidence.json
+          if-no-files-found: error
+          retention-days: 7

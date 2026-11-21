@@ -1,0 +1,124 @@
+{
+  "version": "v181",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 179,
+  "indexedNew": 7,
+  "indexedTotal": 185,
+  "notYetIndexed": 0,
+  "sourcePartiallyImplemented": 4,
+  "requirementsNotImplemented": 1,
+  "explicitlyCancelled": 2,
+  "decisions": [
+    {
+      "id": 179,
+      "decision": "Private Booking Note",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Private note with role-based read/write access, explicit visibility rules, safe retention and PostgreSQL/HTTP verification is not implemented. No private note is stored in the five-minute guest draft."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 180,
+      "decision": "Xizmat davomiyligi 5 daqiqalik qadam",
+      "originalStatus": "Qisman: v10 5 daqiqalik validatsiya",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/servicesController.js",
+        "backend/services/slotGrid.js"
+      ],
+      "tests": [
+        "backend/test/v181SevenFinalDecisions.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Service creation and availability enforce five-minute steps. Legacy stored values and real PostgreSQL are not verified end to end."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 181,
+      "decision": "Butun shop pauzasi HOZIRCHA KERAK EMAS",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Shop-wide pause was explicitly postponed; no additional workflow is added."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 182,
+      "decision": "Profil preview takroriy savol BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Extra profile preview re-discussion was cancelled; no duplicate preview flow is added."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 183,
+      "decision": "Offline amalning oddiy saqlash holati",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/barber/bookingDraft.js",
+        "frontend/src/pages/user/barber/bookingDraftStatusV181.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "frontend/test/v181OfflineDraftSaveStatus.test.js"
+      ],
+      "missingImplementation": [
+        "Saved/failed/expired status is shown for a five-minute browser-tab selection; no offline booking mutation, durable cross-device sync or live browser validation is claimed."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 184,
+      "decision": "Faqat ochilgan slotlarga bron, kun limiti yo‘q",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/slotGrid.js",
+        "backend/controllers/bookingsController.js"
+      ],
+      "tests": [
+        "backend/test/v181SevenFinalDecisions.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Slot generation is based on working hours and conflicts rather than a fixed daily booking quota. Runtime scheduling, PostgreSQL locks and booking E2E are not verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 185,
+      "decision": "Slot barcha mijozlar uchun ochiq",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/routes/bookings.js",
+        "backend/controllers/bookingsController.js"
+      ],
+      "tests": [
+        "backend/test/v181SevenFinalDecisions.unit.test.js"
+      ],
+      "missingImplementation": [
+        "The public availability endpoint shows eligible free slots to guests/customers; booking creation still requires an authenticated customer and server conflict checks. Real multi-user contention E2E not run."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "productionReady": false
+}

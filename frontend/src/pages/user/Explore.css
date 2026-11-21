@@ -90,3 +90,49 @@
 .ex-rating svg { color: var(--rating-star); fill: var(--rating-star); }
 
 .ex-service-filter small { color: var(--muted); font-size: 12px; }
+
+.ex-view-switch { display: flex; padding: 3px; gap: 3px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.ex-view-switch button { min-height: 40px; padding: 8px 15px; border: 0; border-radius: 9px; color: var(--muted); background: transparent; font: inherit; cursor: pointer; }
+.ex-view-switch [aria-pressed="true"] { color: var(--accent-hover); background: var(--accent-soft); }
+.ex-results-heading { margin: 14px 0; }
+.ex-state { padding: 26px 16px; }
+
+/* v115 / #16, #164, #42: mobilga mos filtr va bron yo‘li. */
+.ex-search-help { color: var(--muted); font-size: var(--font-small); line-height: 1.5; margin: 7px 2px 0; }
+.ex-filter-grid :is(input[type="search"]) { min-height: 46px; width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; font-size: var(--font-input); }
+.ex-area-filter small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.ex-result-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ex-action-primary { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--ex-primary); font-weight: 600; }
+@media (max-width: 520px) {
+  .ex-result-footer { align-items: stretch; }
+  .ex-result-actions { width: 100%; }
+  .ex-result-actions .ex-action { flex: 1; min-width: min(100%, 120px); }
+  .ex-area-filter { grid-column: 1 / -1; }
+}
+
+/* v121 #16: qidiruv natijasini foydalanuvchi tartiblaydi, faqat real narxlar. */
+.ex-sort-label { display: inline-flex; align-items: center; gap: 8px; font-size: var(--font-small); color: var(--muted); }
+.ex-sort-label select { min-height: 44px; min-width: 134px; max-width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 8px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+@media (max-width: 480px) { .ex-sort-label { width: 100%; justify-content: space-between; } .ex-sort-label select { flex: 1; max-width: 220px; } }
+
+/* v132 / decision #95: explicit, factual 2–3 provider comparison. */
+.ex-compare-help,.ex-compare-note { margin: 10px 0; color: var(--muted); font-size: var(--font-small); line-height: 1.5; }
+.ex-compare { padding: 16px; margin: 16px 0 20px; background: var(--surface); border: 1px solid var(--border-strong,var(--border)); border-radius: 14px; }
+.ex-compare-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.ex-compare-header h2 { margin: 0; font-size: var(--font-section); }
+.ex-compare-header p { margin: 6px 0; font-size: var(--font-small); color: var(--muted); }
+.ex-compare-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); }
+.ex-compare-card { min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+.ex-compare-card-head { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.ex-compare-card h3 { font-size: var(--font-body); margin: 0; overflow-wrap: anywhere; }
+.ex-compare-remove { border: none; background: none; color: var(--ex-primary); cursor: pointer; min-height: 44px; font: inherit; font-size: var(--font-small); }
+.ex-compare-card dl { margin: 12px 0; }
+.ex-compare-card dl > div { padding: 7px 0; border-bottom: 1px solid var(--border); }
+.ex-compare-card dt { color: var(--muted); font-size: var(--font-small); }
+.ex-compare-card dd { margin: 4px 0 0; font-size: var(--font-body); overflow-wrap: anywhere; }
+.ex-compare-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ex-compare-actions .ex-action { flex: 1; }
+.ex-compare-no-booking { color: var(--muted); font-size: var(--font-small); }
+.ex-compare-pick[aria-pressed="true"] { border-color: var(--ex-primary); background: var(--accent-soft); }
+.ex-compare-pick:disabled { opacity: .5; cursor: not-allowed; }
+@media(max-width:520px) { .ex-compare {padding: 12px;} .ex-compare-grid { grid-template-columns: minmax(0,1fr); } }

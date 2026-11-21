@@ -1,0 +1,116 @@
+{
+  "version": "v176",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 144,
+  "indexedNew": 7,
+  "indexedTotal": 151,
+  "notYetIndexed": 34,
+  "sourcePartiallyImplemented": 3,
+  "requirementsNotImplemented": 4,
+  "decisions": [
+    {
+      "id": 144,
+      "decision": "Internet uzilganda Booking Recovery",
+      "originalStatus": "Qisman: v9 server/frontend idempotency kod va unit test bor; real PostgreSQL sinovi yo‘q",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/bookingRecovery.js",
+        "backend/services/bookingIdempotency.js"
+      ],
+      "tests": [
+        "backend/test/v81BookingRecovery.unit.test.js",
+        "backend/test/bookingIdempotency.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Idempotency and read-only recovery exist; real PG concurrent transactions, network interruption and browser E2E remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 145,
+      "decision": "Professional Booking Inbox",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/barber/Bookings.jsx",
+        "frontend/src/pages/barber/data/bookingInboxV176.js"
+      ],
+      "tests": [
+        "frontend/test/v176ProfessionalBookingInbox.test.js"
+      ],
+      "missingImplementation": [
+        "Read-only client-side search, date and existing status tabs over already-loaded bookings. Server-wide history pagination, full inbox search and real browser E2E are not implemented/verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 146,
+      "decision": "Adaptive Booking Timeline",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/barber/components/BookingDayTimelineV160.jsx"
+      ],
+      "tests": [
+        "frontend/test/v160BookingDayTimeline.test.js"
+      ],
+      "missingImplementation": [
+        "Read-only timeline with five statuses exists; end-to-end calendar updates, DST/timezone and real PG event races are unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 147,
+      "decision": "Compact Client History",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No server-scoped authorization and privacy-minimized per-client history UI is implemented; a booking list is not a cross-visit client card."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 148,
+      "decision": "Verified Sartaroshxona",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Shop profile and barber badge do not amount to independently verified shop registration, Admin evidence review or shop verification lifecycle."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 149,
+      "decision": "Safe Ownership Transfer",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No two-party shop-ownership consent, Admin review, role handoff and transactional transfer exists; do not imply shop owner can transfer rights."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 150,
+      "decision": "Safe Block foydalanuvchilar orasida",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No authenticated mutual user block/unblock policy across profile, social/chat and bookings has been implemented or tested."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

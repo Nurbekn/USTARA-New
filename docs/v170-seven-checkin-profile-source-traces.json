@@ -1,0 +1,149 @@
+{
+  "version": "v170",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "reviewedDecisions": 7,
+  "previousSourceTraces": 103,
+  "alreadyIndexed": [
+    107
+  ],
+  "newSourceTraces": 6,
+  "uniqueSourceTraces": 109,
+  "notYetTraced": 76,
+  "decisions": [
+    {
+      "id": 102,
+      "decision": "Mijoz check-in, sartarosh tasdig‘i",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/bookingCheckInV170.js",
+        "frontend/src/pages/user/bookings/CheckInV170.jsx",
+        "frontend/src/pages/barber/components/BookingCard.jsx"
+      ],
+      "tests": [
+        "backend/test/v170BookingCheckIn.unit.test.js",
+        "frontend/test/v170BookingCheckIn.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Two-step server check-in added; real DB concurrent cancellation, live mobile browser and real notifications NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 103,
+      "decision": "Ixcham Smart Service Card",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/InlineBooking.jsx",
+        "frontend/src/pages/user/barber/availableSlots.js"
+      ],
+      "tests": [
+        "frontend/test/v77BookingQuote.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Service summaries exist inside booking UI, but dedicated compact smart card design, usability and mobile E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 104,
+      "decision": "Professional Finish Flow",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/barber/components/BookingCard.jsx",
+        "backend/controllers/bookingsController.js"
+      ],
+      "tests": [
+        "frontend/test/v100ServiceFinishConfirmation.test.js",
+        "backend/test/v87BookingStatusCommit.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Explicit service completion confirmation exists, but professional end-to-end finish and verified receipt E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 105,
+      "decision": "Bekor qilishdan keyin muqobil vaqtlari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/bookings/CancellationAlternatives.jsx",
+        "frontend/src/pages/user/bookings/cancellationAlternatives.js"
+      ],
+      "tests": [
+        "frontend/test/v101CancellationAlternatives.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Read-only suggestions exist; no slot reservation, fresh PostgreSQL availability and mobile E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 106,
+      "decision": "Xavfsiz bronni ko‘chirish",
+      "originalStatus": "Qisman: v13 vaqt + xizmat tahriri UI/API",
+      "code": [
+        "backend/controllers/bookingsController.js",
+        "frontend/src/pages/user/bookings/model.js"
+      ],
+      "tests": [
+        "frontend/test/v103RescheduleSlotBoundary.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Revision/quote guards exist; concurrent PostgreSQL writes and browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 107,
+      "decision": "Ommaviy profil havolasini ko‘rish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/publicShare.js",
+        "frontend/src/pages/user/barber/PublicProfileShare.jsx"
+      ],
+      "tests": [
+        "frontend/test/v136ShareBasePath.test.js"
+      ],
+      "sourceStatus": "ALREADY_INDEXED_PARTIAL",
+      "missingImplementation": [
+        "Already indexed in v155. Public numeric-ID links exist; real deployment and sharing E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 108,
+      "decision": "Shaxsiy ustara.uz/@username havola",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/publicShare.js",
+        "frontend/src/pages/barber/Portfolio.jsx"
+      ],
+      "tests": [
+        "frontend/test/v134PublicProfileSharing.test.js"
+      ],
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "missingImplementation": [
+        "NOT IMPLEMENTED: current canonical URLs are /barbers/:id, not /@username. Reserved names, uniqueness, migration and public slug route remain open."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramCheckIn": "NOT_IMPLEMENTED",
+  "productionReady": false,
+  "releaseReadiness": "NOT_VERIFIED"
+}

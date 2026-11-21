@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { authorName } from "../../../utils/profileName.js";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Avatar } from "../../../components/Avatar";
 import Icon from "../../../components/Icon";
+import Sheet from '../../../components/Sheet';
+import MediaGallery from './MediaGallery';
+import { resolveMediaUrl } from '../../../api/client.js';
 import { knownCount, postTime, profileUrl } from "./model";
+import { siteLocalePath } from "../../../utils/siteLocale.js";
+import { socialQueueText } from "./socialQueueLocaleV149.js";
 
 export default function PostCard({
   post,
@@ -17,27 +23,36 @@ export default function PostCard({
   onComments,
   onShare,
   onReport,
+  mutationsAvailable = false,
+  lang = "uz",
 }) {
-  const [failed, setFailed] = useState({});
+  const tr = socialQueueText(lang);
+  const [viewing, setViewing] = useState(null);
+  useEffect(() => {
+    if (viewing === null) return;
+    const marker = `post-${post.id}-${Date.now()}`;
+    window.history.pushState({ ...window.history.state, ustaraMedia: marker }, '');
+    const back = () => setViewing(null);
+    window.addEventListener('popstate', back);
+    return () => { window.removeEventListener('popstate', back); if (window.history.state?.ustaraMedia === marker) window.history.back(); };
+  }, [viewing, post.id]);
   const author = post.author;
   const profile = profileUrl(author);
-  const name = author.name || "Muallif nomi ko‘rsatilmagan";
+  const name = authorName(author) || tr("Muallif nomi ko‘rsatilmagan");
   const avatar = (
     <Avatar
       className={author.role === "barber" ? "" : "up-user-avatar"}
-      photo={author.avatarPhoto}
+      photo={resolveMediaUrl(author.avatarPhoto)}
       name={name}
       size={44}
     />
   );
-  const likeCount = knownCount(post.likeCount)
-    ? Math.max(0, post.likeCount + Number(liked) - Number(!!post.likedByMe))
-    : null;
+  const likeCount = knownCount(post.likeCount) ? post.likeCount : null;
   return (
-    <article className="so-post" id={`social-post-${post.id}`}>
+    <><article className="so-post" id={`social-post-${post.id}`}>
       <header className="so-post-head">
         {profile ? (
-          <Link className="so-author" to={profile}>
+          <Link className="so-author" to={siteLocalePath(profile,lang)}>
             {avatar}
             <span>
               <strong>{name}</strong>
@@ -66,67 +81,31 @@ export default function PostCard({
               className="so-follow"
               type="button"
               aria-pressed={followed}
+              aria-label={followed ? tr("Kuzatuvni bekor qilish") : tr("Kuzatish")}
+              disabled={!mutationsAvailable}
               onClick={onFollow}
             >
-              {followed ? "Obuna bo‘lingan" : "Obuna bo‘lish"}
+              {followed ? <Icon name="check" size={21}/> : "+ Kuzatish"}
             </button>
           )}
         <button
           className="so-icon-button"
           type="button"
-          aria-label="Post haqida shikoyat"
+          aria-label={tr("Post haqida shikoyat")}
           onClick={onReport}
         >
           ···
         </button>
       </header>
-      {post.media.length > 0 ? (
-        <div
-          className={`so-media ${post.kind === "beforeAfter" ? "so-before-after" : ""}`}
-          aria-label={
-            post.kind === "beforeAfter"
-              ? "Oldin va keyin"
-              : "Post media fayllari"
-          }
-        >
-          {post.media.map((m, index) => (
-            <figure key={`${m.url}-${index}`}>
-              {failed[index] ? (
-                <div className="so-media-error">
-                  Media faylni ochib bo‘lmadi.
-                </div>
-              ) : m.type === "video" ? (
-                <video
-                  src={m.url}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  onError={() => setFailed((p) => ({ ...p, [index]: true }))}
-                />
-              ) : (
-                <img
-                  src={m.url}
-                  alt={m.alt || `${name} — ${index + 1}-rasm`}
-                  loading="lazy"
-                  onError={() => setFailed((p) => ({ ...p, [index]: true }))}
-                />
-              )}
-              {post.kind === "beforeAfter" && (
-                <figcaption>{index === 0 ? "Oldin" : "Keyin"}</figcaption>
-              )}
-            </figure>
-          ))}
-        </div>
-      ) : (
-        <div className="so-media-error">Postga media qo‘shilmagan.</div>
-      )}
+      <MediaGallery key={post.media.map(item => item.url).join(',')} media={post.media} name={name} lang={lang} onOpen={setViewing}/>
       <div className="so-post-body">
         <div className="so-post-actions">
           <button
             className={`so-icon-button ${liked ? "so-liked" : ""}`}
             type="button"
-            aria-label="Like"
+            aria-label={tr("Like")}
             aria-pressed={liked}
+            disabled={!mutationsAvailable}
             onClick={onLike}
           >
             <Icon name="heart" viewBox="0 0 24 24" fill={liked?"currentColor":"none"} stroke="currentColor" strokeWidth="1.7" aria-hidden="true" />
@@ -135,7 +114,8 @@ export default function PostCard({
           <button
             type="button"
             className="so-icon-button"
-            aria-label="Izohlar"
+            aria-label={tr("Izohlar")}
+            disabled={!mutationsAvailable}
             onClick={onComments}
           >
             <svg
@@ -152,24 +132,26 @@ export default function PostCard({
           <button
             type="button"
             className="so-icon-button"
-            aria-label="Ulashish"
+            aria-label={tr("Ulashish")}
             onClick={onShare}
           >
-            <Icon name="arrow" />
+            <Icon name="send" />
           </button>
           <button
             type="button"
             className="so-icon-button so-save"
             aria-label={
-              saved ? "Saqlanganlardan olib tashlash" : "Postni saqlash"
+              saved ? tr("Saqlanganlardan olib tashlash") : tr("Postni saqlash")
             }
             aria-pressed={saved}
+            disabled={!mutationsAvailable}
             onClick={onSave}
           >
             <Icon name="bookmark" viewBox="0 0 24 24" fill={saved?"currentColor":"none"} stroke="currentColor" strokeWidth="1.7" aria-hidden="true" />
           </button>
         </div>
         {post.caption && <p className="so-caption">{post.caption}</p>}
+        {author.role === "barber" && Number.isSafeInteger(Number(author.id)) && Number(author.id)>0 && <Link className="so-provider-link" to={siteLocalePath(`/user/chat?barber=${author.id}&post=${post.id}`,lang)}>{({uz:"Chatda ulashish",ru:"Отправить в чат",en:"Share in chat"})[lang]||"Chatda ulashish"}</Link>}
         <div className="so-service-links">
           {services
             .filter((s) =>
@@ -178,7 +160,7 @@ export default function PostCard({
             .map((s) => (
               <Link
                 key={s.id}
-                to={`/user/explore?type=services&q=${encodeURIComponent(s.name)}`}
+                to={siteLocalePath(`/user/explore?type=services&q=${encodeURIComponent(s.name)}`,lang)}
               >
                 {s.name}
                 <Icon name="arrow" size={15} />
@@ -186,14 +168,25 @@ export default function PostCard({
             ))}
         </div>
         {["barber", "salon"].includes(author.role) && profile && (
-          <Link className="so-provider-link" to={profile}>
+          <Link className="so-provider-link" to={siteLocalePath(profile,lang)}>
             {author.role === "barber"
-              ? "Barber profili va xizmatlari"
-              : "Salon profili va xizmatlari"}
+              ? tr("Barber profili va xizmatlari")
+              : tr("Salon profili va xizmatlari")}
             <Icon name="arrow" size={17} />
           </Link>
         )}
       </div>
     </article>
+    <Sheet open={viewing !== null} title={tr("Post")} className="so-media-viewer so-dialog-scope" onClose={() => setViewing(null)}>
+      {viewing !== null && <article className="so-post"><header className="so-post-head"><Link className="so-author" to={profile ? siteLocalePath(profile,lang) : '#'}>{avatar}<strong>{name}</strong></Link></header>
+        <MediaGallery key={viewing} media={post.media} name={name} lang={lang} initialIndex={viewing}/>
+        <div className="so-post-body"><div className="so-post-actions">
+          <button type="button" className={`so-icon-button ${liked ? 'so-liked' : ''}`} aria-label={tr("Like")} aria-pressed={liked} disabled={!mutationsAvailable} onClick={onLike}><Icon name="heart" fill={liked ? 'currentColor' : 'none'}/><span>{likeCount}</span></button>
+          <button type="button" className="so-icon-button" aria-label={tr("Izohlar")} onClick={() => { setViewing(null); onComments(); }}><Icon name="comment"/><span>{post.commentCount}</span></button>
+          <button type="button" className="so-icon-button" aria-label={tr("Ulashish")} onClick={onShare}><Icon name="send"/></button>
+          <button type="button" className="so-icon-button so-save" aria-label={tr("Postni saqlash")} aria-pressed={saved} disabled={!mutationsAvailable} onClick={onSave}><Icon name="bookmark" fill={saved ? 'currentColor' : 'none'}/></button>
+        </div><p className="so-caption">{post.caption}</p></div>
+      </article>}
+    </Sheet></>
   );
 }

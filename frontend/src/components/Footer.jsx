@@ -1,40 +1,39 @@
 import BrandLogo from "./brand/BrandLogo";
+import { getSiteUi, readSiteLocale, siteLocalePath } from "../utils/siteLocale.js";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Footer.css";
 
 function Footer() {
+  const lang = readSiteLocale(useLocation().search);
+  const ui = getSiteUi(lang);
   return (
     <footer className="footer" id="contact">
       <div className="footer-main container">
         <div className="footer-brand">
-          <Link to="/" className="footer-logo">
+          <Link to={siteLocalePath("/", lang)} className="footer-logo">
             <BrandLogo />
           </Link>
 
-          <p>
-            O'zingizga mos sartaroshni toping.
-            Navbatingizni oldindan band qiling.
-            Vaqtingizni tejab, uslubingizni yangilang.
-          </p>
+          <p>{ui.footer.description}</p>
         </div>
 
         <div className="footer-column">
-          <h3>Platforma</h3>
-          <Link to="/barbers">Sartaroshlar</Link>
-          <Link to="/logos">Brend konsepsiyalari</Link>
-          <a href="/#how-it-works">Qanday ishlaydi?</a>
-          <a href="/#about">Biz haqimizda</a>
+          <h3>{ui.footer.platform}</h3>
+          <Link to={siteLocalePath("/barbers", lang)}>{ui.footer.barbers}</Link>
+          <Link to={siteLocalePath("/logos", lang)}>{ui.footer.brands}</Link>
+          <Link to={siteLocalePath("/#how-it-works", lang)}>{ui.public.how}</Link>
+          <Link to={siteLocalePath("/#about", lang)}>{ui.public.about}</Link>
         </div>
 
         <div className="footer-column">
-          <h3>Hisob</h3>
-          <Link to="/login">Kirish</Link>
-          <Link to="/signup">Ro'yxatdan o'tish</Link>
+          <h3>{ui.footer.account}</h3>
+          <Link to={siteLocalePath("/login", lang)}>{ui.public.signIn}</Link>
+          <Link to={siteLocalePath("/signup", lang)}>{ui.footer.signup}</Link>
         </div>
 
         <div className="footer-column">
-          <h3>Bog'lanish</h3>
+          <h3>{ui.public.contact}</h3>
           <a
             href="https://t.me/web_dev2305"
             target="_blank"
@@ -43,7 +42,7 @@ function Footer() {
             Telegram
           </a>
           <a href="mailto:mirzayevnurbek23@gmail.com">
-            Email yuborish
+            {ui.footer.email}
           </a>
           <a href="tel:+998332582331">
             +998 33 258 23 31
@@ -53,8 +52,8 @@ function Footer() {
 
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
-          <p>© 2026 Ustara. Barcha huquqlar himoyalangan.</p>
-          <span>Sartarosh tanlashning qulay usuli.</span>
+          <p>© 2026 Ustara. {ui.footer.rights}</p>
+          <span>{ui.footer.motto}</span>
         </div>
       </div>
     </footer>

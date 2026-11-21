@@ -1,0 +1,121 @@
+{
+  "version": "v180",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 172,
+  "indexedNew": 7,
+  "indexedTotal": 179,
+  "notYetIndexed": 6,
+  "sourcePartiallyImplemented": 3,
+  "requirementsNotImplemented": 3,
+  "explicitlyCancelled": 1,
+  "decisions": [
+    {
+      "id": 172,
+      "decision": "Profil yashirish funksiyasi BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Profile hiding was explicitly cancelled. No new hide-profile toggle is introduced."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 173,
+      "decision": "Mijozga faqat bo‘sh vaqt va navbat",
+      "originalStatus": "Qisman: v20 customer privacy tuzatildi; navbat ETA va E2E qoldi",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/bookingsController.js",
+        "frontend/src/pages/user/barber/availableSlots.js"
+      ],
+      "tests": [
+        "backend/test/bookings.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Busy slots are limited to the owning barber; customer reads expose availability. Queue ETA and live DB/browser privacy remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 174,
+      "decision": "Bron tafsilotida xarita va qo‘ng‘iroq",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/barber/publicNavigationV175.js",
+        "frontend/src/pages/user/barber/publicPhoneV178.js"
+      ],
+      "tests": [
+        "frontend/test/v175PublicBarberNavigation.test.js"
+      ],
+      "missingImplementation": [
+        "Public profile navigation and telephone links exist and booking contacts have earlier source evidence. Live booking-detail browser/network test is not complete."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 175,
+      "decision": "Sartaroshxona yopilganda butunlay o‘chirish",
+      "originalStatus": "Hozirgi backendda shop modeli topilmadi",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "A single-address shop model now exists, but an approved shop-closing and erasure/retention policy with team and booking dependencies is not implemented. No destructive deletion introduced."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 176,
+      "decision": "Telefon orqali bron uchun alohida xabar shart emas",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "The requirement not to send an automatic notification is accepted, but there is no verified barber-initiated manual phone-booking workflow to which it can safely apply."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 177,
+      "decision": "Admin suspend qilsa bronlar xavfsiz boshqariladi",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No verified admin suspension lifecycle for preserving/resolving existing bookings. Account deactivation is a separate user action, not equivalent to admin suspension."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 178,
+      "decision": "Profildagi xatoni bir tugma bilan bildirish",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/profileIssueReports.js",
+        "frontend/src/pages/user/barber/ProfileIssueReport.jsx",
+        "frontend/src/pages/user/barber/profileIssueLocaleV180.js",
+        "frontend/src/pages/user/barber/profileIssueModel.js"
+      ],
+      "tests": [
+        "frontend/test/v180ProfileIssueSafeRetry.test.js",
+        "backend/test/v128ProfileIssueReports.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Customer report, admin review, three-language form and fail-closed status recheck are present. Real PostgreSQL/HTTP/browser and rate-abuse load tests are not run."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "productionReady": false
+}

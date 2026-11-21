@@ -1,0 +1,452 @@
+{
+  "version": "v165",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "previousSourceTraces": 70,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 77,
+  "notYetTraced": 108,
+  "decisions": [
+    {
+      "id": 67,
+      "decision": "Admin Telegram Control Center",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/adminOpsReadOnlyV165.js",
+        "backend/routes/admin.js",
+        "frontend/src/pages/AdminOpsReadOnlyV165.jsx"
+      ],
+      "tests": [
+        "backend/test/v165AdminOperations.unit.test.js",
+        "frontend/test/v165AdminOperations.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Outbox counters + health are read-only; real Telegram delivery, retries, reconciliation and PG data NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 68,
+      "decision": "Admin System Control va rollback",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/adminOpsReadOnlyV165.js",
+        "frontend/src/pages/AdminOpsReadOnlyV165.jsx"
+      ],
+      "tests": [
+        "backend/test/v165AdminOperations.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Read-only system diagnostics added; NO in-app restart, rollback, approval workflow or live infrastructure metrics."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 69,
+      "decision": "Demo va avtomatlashtirilgan test markazi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/scripts/v165-operations-checklist.cjs",
+        ".github/workflows/v55-verify.yml"
+      ],
+      "tests": [
+        "backend/test/v165OperationsChecklist.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Package-free local/CI checklist exists; no production Demo/Test Center UI or real staged user flows."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 70,
+      "decision": "Monitoring xizmatlar va ogohlantirish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/adminOpsReadOnlyV165.js",
+        "backend/scripts/v41-telegram-delivery-health.js"
+      ],
+      "tests": [
+        "backend/test/v165AdminOperations.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Operator-visible outbox alerts; no long-term metrics, alert delivery, incident acknowledgement or multi-service monitoring."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 71,
+      "decision": "Xavfsiz zaxira va tiklash",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "docs/v165-operations-runbook.md"
+      ],
+      "tests": [
+        "backend/test/v165OperationsChecklist.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Manual backup/verify/restore guidance only; no automated encrypted backups or proven restoration drill."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 72,
+      "decision": "Bosqichli deployment va rollback",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "docs/v165-operations-runbook.md",
+        ".github/workflows/v55-verify.yml"
+      ],
+      "tests": [
+        "backend/test/v165OperationsChecklist.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Documented human-controlled staged release; no proven CDN/DB/browser staging deploy or rollback test."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 73,
+      "decision": "Feature flags va bosqichli chiqarish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/opsReadOnlyFlagsV165.js",
+        "backend/controllers/adminOpsReadOnlyV165.js"
+      ],
+      "tests": [
+        "backend/test/v165AdminOperations.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Server-side stable 0-100% Admin read-only diagnostics rollout only; full platform feature flag console not implemented."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "knownGaps": [
+    {
+      "id": 18,
+      "missingImplementation": [
+        "Bron boshlanishidan oldin avtomatik mijoz eslatmasi va kechikish holati E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 22,
+      "missingImplementation": [
+        "Hozirgi avtomatik Smart Booking opening trigger faqat cancellation uchun; xizmat erta yakunlanganda qolgan vaqtni taklif qilish implementatsiyasi aniqlanmadi."
+      ]
+    },
+    {
+      "id": 24,
+      "missingImplementation": [
+        "Admin pause/resume SQL va worker unit-testlangan, lekin haqiqiy PostgreSQL parallel lock/race va brauzer E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 25,
+      "missingImplementation": [
+        "Site/Telegram callbacklar bir xizmatda ishlaydi, real webhook/polling parallel E2E dalili yo‘q."
+      ]
+    },
+    {
+      "id": 26,
+      "missingImplementation": [
+        "Manual guest navbat hali haqiqiy PostgreSQL va mobil E2E bilan tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 28,
+      "missingImplementation": [
+        "QR approval transaction real database race test bilan yakuniy tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 29,
+      "missingImplementation": [
+        "Real DB va barber/mobile browser E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 30,
+      "missingImplementation": [
+        "QR va explicit consent bilan bog‘langan manual mijoz eligible; avtomatik ustuvorlik/haqiqiy DB race to‘liq E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 31,
+      "missingImplementation": [
+        "FIFO va manual override real parallel PostgreSQL transaction va mobil E2E bilan tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 32,
+      "missingImplementation": [
+        "Manual reorder real PostgreSQL parallel execution and barber browser E2E not verified."
+      ]
+    },
+    {
+      "id": 33,
+      "missingImplementation": [
+        "Transactional audit real database rollback and review UI not verified."
+      ]
+    },
+    {
+      "id": 34,
+      "missingImplementation": [
+        "Real timezone/midnight and concurrency database coverage remains incomplete."
+      ]
+    },
+    {
+      "id": 35,
+      "missingImplementation": [
+        "Public estimates are approximate; real database and mobile-browser timing not verified."
+      ]
+    },
+    {
+      "id": 36,
+      "missingImplementation": [
+        "Read-only day timeline is unit-tested; real authenticated browser/mobile E2E is not verified."
+      ]
+    },
+    {
+      "id": 37,
+      "missingImplementation": [
+        "Customer bookings filtering works in sources; live DB and browser E2E not verified."
+      ]
+    },
+    {
+      "id": 38,
+      "missingImplementation": [
+        "Followed-barber ranking lacks full authenticated browser E2E."
+      ]
+    },
+    {
+      "id": 39,
+      "missingImplementation": [
+        "Private chat REST/polling foundation; 6-second polling is NOT true push real-time. Browser, real PostgreSQL, abuse controls and lost-ACK idempotency not verified."
+      ]
+    },
+    {
+      "id": 40,
+      "missingImplementation": [
+        "Three languages and 3 preset human quick replies. AI generation/inference is not implemented."
+      ]
+    },
+    {
+      "id": 41,
+      "missingImplementation": [
+        "Human sender provenance enforced in API; AI sender route and end-to-end provenance verification not implemented."
+      ]
+    },
+    {
+      "id": 42,
+      "missingImplementation": [
+        "Booking CTA exists; mobile browser prominence/accessibility not reverified."
+      ]
+    },
+    {
+      "id": 43,
+      "missingImplementation": [
+        "Public ads labelled, no online payments; live campaign visibility and accessibility E2E unverified."
+      ]
+    },
+    {
+      "id": 44,
+      "missingImplementation": [
+        "Admin-only enable/disable with duration exists; real DB, concurrency and billing proof not verified."
+      ]
+    },
+    {
+      "id": 45,
+      "missingImplementation": [
+        "Admin role guard exists; real verification lifecycle and audit evidence E2E missing."
+      ]
+    },
+    {
+      "id": 46,
+      "missingImplementation": [
+        "Three evidence-checked badge categories implemented. The badge is not an independent professional certification. PostgreSQL and browser E2E NOT RUN."
+      ]
+    },
+    {
+      "id": 47,
+      "missingImplementation": [
+        "Admin reason/evidence summary recorded transactionally; external evidence document review, real DB and role integration NOT VERIFIED."
+      ]
+    },
+    {
+      "id": 48,
+      "missingImplementation": [
+        "Revoke/re-grant revision and append-only API audit implemented; no browser or real PostgreSQL race E2E."
+      ]
+    },
+    {
+      "id": 49,
+      "missingImplementation": [
+        "Evidence-described profile report and Admin review exist. Separate formal appeal, attachments and appeal resolution workflow NOT IMPLEMENTED."
+      ]
+    },
+    {
+      "id": 50,
+      "missingImplementation": [
+        "Unverified payments now explicitly reported as estimates; real financial reconciliation/payment tracking absent by design. PostgreSQL E2E NOT RUN."
+      ]
+    },
+    {
+      "id": 51,
+      "missingImplementation": [
+        "Current queue no-show uses called-state CAS and audit; appeals/disputes and original booked-appointment no-show lifecycle still need review."
+      ]
+    },
+    {
+      "id": 52,
+      "missingImplementation": [
+        "Immutable price, service name/duration and time update are source tested; independent address snapshot at booking time not fully implemented/verified."
+      ]
+    },
+    {
+      "id": 53,
+      "missingImplementation": [
+        "Auto-confirm sources exist, but actual PostgreSQL concurrency/idempotency E2E and full no-conflict policy not verified."
+      ]
+    },
+    {
+      "id": 54,
+      "missingImplementation": [
+        "Discovery after cancelled/rejected booking is possible without silent transfer. A barber-absence-triggered workflow, notification and verified equivalent alternatives are NOT IMPLEMENTED."
+      ]
+    },
+    {
+      "id": 55,
+      "missingImplementation": [
+        "Confirmed booking blocks vacation-calendar update in mock-tested transaction; real parallel PostgreSQL schedule changes NOT RUN."
+      ]
+    },
+    {
+      "id": 56,
+      "missingImplementation": [
+        "Price/service snapshot tested at source level. Legacy paths, full address snapshot (#52), database E2E and production verification remain open."
+      ]
+    },
+    {
+      "id": 57,
+      "missingImplementation": [
+        "Admin-paid placement is NOT a barber-created service discount or an outcomes dashboard. Barber campaigns, redemption/results and analytics are NOT IMPLEMENTED."
+      ]
+    },
+    {
+      "id": 58,
+      "missingImplementation": [
+        "Dark blue/mobile styles have source evidence. Visual browser, screen reader, contrast, keyboard and device matrix E2E NOT RUN."
+      ]
+    },
+    {
+      "id": 59,
+      "missingImplementation": [
+        "Offline/connectivity UX is a device hint; private API data is never cached or auto-replayed. Offline app shell/service-worker cache and browser E2E NOT IMPLEMENTED."
+      ]
+    },
+    {
+      "id": 60,
+      "missingImplementation": [
+        "Five tabs and routes source tested; actual mobile navigation, screen readers and browser E2E NOT RUN."
+      ]
+    },
+    {
+      "id": 61,
+      "missingImplementation": [
+        "Five barber routes source tested; responsive behavior and real authenticated browser E2E NOT RUN."
+      ]
+    },
+    {
+      "id": 62,
+      "missingImplementation": [
+        "Admin sidebar code exists; desktop/mobile visual/a11y testing not completed."
+      ]
+    },
+    {
+      "id": 63,
+      "missingImplementation": [
+        "Basic aggregate counts are shown; live dashboard freshness, metrics accuracy, and actual PG aggregation have not been E2E verified."
+      ]
+    },
+    {
+      "id": 64,
+      "missingImplementation": [
+        "Admin auth/list/deletion sources are present; full account audit/privilege testing and production security review NOT VERIFIED."
+      ]
+    },
+    {
+      "id": 65,
+      "missingImplementation": [
+        "Admin can review barber status and approve/reject; full monitoring/alerts/operational SLA are NOT IMPLEMENTED/VERIFIED."
+      ]
+    },
+    {
+      "id": 66,
+      "missingImplementation": [
+        "Read-only, bounded booking investigation with status/day/barber filters. Administrative booking mutation, escalations, audit workflow, real PG and browser E2E remain NOT IMPLEMENTED/VERIFIED."
+      ]
+    },
+    {
+      "id": 67,
+      "missingImplementation": [
+        "Outbox counters + health are read-only; real Telegram delivery, retries, reconciliation and PG data NOT VERIFIED."
+      ]
+    },
+    {
+      "id": 68,
+      "missingImplementation": [
+        "Read-only system diagnostics added; NO in-app restart, rollback, approval workflow or live infrastructure metrics."
+      ]
+    },
+    {
+      "id": 69,
+      "missingImplementation": [
+        "Package-free local/CI checklist exists; no production Demo/Test Center UI or real staged user flows."
+      ]
+    },
+    {
+      "id": 70,
+      "missingImplementation": [
+        "Operator-visible outbox alerts; no long-term metrics, alert delivery, incident acknowledgement or multi-service monitoring."
+      ]
+    },
+    {
+      "id": 71,
+      "missingImplementation": [
+        "Manual backup/verify/restore guidance only; no automated encrypted backups or proven restoration drill."
+      ]
+    },
+    {
+      "id": 72,
+      "missingImplementation": [
+        "Documented human-controlled staged release; no proven CDN/DB/browser staging deploy or rollback test."
+      ]
+    },
+    {
+      "id": 73,
+      "missingImplementation": [
+        "Server-side stable 0-100% Admin read-only diagnostics rollout only; full platform feature flag console not implemented."
+      ]
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "backupRestoreDrill": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

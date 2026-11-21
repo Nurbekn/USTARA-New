@@ -1,0 +1,15 @@
+'use strict';
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const {validateTapReport, REQUIRED} = require('../scripts/v195-tap-result-gate.cjs');
+const {buildEvidence} = require('../scripts/v196-integration-evidence.cjs');
+const base = `TAP version 13\n# Subtest: ${REQUIRED}\n    ok 1 - alpha\n    ok 2 - beta\n    1..2\nok 1 - ${REQUIRED}\n1..1\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2\n`;
+const rejects = report => assert.throws(() => validateTapReport(report), /v202/);
+test('v202 accepts real-shaped single suite TAP and evidence', () => {assert.equal(validateTapReport(base).tests, 3); assert.equal(buildEvidence(base).passed, 3)});
+test('v202 rejects duplicate required subtest header', () => rejects(base.replace('# Subtest:', '# Subtest: fake\n# Subtest:')));
+test('v202 rejects unexpected second nested subtest', () => rejects(base.replace('    ok 2 - beta', '    # Subtest: hidden\n    ok 2 - beta')));
+test('v202 rejects nested assertion before suite header', () => assert.throws(() => validateTapReport(base.replace('# Subtest:', '    ok 3 - misplaced\n# Subtest:').replace('    ok 2 - beta\n','')), /v200|v202/));
+test('v202 rejects nested assertion after nested plan', () => rejects(base.replace('    ok 2 - beta\n','').replace('    1..2\n','    1..2\n    ok 2 - beta\n')));
+test('v202 rejects forged nonzero suite count', () => rejects(base.replace('# suites 0', '# suites 1')));
+test('v202 rejects extra top-level subtest header', () => rejects(base.replace('    1..2', '# Subtest: sneak\n    1..2')));
+test('v202 rejects relocated suite header', () => rejects(base.replace('# Subtest:', '# diagnostic\n# Subtest:')));

@@ -1,0 +1,4 @@
+.va-wrap { position: relative; display: inline-flex; flex-shrink: 0; vertical-align: middle; }
+.va-wrap > .bx-avatar { width: 100%; height: 100%; }
+.va-badge { position: absolute; right: -2px; bottom: -3px; display: grid; place-items: center; width: var(--va-badge); height: var(--va-badge); background: #2385ff; filter: drop-shadow(0 1px 2px #071121); clip-path: polygon(50% 0%,62% 8%,76% 6%,83% 20%,96% 26%,93% 42%,100% 54%,91% 66%,91% 82%,75% 87%,65% 100%,50% 95%,35% 100%,25% 87%,9% 82%,9% 66%,0% 54%,7% 42%,4% 26%,17% 20%,24% 6%,38% 8%); }
+.va-badge svg { width: 76%; height: 76%; }

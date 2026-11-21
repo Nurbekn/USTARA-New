@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="uz">
   <head>
+    <meta name="referrer" content="no-referrer" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,8 +16,9 @@
       content="Ustara — o'zingga mos sartaroshni top va navbatingni oldindan band qil."
     />
 
-    <link rel="stylesheet" href="/loading.css" />
-    <link rel="icon" type="image/svg+xml" href="/brand/ustara.svg" />
+    <script defer src="%BASE_URL%bootstrap-locale.js"></script>
+    <link rel="stylesheet" href="%BASE_URL%loading.css" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%brand/ustara.svg" />
     <title>Ustara — Sartarosh bron qilish</title>
 
   </head>
@@ -25,10 +27,10 @@
     <div id="root">
       <div class="app-loading app-loading--screen" role="status" aria-live="polite">
         <span class="app-loading__mark" aria-hidden="true">
-          <img src="/brand/ustara.svg" width="48" height="48" alt="" />
+          <img src="%BASE_URL%brand/ustara.svg" width="48" height="48" alt="" />
         </span>
-        <p>Yuklanmoqda…</p>
-        <small>Iltimos, biroz kuting</small>
+        <p id="ustara-boot-status">Yuklanmoqda…</p>
+        <small id="ustara-boot-detail">Iltimos, biroz kuting</small>
       </div>
     </div>
     <script type="module" src="/src/main.jsx"></script>

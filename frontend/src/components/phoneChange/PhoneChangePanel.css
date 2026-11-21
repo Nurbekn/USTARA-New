@@ -1,0 +1,17 @@
+.pc-panel { display: grid; gap: 18px; width: 100%; max-width: 420px; margin-inline: auto; color: var(--text); }
+.pc-panel fieldset { display: grid; gap: 18px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.pc-panel p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--muted); }
+.pc-panel .pc-current { display: grid; gap: 6px; }
+.pc-current strong, .pc-panel .pc-destination { font-size: 20px; color: var(--text); }
+.pc-panel .pc-step { font-size: 12px; color: var(--accent-hover); }
+.pc-panel .au-field { margin: 0; }
+.pc-panel .au-phone, .pc-panel .au-password { background: var(--bg-soft); }
+.pc-panel .au-label, .pc-panel label { color: var(--text); }
+.pc-primary, .pc-bot, .pc-resend { display: flex; align-items: center; justify-content: center; min-height: 48px; width: 100%; padding: 12px; border: 0; border-radius: 12px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+.pc-primary { background: var(--accent); color: var(--accent-ink); }
+.pc-bot, .pc-resend { background: var(--accent-soft); color: var(--accent-hover); }
+.pc-panel :disabled { cursor: default; opacity: .55; }
+.pc-panel .pc-error { color: var(--danger, #f87171); }
+.pc-otp { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.pc-otp input { width: 100%; min-width: 0; height: 56px; padding: 0; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--bg-soft); color: var(--text); text-align: center; font-size: 24px; }
+.pc-panel :is(input, button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

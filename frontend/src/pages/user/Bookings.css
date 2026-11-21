@@ -117,3 +117,36 @@
 .ub-card-footer > strong { font-size: 16px; font-weight: 600; }
 .ub-card-footer > a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent-hover); font-size: 13px; }
 @media (max-width: 480px) { .ub-rows { gap: 12px; } }
+
+/* V12: accessible time-change form, matching existing mobile visual language. */
+.ub-reschedule-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+.ub-reschedule-fields label { display: grid; gap: 8px; color: var(--muted); font-size: var(--font-small); }
+.ub-reschedule-fields input { min-width: 0; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--bg-soft); color: var(--text); color-scheme: dark; font: inherit; }
+.ub-reschedule-fields input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ub-reschedule .ub-action-error { color: #fca5a5; }
+@media(max-width:480px) { .ub-reschedule-fields { grid-template-columns: 1fr; } }
+
+.ub-reschedule-fields select { min-width:0; width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-soft); color:var(--text); font:inherit; }
+
+/* v13: customer service edits share the existing booking-detail panel */
+.ub-edit-services { min-width: 0; margin: 0 0 18px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; display: grid; gap: 8px; }
+.ub-edit-services legend { padding: 0 6px; font-size: var(--font-body); font-weight: 600; }
+.ub-edit-service { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 9px 10px; border-radius: 9px; background: var(--bg-soft); cursor: pointer; }
+.ub-edit-service input { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--primary); }
+.ub-edit-service span { display: grid; gap: 3px; min-width: 0; }
+.ub-edit-service small { font-size: var(--font-small); color: var(--muted); }
+.ub-edit-quote { display: grid; gap: 8px; padding: 14px; margin: 14px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-soft); font-size: var(--font-body); }
+.ub-edit-quote span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.ub-edit-quote p { margin: 0; }
+
+/* v101: suggestions are not a reservation or a quote */
+.ub-alternatives { margin: 0 0 20px; }
+.ub-alternatives-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.ub-alternatives-heading h2 { margin:0; }
+.ub-alternative-times { list-style:none; margin:16px 0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+.ub-alternative-times li { border:1px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); background:var(--bg-soft); }
+.ub-alternatives .ub-button { min-height:44px; display:inline-flex; align-items:center; justify-content:center; text-align:center; }
+
+/* v125: navigation providers and contact buttons remain reachable on small screens. */
+.ub-contact-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
+.ub-contact-actions > a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }

@@ -1,6 +1,9 @@
 import Icon from "../../../components/Icon";
 import { useState } from "react";
-import { WEEKDAYS } from "../data/format";
+import { useLocation } from "react-router-dom";
+import { readSiteLocale } from "../../../utils/siteLocale.js";
+import { accountBarberUi } from "../../../components/accountLocaleV145.js";
+// Weekday labels are translated, numeric weekday IDs stay unchanged.
 import "./working-hours.css";
 
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -10,6 +13,8 @@ const TIMES = Array.from({ length: 36 }, (_, i) => {
 });
 
 export default function WorkingHours({ value, onChange }) {
+  const lang = readSiteLocale(useLocation().search);
+  const ui = accountBarberUi(lang).hours;
   const [applied, setApplied] = useState(null);
   const appliedNow = applied?.signature === JSON.stringify(value);
   const days = ORDER.map((day) => value.find((item) => item.day === day)).filter(Boolean);
@@ -29,32 +34,32 @@ export default function WorkingHours({ value, onChange }) {
   return (
     <div className="wh-editor">
       <div className="wh-tools">
-        <p>Kunlarni yoqing va ish vaqtini tanlang. Toshkent vaqti.</p>
+        <p>{ui.intro}</p>
         <button type="button" className={appliedNow ? "is-applied" : ""} disabled={!first || first.start >= first.end} onClick={applyToWorkdays}>
           {appliedNow && <Icon name="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" />}
-          {appliedNow ? "Ish kunlariga qo‘llanildi" : first ? `${WEEKDAYS[first.day]} vaqtini ish kunlariga qo'llash` : "Avval ish kunini tanlang"}
+          {appliedNow ? ui.applyDone : first ? `${ui.days[first.day]}: ${ui.apply}` : ui.applyFirst}
         </button>
-        <p className="wh-apply-status" role="status" aria-live="polite">{appliedNow ? `${applied.start}–${applied.end} vaqti ${applied.count} ta ish kuniga qo‘llandi.` : ""}</p>
+        <p className="wh-apply-status" role="status" aria-live="polite">{appliedNow ? `${applied.start}–${applied.end} ${ui.applied.replace("{count}", String(applied.count))}` : ""}</p>
       </div>
       <div className="wh-days">
         {days.map((item) => {
           const invalid = !item.isOff && item.start >= item.end;
           return (
             <div key={item.day} className={`wh-day ${item.isOff ? "is-off" : ""}`}>
-              <button type="button" className="wh-toggle" role="switch" aria-checked={!item.isOff} aria-label={`${WEEKDAYS[item.day]} ish kuni`} onClick={() => change(item.day, { isOff: !item.isOff })}>
-                <span><strong>{WEEKDAYS[item.day]}</strong><small>{item.isOff ? "Dam olish kuni" : "Ish kuni"}</small></span>
+              <button type="button" className="wh-toggle" role="switch" aria-checked={!item.isOff} aria-label={`${ui.days[item.day]}: ${ui.dayLabel}`} onClick={() => change(item.day, { isOff: !item.isOff })}>
+                <span><strong>{ui.days[item.day]}</strong><small>{item.isOff ? ui.off : ui.on}</small></span>
                 <span className="wh-track" aria-hidden="true" />
               </button>
               {!item.isOff && <div className="wh-times">
-                {[["start", "Boshlanish"], ["end", "Tugash"]].map(([field, label]) => (
+                {[["start", ui.start], ["end", ui.end]].map(([field, label]) => (
                   <label key={field}><span>{label}</span>
-                    <select value={item[field]} aria-label={`${WEEKDAYS[item.day]} ${label.toLowerCase()} vaqti`} aria-invalid={invalid} onChange={(event) => change(item.day, { [field]: event.target.value })}>
+                    <select value={item[field]} aria-label={`${ui.days[item.day]}: ${label} ${ui.time}`} aria-invalid={invalid} onChange={(event) => change(item.day, { [field]: event.target.value })}>
                       {[...new Set([...TIMES, item[field]])].sort().map((time) => <option key={time} value={time} disabled={field === "end" && time <= item.start}>{time}</option>)}
                     </select>
                   </label>
                 ))}
               </div>}
-              {invalid && <p className="wh-error" role="alert">Tugash vaqtini boshlanishdan keyin tanlang.</p>}
+              {invalid && <p className="wh-error" role="alert">{ui.invalid}</p>}
             </div>
           );
         })}

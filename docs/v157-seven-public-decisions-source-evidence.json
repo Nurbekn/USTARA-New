@@ -1,0 +1,135 @@
+{
+  "version": "v157",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "previousSourceTraces": 14,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 21,
+  "notYetTraced": 164,
+  "decisions": [
+    {
+      "id": 10,
+      "decision": "Sayt va Telegram real-time bildirishnomalari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/telegramBookingNotifications.js",
+        "frontend/src/pages/user/bookings/notifications.js"
+      ],
+      "tests": [
+        "backend/test/bookingNotificationAfterCommit.unit.test.js",
+        "frontend/test/bookingNotifications.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 11,
+      "decision": "Xizmatlarni tahrirlash va faolligini boshqarish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/servicesController.js",
+        "frontend/src/pages/barber/Services.jsx"
+      ],
+      "tests": [
+        "backend/test/v76ServiceArchive.unit.test.js",
+        "frontend/test/v73ServiceForm.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 12,
+      "decision": "Portfolio foto va video ishlari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/socialController.js",
+        "frontend/src/pages/barber/Portfolio.jsx"
+      ],
+      "tests": [
+        "backend/test/v157PublicGuestProfile.unit.test.js",
+        "frontend/test/publicProfile.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 13,
+      "decision": "Tasdiqlangan tashrifdan keyin baho va javob",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/reviewsController.js",
+        "frontend/src/pages/barber/Reviews.jsx"
+      ],
+      "tests": [
+        "backend/test/v157PublicGuestProfile.unit.test.js",
+        "frontend/test/publicProfile.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 14,
+      "decision": "Tasdiqlangan manzil va xarita",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/barbersController.js",
+        "frontend/src/pages/user/BarbersMap.jsx"
+      ],
+      "tests": [
+        "frontend/test/v124MapBookingAndDistanceSafety.test.js",
+        "backend/test/barber-profile.unit.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 15,
+      "decision": "Mavjud profil uslubi va tahrirlash",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/barberProfile.js",
+        "frontend/src/pages/barber/BarberProfileEdit.jsx"
+      ],
+      "tests": [
+        "backend/test/barber-profile.unit.test.js",
+        "frontend/test/barberSetup.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    },
+    {
+      "id": 16,
+      "decision": "Smart Search qidirish va filtrlar",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/explore/catalog.js",
+        "frontend/src/pages/user/Explore.jsx"
+      ],
+      "tests": [
+        "frontend/test/v117ExploreSearchContract.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitStatus": "NOT_INFERRED",
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "guestPublicPortfolioAndReviews": "UNIT_TESTED_ONLY",
+  "notificationRealtimeE2E": "NOT_VERIFIED",
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

@@ -109,3 +109,131 @@
 .bpv-actions .bpv-message-action.is-pressed, .bpv-actions .bpv-message-action:active { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
 @media (prefers-reduced-motion: no-preference) { .bpv-message-action { transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease; } }
 @media (min-width: 640px) { .bpv-profile-avatar .bx-avatar { width: 96px; height: 96px; } .bpv-stats dt { font-size: 28px; } .bpv-tabs button { font-size: 15px; } }
+/* Ixcham public profil, 320px dan boshlab. */
+.bpv-page { min-width: 0; padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+.bpv-profile-head { padding: 16px 10px 12px; }
+.bpv-profile-row { gap: 14px; }
+.bpv-stats { min-width: 0; gap: 5px; }
+.bpv-stats dt { font-size: clamp(18px, 5vw, 24px); }
+.bpv-stats dd { color: var(--muted); font-size: 12px; }
+.bpv-bio { gap: 7px; font-size: 14px; }
+.bpv-category { gap: 9px; }
+.bpv-approved { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; color: #6ee7b7; }
+.bpv-page .va-badge { background: #10b981; }
+.bpv-business { font-weight: 600; }
+.bpv-address { display: flex; align-items: flex-start; gap: 7px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.bpv-address svg { flex-shrink: 0; margin-top: 3px; }
+.bpv-address span { min-width: 0; overflow-wrap: anywhere; }
+.bpv-map-link { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; color: var(--accent-hover); font-size: 13px; }
+.bpv-tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; gap: 2px; top: calc(64px + env(safe-area-inset-top)); }
+.bpv-tabs button { flex: 1 0 auto; white-space: nowrap; min-width: 82px; min-height: 48px; padding: 10px; font-size: 13px; }
+.bpv-tabs button[aria-pressed="true"] { color: var(--accent-hover); border-bottom-color: var(--accent); }
+.bpv-rating-number svg, .bpv-review-stars { color: #fbbf24; }
+.bpv-review-stars { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; font-size: 13px; }
+.bpv-notice { padding: 18px 10px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.bpv-retry { min-height: 40px; border: 0; padding: 8px 0; background: transparent; color: var(--accent-hover); font: inherit; cursor: pointer; }
+.bpv-posts { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 3px; }
+.bpv-post { width: 100%; aspect-ratio: 1; cursor: pointer; }
+.bpv-media { position: relative; display: grid; place-items: center; overflow: hidden; width: 100%; background: var(--surface); }
+.bpv-media.is-thumb { aspect-ratio: 1; height: 100%; }
+.bpv-media img, .bpv-media video { display: block; width: 100%; max-height: 65dvh; object-fit: contain; }
+.bpv-media.is-thumb img, .bpv-media.is-thumb video { width: 100%; height: 100%; max-height: none; object-fit: cover; }
+.bpv-media-placeholder { display: grid; justify-items: center; gap: 8px; padding: 12px 4px; color: var(--muted); font-size: 10px; }
+.bpv-post-detail .bpv-media-placeholder { min-height: 200px; align-content: center; font-size: 14px; }
+.bpv-video-mark, .bpv-media-count { position: absolute; right: 6px; top: 5px; padding: 2px 5px; border-radius: 5px; background: #07111c99; color: white; font-size: 12px; }
+.bpv-schedule { padding: 14px 10px; }
+.bpv-timezone { padding-bottom: 10px; color: var(--muted); font-size: 12px; }
+.bpv-hours-row { display: flex; gap: 12px; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.bpv-hours-row strong { white-space: nowrap; font-weight: 500; }
+.bpv-hours-row.is-off strong { color: var(--muted); }
+.bpv-page .ib-slots button[aria-pressed="true"] { background: rgb(16 185 129 / .14); color: #6ee7b7; border-color: #10b981; }
+.bpv-post-detail { display: grid; gap: 14px; min-width: 0; }
+.bpv-post-author { display: flex; align-items: center; gap: 10px; }
+.bpv-post-detail p { overflow-wrap: anywhere; white-space: pre-wrap; }
+.bpv-post-detail time { color: var(--muted); font-size: 12px; }
+.bpv-media-switch { display: flex; justify-content: center; gap: 6px; }
+.bpv-media-switch button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.bpv-media-switch [aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+@media (min-width: 640px) { .bpv-profile-head { padding: 20px 16px 14px; } .bpv-tabs button { min-width: 120px; } }
+.bpv-address { display: block; }
+.bpv-address summary { display: flex; align-items: flex-start; gap: 7px; cursor: pointer; list-style: none; }
+.bpv-address summary::-webkit-details-marker { display: none; }
+.bpv-address summary span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-width: 0; overflow-wrap: anywhere; }
+.bpv-address[open] summary span { display: block; -webkit-line-clamp: unset; }
+.bpv-address summary svg:last-child { margin-left: auto; transform: rotate(90deg); }
+.bpv-address[open] summary svg:last-child { transform: rotate(-90deg); }
+
+/* v116: genuine profile-first booking CTA and touch-friendly dark-blue layouts. */
+.bpv-profile-head { min-width: 0; }
+.bpv-booking-actions { display: grid; gap: 7px; margin-top: 16px; }
+.bpv-booking-jump { display: inline-flex; justify-content: center; align-items: center; gap: 9px; width: 100%; max-width: 440px; min-height: 48px; padding: 11px 18px; border: 1px solid var(--accent); border-radius: var(--radius-md); background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 700; text-decoration: none; }
+.bpv-booking-jump > svg:last-child { margin-left: auto; }
+.bpv-booking-jump:hover { filter: brightness(1.08); }
+.bpv-booking-hint { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 60ch; }
+.bpv-booking-unavailable { padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--muted); font-size: 13px; }
+.bpv-content { scroll-margin-top: calc(128px + env(safe-area-inset-top, 0px)); outline: none; }
+.bpv-tabs { overscroll-behavior-x: contain; }
+.bpv-tabs button { cursor: pointer; }
+.bpv-tabs button:focus-visible, .bpv-booking-jump:focus-visible { outline: 3px solid var(--accent-hover); outline-offset: -3px; }
+.bpv-post { aspect-ratio: 1; }
+.bpv-post .bpv-media { width: 100%; height: 100%; }
+.bpv-post .bpv-media-placeholder { text-align: center; }
+.bpv-reviews { display: grid; gap: 12px; padding: 18px 12px; }
+.bpv-review { min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); line-height: 1.5; }
+.bpv-review p { margin-top: 8px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.bpv-review > div { margin-top: 12px; padding: 11px; border-radius: 8px; background: var(--surface-2); }
+.bpv-post-modal .bpv-media img, .bpv-post-modal .bpv-media video { max-height: min(60dvh, 600px); }
+@media (max-width: 359px) {
+  .bpv-profile-head { padding-inline: 8px; }
+  .bpv-profile-row { gap: 7px; }
+  .bpv-stats dt { font-size: 17px; }
+  .bpv-stats dd { font-size: 11px; }
+  .bpv-tabs button { min-width: 76px; padding-inline: 6px; gap: 5px; font-size: 12px; }
+  .bpv-tabs button svg { width: 15px; }
+  .bpv-booking-jump { max-width: none; }
+}
+@media (min-width: 640px) {
+  .bpv-booking-actions { margin-top: 20px; }
+  .bpv-reviews { padding: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bpv-post, .bpv-booking-jump { transition: none; }
+}
+
+/* v133: honest public/guest preview notice. */
+.bpv-guest-note { margin: 12px auto; max-width: 1100px; padding: 10px 16px; border-radius: 10px; background: rgba(59,130,246,.10); color: inherit; font-size: 14px; }
+
+/* v134: Public-only profile sharing (touch-friendly and keyboard accessible). */
+.bpv-share { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; max-width:100%; }
+.bpv-share-trigger { display:inline-flex; align-items:center; justify-content:center; min-height:44px; min-width:150px; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--text); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.bpv-share-trigger:disabled { opacity:.6; cursor:wait; }
+.bpv-share-notice { font-size:13px; color:var(--muted); overflow-wrap:anywhere; }
+.bpv-share-manual { display:grid; gap:5px; flex:1 1 100%; min-width:0; }
+.bpv-share-manual label { font-size:12px; color:var(--muted); }
+.bpv-share-manual input { width:100%; min-width:0; min-height:44px; padding:9px 10px; border:1px solid var(--border); border-radius:8px; color:var(--text); background:var(--bg); font:inherit; font-size:14px; }
+.bpv-share-trigger:focus-visible,.bpv-share-manual input:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+@media(max-width:359px) { .bpv-share-trigger { width:100%; } }
+
+.bpv-chat-link { display: inline-flex; min-height: 44px; align-items: center; margin: 10px 0; padding: 10px 16px; border: 1px solid var(--border); border-radius: 12px; font-weight: 600; text-decoration: none; }
+/* v162: evidence checks are visually distinct from barber approval. */
+.bpv-evidence-badges {list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:8px 0;color:#1e6a57}
+.bpv-evidence-badges li {border:1px solid currentColor;border-radius:20px;padding:4px 8px;font-size:.78rem;font-weight:600}
+
+/* v168: public featured works appear first, in newest-feature order. */
+.bpv-post { position:relative; }
+.bpv-featured-mark { position:absolute; top:6px; left:6px; z-index:1; padding:1px 6px; border-radius:8px; background:#12233acc; color:#ffe19a; font-weight:700; }
+
+/* v171: credentials are self-reported, never shown with a verification icon. */
+.bpv-certificates-v171 { margin-block:var(--space-3); padding:var(--space-3); border:1px solid var(--border); border-radius:var(--radius-md); min-width:0; }
+.bpv-certificates-v171 .bpv-about-text { margin:var(--space-2) 0; }
+.bpv-certificates-v171 ul { padding-inline-start:1.4em; margin:0; overflow-wrap:anywhere; }
+.bpv-certificates-v171 li { margin-block:var(--space-1); }
+
+/* v175 / #141 — compact, keyboard-accessible external map provider chooser. */
+.bpv-navigation-v175 { min-width: 0; max-width: 100%; }
+.bpv-navigation-v175 > summary { cursor: pointer; list-style-position: inside; }
+.bpv-navigation-v175 > summary::marker { color: var(--muted); }
+.bpv-navigation-options-v175 { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.bpv-navigation-choice-v175 { display: inline-flex; gap: 5px; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent-hover); overflow-wrap: anywhere; }
+.bpv-navigation-choice-v175:focus-visible, .bpv-navigation-v175 > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.bpv-navigation-hint-v175 { max-width: 56ch; margin-block: 7px; color: var(--muted); font-size: 12px; }

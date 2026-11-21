@@ -1,338 +1,272 @@
-// ==========================================================
-// store.js — single source of truth for the whole barber panel
-//
-// Every barber page reads and writes through this file, so
-// working hours, services and bookings are never duplicated
-// or out of sync between pages.
-//
-// Today it persists to localStorage (mock). When the backend
-// is ready, only the `load()` and `commit()` functions change
-// (they will call fetch). The pages stay exactly the same.
-// ==========================================================
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { request, resolveMediaUrl } from "../../../api/client.js";
+import { getSession } from "../../auth/utils/session.js";
+import { parseCheckIn } from "../../user/bookings/checkInV170.js";
 
-// "barber-profile" is the SAME key the onboarding page already uses,
-// so profile, services, hours and location stay compatible.
-const KEYS = {
-  profile: "barber-profile",
-  bookings: "barber-bookings",
-  posts: "barber-posts",
-  reviews: "barber-reviews",
-};
-
-// Booking statuses (match the backend enum + "absent" for no-shows)
 export const STATUS = {
   PENDING: "pending",
   CONFIRMED: "confirmed",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
-  ABSENT: "absent", // customer did not come (3 times = blocked)
+  REJECTED: "rejected",
 };
 
-// ---------- Date helpers ----------
-
-// Local "YYYY-MM-DD". Do NOT use toISOString() here: it converts to UTC,
-// and in Uzbekistan (UTC+5) the date is wrong before 05:00 in the morning.
 export const toISODate = (date = new Date()) => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tashkent", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(date);
+  const fields = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${fields.year}-${fields.month}-${fields.day}`;
 };
-
 export const addDays = (offset, from = new Date()) => {
-  const d = new Date(from);
-  d.setDate(d.getDate() + offset);
-  return d;
+  const date = new Date(from);
+  date.setDate(date.getDate() + offset);
+  return date;
 };
 
-// ---------- Defaults (mock data until the backend exists) ----------
-
-// day: 0 = Sunday ... 6 = Saturday (same as Date.getDay())
-const DEFAULT_HOURS = [1, 2, 3, 4, 5, 6, 0].map((day) => ({
-  day,
-  isOff: day === 0,
-  start: "09:00",
-  end: "20:00",
+const emptyHours = () => Array.from({ length: 7 }, (_, day) => ({
+  day, isOff: true, start: "09:00", end: "18:00",
 }));
+const emptyProfile = () => ({
+  id: null, firstName: "", lastName: "", phone: "", specialty: "",
+  salonName: "", telegram: "", experience: null, about: "", certificates: [], address: "",
+  location: null, avatar: null, avatarPhoto: "", isAvailable: null, followers: 0, following: 0,
+  acceptingBookings: null,
+  services: [], hours: emptyHours(), verification_status: "pending",
+});
 
-const DEFAULT_PROFILE = {
-  firstName: "",
-  lastName: "",
-  phone: "",
-  telegram: "",
-  username: "",
-  salonName: "",
-  address: "",
-  location: null,
-  experience: null,
-  about: "",
-  avatar: null, // id of one of the built-in avatars (see avatars.jsx)
-  isAvailable: true,
-  services: [
-    { id: 1, name: "Soch olish", price: 50000, duration: 45 },
-    { id: 2, name: "Soqol olish", price: 30000, duration: 30 },
-    { id: 3, name: "Soch + soqol", price: 70000, duration: 75 },
-  ],
-  hours: DEFAULT_HOURS,
-};
-
-const MOCK_NAMES = [
-  "Jasur Karimov", "Aziz Toshev", "Bobur Rahimov", "Sardor Aliyev",
-  "Dilshod Umarov", "Otabek Yusupov", "Sherzod Nazarov", "Akmal Ergashev",
-  "Javohir Qodirov", "Humoyun Saidov", "Rustam Mirzayev", "Anvar Ismoilov",
-];
-
-const pad = (n) => String(n).padStart(2, "0");
-
-// Small seeded random generator: same "random" data on every reload
-function mulberry32(seed) {
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// Builds one booking. Price/name are COPIED from the service at booking time,
-// so changing a service price later never rewrites past earnings.
-function makeBooking(id, rand, service, date, time, status) {
-  const name = MOCK_NAMES[Math.floor(rand() * MOCK_NAMES.length)];
-  const phone = `+99890${String(1000000 + Math.floor(rand() * 8999999))}`;
-  return {
-    id,
-    customer: name,
-    phone,
-    serviceId: service.id,
-    service: service.name,
-    price: service.price,
-    duration: service.duration,
-    date,
-    time,
-    status,
-  };
-}
-
-// 1 year of history (for earnings charts) + today / next days
-function seedBookings(profile) {
-  const rand = mulberry32(2026);
-  const { services, hours } = profile;
-  const list = [];
-  let id = 1;
-
-  // Past 365 days: only on working days, 0–4 bookings per day
-  for (let offset = -365; offset < 0; offset++) {
-    const date = addDays(offset);
-    const dayHours = hours.find((h) => h.day === date.getDay());
-    if (!dayHours || dayHours.isOff) continue;
-
-    const count = Math.floor(rand() * 4) + (rand() < 0.5 ? 1 : 0);
-    for (let i = 0; i < count; i++) {
-      const hour = 9 + i * 2 + Math.floor(rand() * 2);
-      const time = `${pad(hour)}:${rand() < 0.5 ? "00" : "30"}`;
-      const service = services[Math.floor(rand() * services.length)];
-      const r = rand();
-      const status =
-        r < 0.88 ? STATUS.COMPLETED : r < 0.95 ? STATUS.CANCELLED : STATUS.ABSENT;
-      list.push(makeBooking(id++, rand, service, toISODate(date), time, status));
-    }
-  }
-
-  // Today and the next two days (what the dashboard shows)
-  const upcoming = [
-    [0, "09:30", STATUS.COMPLETED],
-    [0, "12:30", STATUS.CONFIRMED],
-    [0, "15:00", STATUS.PENDING],
-    [0, "17:30", STATUS.PENDING],
-    [1, "10:30", STATUS.CONFIRMED],
-    [1, "14:00", STATUS.PENDING],
-    [2, "11:00", STATUS.PENDING],
-  ];
-  for (const [offset, time, status] of upcoming) {
-    const service = services[Math.floor(rand() * services.length)];
-    list.push(makeBooking(id++, rand, service, toISODate(addDays(offset)), time, status));
-  }
-  return list;
-}
-
-function seedReviews() {
-  const items = [
-    ["Jasur Karimov", 5, "Juda zo'r fade qildi, rahmat! Albatta yana kelaman.", 2],
-    ["Aziz Toshev", 5, "Vaqtida boshladi, tez va toza ishlaydi.", 6],
-    ["Bobur Rahimov", 4, "Yaxshi, faqat biroz kutishga to'g'ri keldi.", 11],
-    ["Sardor Aliyev", 5, "Soqol dizayni a'lo darajada.", 19],
-    ["Dilshod Umarov", 3, "Soch yaxshi, lekin xizmat biroz sekin bo'ldi.", 34],
-    ["Otabek Yusupov", 5, "Do'stlarimga ham tavsiya qildim.", 52],
-    ["Sherzod Nazarov", 4, "Narxiga arziydi, toza va qulay joy.", 80],
-  ];
-  return items.map(([customer, rating, text, daysAgo], i) => ({
-    id: i + 1,
-    customer,
-    rating,
-    text,
-    date: toISODate(addDays(-daysAgo)),
-    reply: "",
-  }));
-}
-
-// ---------- Storage ----------
-
-function read(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function write(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch {
-    return false; // storage full or blocked
-  }
-}
-
-function load() {
-  const saved = read(KEYS.profile, null) ?? {};
-
-  // `account: true` = created through the sign-up page (real, starts empty).
-  // Without it we show demo data so the panel can be previewed.
-  const isAccount = saved.account === true;
-
-  const savedServices = Array.isArray(saved.services) ? saved.services : [];
-  const profile = {
-    ...DEFAULT_PROFILE,
-    ...saved,
-    // Guard against the old object format: hours must be an array
-    hours: Array.isArray(saved.hours) ? saved.hours : DEFAULT_HOURS,
-    services: isAccount || savedServices.length ? savedServices : DEFAULT_PROFILE.services,
-  };
-
-  return {
-    profile,
-    bookings: read(KEYS.bookings, null) ?? (isAccount ? [] : seedBookings(profile)),
-    posts: read(KEYS.posts, []),
-    reviews: read(KEYS.reviews, null) ?? (isAccount ? [] : seedReviews()),
-  };
-}
-
-// ---------- Store (subscribe / snapshot) ----------
-
-let state = load();
+let state = { status: "idle", error: "", profile: emptyProfile(), bookings: [], reviews: [], posts: [] };
 const listeners = new Set();
-
-const subscribe = (listener) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
+let requestInFlight;
+const subscribe = (listener) => { listeners.add(listener); return () => listeners.delete(listener); };
 const getSnapshot = () => state;
-
-// Saves the changed parts first. Returns false if saving failed
-// (e.g. photos filled localStorage) and then leaves the state untouched.
-function commit(patch) {
-  for (const part of Object.keys(patch)) {
-    if (!write(KEYS[part], patch[part])) return false;
-  }
+function publish(patch) {
   state = { ...state, ...patch };
   listeners.forEach((listener) => listener());
+}
+
+function bookingView(row) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Tashkent", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(row.booking_time));
+  const fields = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return {
+    id: row.id,
+    customer: [row.customer_first_name, row.customer_last_name].filter(Boolean).join(" ") || "Mijoz",
+    // The API exposes this only to the barber who owns the booking.
+    phone: row.customer_phone || "",
+    serviceId: row.service_id,
+    service: row.services?.length ? row.services.map(item => item.name).join(" + ") : row.service_name || "Xizmat",
+    services: row.services || [],
+    // Booking list API exposes service name and duration, not its current price.
+    price: row.total_price == null ? null : Number(row.total_price),
+    duration: row.duration_minutes,
+    bookingTime: row.booking_time,
+    checkIn: parseCheckIn(row.check_in),
+    lateNotice: row.late_notice && [5,10,15,20,30].includes(Number(row.late_notice.minutes))
+      && Number.isFinite(Date.parse(row.late_notice.reportedAt))
+      ? { minutes: Number(row.late_notice.minutes), reportedAt: row.late_notice.reportedAt } : null,
+    date: `${fields.year}-${fields.month}-${fields.day}`,
+    time: `${fields.hour}:${fields.minute}`,
+    status: row.status,
+  };
+}
+
+function profileView(barber, session = getSession()) {
+  const location = Number.isFinite(barber.latitude) && Number.isFinite(barber.longitude)
+    ? { lat: barber.latitude, lng: barber.longitude } : null;
+  return {
+    ...emptyProfile(),
+    id: barber.id,
+    firstName: barber.first_name || "",
+    lastName: barber.last_name || "",
+    phone: barber.phone || session?.phone || "",
+    specialty: barber.specialty || "",
+    salonName: barber.salon_name || "",
+    address: barber.address || "",
+    location,
+    experience: barber.experience_years ?? null,
+    about: barber.bio || "",
+    certificates: Array.isArray(barber.certificates) ? barber.certificates : [],
+    avatarPhoto: barber.avatar_url || "",
+    isAvailable: barber.accepting_bookings,
+    acceptingBookings: barber.accepting_bookings,
+    verification_status: barber.verification_status,
+  };
+}
+
+export async function refreshBarberData({ signal } = {}) {
+  const session = getSession();
+  if (session?.role !== "barber" || !session.token) {
+    publish({ status: "error", error: "Sartarosh hisobi orqali qayta kiring." });
+    return;
+  }
+  if (requestInFlight) return requestInFlight;
+  publish({ status: "loading", error: "" });
+  requestInFlight = (async () => {
+    try {
+      const profileResult = await request("GET", "/api/barbers/me", { token: session.token, signal });
+      const barber = profileResult?.barber;
+      if (!barber || barber.id !== session.profileId) throw new Error("Sartarosh profili olinmadi.");
+      const paths = ["/api/bookings", `/api/services?barber_id=${barber.id}`, "/api/barbers/working-hours", "/api/barbers/reviews/me", "/api/barbers/me/portfolio"];
+      const names = ["bookings", "services", "hours", "reviews", "posts"];
+      const results = await Promise.allSettled(paths.map(path => request("GET", path, { token: session.token, signal })));
+      const errors = {};
+      const values = results.map((item, index) => {
+        const value = item.status === "fulfilled" ? item.value : null;
+        const valid = index < 3 ? Array.isArray(value) : Array.isArray(value?.[index === 3 ? "reviews" : "posts"]);
+        if (!valid) errors[names[index]] = item.reason?.message || "Ma’lumot yuklanmadi. Qayta urinib ko‘ring.";
+        return valid ? value : index < 3 ? [] : index === 3 ? { reviews: [] } : { posts: [] };
+      });
+      if (signal?.aborted || getSession()?.token !== session.token) return false;
+      const [bookingRows, services, workingHours, reviewResult, portfolioResult] = values;
+      const sameAccount = state.profile.id === barber.id;
+      const hours = emptyHours();
+      for (const item of workingHours) {
+        if (Number.isInteger(item.day_of_week) && hours[item.day_of_week]) {
+          hours[item.day_of_week] = {
+            day: item.day_of_week, isOff: false,
+            start: String(item.start_time).slice(0, 5), end: String(item.end_time).slice(0, 5),
+          };
+        }
+      }
+      publish({
+        status: "ready", error: "", errors,
+        profile: {
+          ...profileView(barber, session),
+          followers: portfolioResult.followerCount ?? state.profile.followers ?? 0,
+          following: portfolioResult.followingCount ?? state.profile.following ?? 0,
+          services: errors.services && sameAccount ? state.profile.services : services.map((service) => ({
+            id: service.id, name: service.name, price: Number(service.price),
+            duration: service.duration_minutes, active: service.is_active !== false,
+          })), hours: errors.hours && sameAccount ? state.profile.hours : hours,
+        },
+        bookings: errors.bookings && sameAccount ? state.bookings : bookingRows.map(bookingView),
+        reviews: errors.reviews && sameAccount ? state.reviews : reviewResult.reviews.map((review) => ({
+          id: review.id, bookingId: review.bookingId, customer: review.customer,
+          rating: review.rating, text: review.text, reply: review.reply,
+          date: review.date,
+        })),
+        posts: errors.posts && sameAccount ? state.posts : portfolioResult.posts.map((post) => ({
+          id: post.id, caption: post.caption, date: post.createdAt, featured: post.featured === true,
+          mediaType: post.media?.[0]?.type || "image", image: resolveMediaUrl(post.media?.[0]?.url || ""),
+          mediaUrl: post.media?.[0]?.type === "video" ? resolveMediaUrl(post.media?.[0]?.url) : "",
+          media: post.media, service: services.find((service) => String(service.id) === String(post.serviceIds?.[0]))?.name || "",
+          likeCount: post.likeCount, commentCount: post.commentCount, likedByMe: post.likedByMe, saved: post.saved,
+        })),
+      });
+      return true;
+    } catch (error) {
+      if (signal?.aborted) return;
+      publish({ status: "error", error: error.message || "Sartarosh ma’lumotlarini yuklab bo‘lmadi." });
+      return false;
+    } finally {
+      requestInFlight = null;
+    }
+  })();
+  return requestInFlight;
+}
+
+export function useBarber() {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  useEffect(() => {
+    if (state.status === "idle") void refreshBarberData();
+  }, []);
+  return snapshot;
+}
+
+export async function updateProfile(patch) {
+  const fields = {
+    firstName: "first_name", lastName: "last_name", salonName: "salon_name",
+    address: "address", experience: "experience_years", about: "bio", certificates: "certificates",
+    avatarPhoto: "avatar_url", location: "location",
+  };
+  const unsupported = Object.keys(patch).filter((key) => !Object.hasOwn(fields, key));
+  if (unsupported.length) throw new Error("Bu profil maydonlarini saqlash API hozircha mavjud emas.");
+  const session = getSession();
+  if (session?.role !== "barber" || !state.profile.id) throw new Error("Sartarosh sessiyasi topilmadi.");
+  const body = {};
+  for (const [field, apiField] of Object.entries(fields)) {
+    if (!Object.hasOwn(patch, field)) continue;
+    const value = patch[field];
+    if (field === "location") body.location = value === null ? null : value && { lat: value.lat, lng: value.lng };
+    else if (field === "experience") body[apiField] = value === "" || value == null ? null : Number(value);
+    else body[apiField] = value;
+  }
+  const result = await request("PUT", `/api/barbers/${state.profile.id}`, {
+    token: session.token,
+    body,
+  });
+  if (!result?.data || result.data.id !== state.profile.id
+    || typeof result.data.first_name !== "string" || typeof result.data.last_name !== "string") {
+    throw new Error("Profil yangilangani server tomonidan tasdiqlanmadi.");
+  }
+  publish({ profile: { ...state.profile, ...profileView(result.data, session), services: state.profile.services, hours: state.profile.hours } });
+  return state.profile;
+}
+
+export async function saveWorkingHours(hours) {
+  const session = getSession();
+  if (session?.role !== "barber") throw new Error("Sartarosh sessiyasi topilmadi.");
+  const working_hours = hours.filter((item) => !item.isOff).map((item) => ({
+    day_of_week: item.day, start_time: item.start, end_time: item.end,
+  }));
+  if (!working_hours.length) throw new Error("Kamida bitta ish kunini tanlang.");
+  await request("PUT", "/api/barbers/working-hours", { token: session.token, body: { working_hours } });
+  if (!(await refreshBarberData()) || state.errors?.hours) throw new Error("Jadval saqlandi, ammo serverdan yangilangan ma’lumotlar olinmadi.");
   return true;
 }
 
-// React hook: any component using it re-renders when data changes
-export const useBarber = () => useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-// ---------- Actions ----------
-
-export const updateProfile = (patch) =>
-  commit({ profile: { ...state.profile, ...patch } });
-
-export const setBookingStatus = (id, status) =>
-  commit({
-    bookings: state.bookings.map((b) => (b.id === id ? { ...b, status } : b)),
+export async function setBookingAcceptance(acceptingBookings) {
+  if (typeof acceptingBookings !== "boolean") throw new Error("Bron qabul qilish holati noto‘g‘ri.");
+  const session = getSession();
+  if (session?.role !== "barber" || !state.profile.id) throw new Error("Sartarosh sessiyasi topilmadi.");
+  const result = await request("PUT", "/api/barbers/booking-acceptance", {
+    token: session.token,
+    body: { accepting_bookings: acceptingBookings },
   });
-
-export const addPost = (post) =>
-  commit({
-    posts: [{ id: Date.now(), date: toISODate(), ...post }, ...state.posts],
-  });
-
-// Likes and comments share the same persistence boundary as post metadata.
-export function togglePostLike(id) {
-  const post = state.posts.find((item) => item.id === id);
-  if (!post) return false;
-  const count = Number.isSafeInteger(post.likeCount) && post.likeCount > 0 ? post.likeCount : 0;
-  return commit({ posts: state.posts.map((item) => item.id === id ? {
-    ...item,
-    likedByMe: !item.likedByMe,
-    likeCount: Math.max(0, count + (item.likedByMe ? -1 : 1)),
-  } : item) });
-}
-
-export function addPostComment(id, value) {
-  const text = typeof value === "string" ? value.trim() : "";
-  if (!text || text.length > 300 || !state.posts.some((item) => item.id === id)) return false;
-  const comment = {
-    id: globalThis.crypto?.randomUUID?.() ?? `comment-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    author: state.profile.username || [state.profile.firstName, state.profile.lastName].filter(Boolean).join(" ") || "Siz",
-    avatar: state.profile.avatar,
-    text,
-    date: new Date().toISOString(),
-  };
-  return commit({ posts: state.posts.map((item) => item.id === id ? {
-    ...item, comments: [...(Array.isArray(item.comments) ? item.comments : []), comment],
-  } : item) });
-}
-
-export const removePost = (id) =>
-  commit({ posts: state.posts.filter((p) => p.id !== id) });
-
-export const replyToReview = (id, reply) =>
-  commit({
-    reviews: state.reviews.map((r) => (r.id === id ? { ...r, reply } : r)),
-  });
-
-// Called right after a barber signs up: a clean account with NO services,
-// bookings, posts or reviews (the barber adds services later in the panel).
-export function createAccount(patch) {
-  const profile = {
-    ...DEFAULT_PROFILE,
-    lastName: "",
-    telegram: "",
-    about: "",
-    experience: 0,
-    address: "",
-    location: null,
-    isAvailable: true,
-    services: [],
-    hours: DEFAULT_HOURS,
-    ...patch,
-    account: true,
-  };
-  const next = { profile, bookings: [], posts: [], reviews: [] };
-
-  for (const part of Object.keys(next)) write(KEYS[part], next[part]);
-  state = next;
-  listeners.forEach((listener) => listener());
-}
-
-// ---------- Derived data (pure helpers) ----------
-
-// Average rating + how many reviews per star (for the bar chart)
-export function getRatingSummary(reviews) {
-  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  let sum = 0;
-  for (const r of reviews) {
-    distribution[r.rating] += 1;
-    sum += r.rating;
+  if (result?.data?.accepting_bookings !== acceptingBookings) {
+    throw new Error("Server bron qabul qilish holatini tasdiqlamadi.");
   }
-  return {
-    count: reviews.length,
-    average: reviews.length ? sum / reviews.length : 0,
-    distribution,
-  };
+  publish({ profile: { ...state.profile, acceptingBookings } });
+  return acceptingBookings;
+}
+
+export async function setBookingStatus(id, status) {
+  const session = getSession();
+  if (session?.role !== "barber") throw new Error("Sartarosh sessiyasi topilmadi.");
+  if (!Number.isSafeInteger(Number(id)) || Number(id) <= 0 || !Object.hasOwn(STATUS, status.toUpperCase())) {
+    throw new Error("Bron ID yoki yangi holat noto‘g‘ri.");
+  }
+  const result = await request("PUT", `/api/bookings/${id}`, { token: session.token, body: { status } });
+  if (result?.data?.id !== Number(id) || result.data.status !== status) {
+    throw new Error("Server bron holati yangilanganini tasdiqlamadi.");
+  }
+  if (!(await refreshBarberData())) throw new Error("Holat saqlandi, ammo bronlar ro‘yxati yangilanmadi.");
+}
+
+export function patchPortfolioPost(id, patch) {
+  const allowed = Object.fromEntries(Object.entries(patch).filter(([key]) => ['likedByMe','saved','likeCount','commentCount'].includes(key)));
+  publish({ posts: state.posts.map(post => String(post.id) === String(id) ? { ...post, ...allowed } : post) });
+}
+
+export function getRatingSummary(reviews = state.reviews) {
+  const distribution = Object.fromEntries([1, 2, 3, 4, 5].map((rating) => [rating, reviews.filter((review) => review.rating === rating).length]));
+  const count = reviews.length;
+  return { count, average: count ? reviews.reduce((sum, review) => sum + review.rating, 0) / count : 0, distribution };
+}
+
+export async function replyToReview(id, text) {
+  const session = getSession();
+  if (session?.role !== "barber") throw new Error("Sartarosh sessiyasi topilmadi.");
+  const result = await request("PUT", `/api/barbers/reviews/${encodeURIComponent(id)}/reply`, {
+    token: session.token, body: { text },
+  });
+  const review = result?.review;
+  if (!review || String(review.id) !== String(id) || review.reply !== text.trim()) {
+    throw new Error("Server javobni saqlaganini tasdiqlamadi.");
+  }
+  publish({ reviews: state.reviews.map((item) => String(item.id) === String(id) ? { ...item, reply: review.reply } : item) });
+  return review;
 }

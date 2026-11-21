@@ -1,0 +1,307 @@
+name: USTARA v55 isolated verification
+# v56: Pages deploy listens only to a successful completed push/main run of this workflow.
+
+# This workflow is only a verification gate: it does not deploy.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_ephemeral_only_ustara_55
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 15
+    env:
+      # CI-only ephemeral credentials, no production or connected-app secrets.
+      NODE_ENV: test
+      USTARA_TEST_DATABASE_URL: postgresql://ustara_account_test:ci_ephemeral_only_ustara_55@127.0.0.1:5432/ustara_test_db
+      USTARA_V40_STAGING: I_AUTHORIZE_LOCAL_STAGING
+      USTARA_V46_STAGING: I_AUTHORIZE_LOCAL_STAGING
+      USTARA_V49_STAGING: I_AUTHORIZE_LOCAL_STAGING
+      USTARA_V53_STAGING: I_AUTHORIZE_LOCAL_STAGING
+      USTARA_V54_STAGING: I_AUTHORIZE_LOCAL_STAGING
+      CI_ONLY_TEST_PASSWORD: ci_ephemeral_only_ustara_55
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - name: v66 preflight — local test target and public API only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v66-ci-preflight.js
+      - name: v150 package-free Pages bootstrap and npm-lock preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v150-pages-source-check.mjs
+      - name: v152 package-free lock integrity and first-paint smoke (NOT a build)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v152-build-doctor.mjs --json
+          node frontend/scripts/v152-first-paint-smoke.mjs --json
+      - name: v153 package-free import graph and public CSS asset audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v153-source-graph.mjs --json
+      - name: v153 original 185-decision status audit (not release certification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v153-decision-progress.mjs --json
+      - name: v154 package-free public QR destination and locale contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v154-qr-preflight.mjs --json
+      - name: v155 seven critical decisions source-to-test trace (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v155-critical-decisions.mjs --json
+      - name: v156 trace next seven original UI/booking decisions (source only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v156-seven-ui-decisions.mjs --json
+      - name: v157 trace public profile and search decisions #10–#16 (source only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v157-seven-public-decisions.mjs --json
+      - name: v158 trace Smart Booking decisions #17–#23 with explicit gaps (source only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v158-seven-smart-booking-decisions.mjs --json
+      - name: v159 source-trace next seven queue/Admin decisions (#27 already counted)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v159-seven-queue-decisions.mjs --json
+      - name: v160 source-trace decisions #32–#38 (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v160-seven-timeline-decisions.mjs --json
+      - name: v161 source-trace chat and ads decisions #39–#45 (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v161-seven-chat-advertising-decisions.mjs --json
+      - name: v165 source trace and operations checklist (offline only, NOT production proof)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v165-operations-checklist.cjs
+          node backend/scripts/v165-seven-operations-decisions.mjs --json
+      - name: v166 audit seven onboarding and media decisions without double-counting #75/#76
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v166-seven-guidance-decisions.mjs --json
+      - name: v167 audit social and security decisions #81–#87 (source references only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v167-seven-social-security-decisions.mjs --json
+      - name: v170 original #102–#108 source traces (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v170-seven-checkin-profile-decisions.mjs --json
+      - name: v171 audit barber certificates and team gaps (no production claims)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v171-seven-barber-team-decisions.mjs --json
+          node --test backend/test/v171BarberCertificates.unit.test.js backend/test/v171SevenBarberTeamDecisions.unit.test.js frontend/test/v171Certificates.test.js
+      - name: v176 booking inbox and #144–#150 source audit (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v176-seven-booking-privacy-decisions.mjs --json
+          node --test backend/test/v176SevenBookingPrivacyDecisions.unit.test.js frontend/test/v176ProfessionalBookingInbox.test.js
+      - name: v177 source trace #151–#157 and private report receipts (NOT production verification)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v177-seven-complaint-day-decisions.mjs --json
+          node --test backend/test/v177SocialReportReceipts.unit.test.js backend/test/v177SevenComplaintDayDecisions.unit.test.js frontend/test/v177SocialReportReceipts.test.js
+      - name: v156 preinstall verify BOTH full unit test scripts and source inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v156-unit-coverage.js --source-only
+      - name: Install backend and frontend from locks
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd backend && npm ci)
+          (cd frontend && npm ci)
+      - name: v152 verify installed frontend dependencies and Node engines
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v152-build-doctor.mjs --require-installed
+      - name: v150 require real installed Vite before any release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/v150-pages-source-check.mjs --require-deps
+      - name: Offline structural audit and immutable 185 decisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/audit-phase1.js
+          node backend/scripts/v45-decision-integrity.js
+      - name: Provision isolated local test database and run 55 migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          service='${{ job.services.postgres.id }}'
+          test -n "$service"
+          # DDL setup runs only inside the disposable PostgreSQL service.
+          docker exec "$service" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1             -c "CREATE ROLE ustara_account_test LOGIN PASSWORD 'ci_ephemeral_only_ustara_55'"
+          docker exec "$service" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1             -c 'CREATE DATABASE ustara_test_db OWNER ustara_account_test'
+          docker exec "$service" psql -X -U postgres -d ustara_test_db -v ON_ERROR_STOP=1             -c 'CREATE EXTENSION btree_gist WITH SCHEMA public'
+          docker cp backend/database "$service:/tmp/ustara-database"
+          # Bootstrap's loopback guard requires a local Unix-socket connection.
+          # Running psql *inside* this disposable DB container satisfies it.
+          docker exec -e "PGPASSWORD=$CI_ONLY_TEST_PASSWORD" "$service"             psql -X -h /var/run/postgresql -U ustara_account_test             -d ustara_test_db -v ON_ERROR_STOP=1             -f /tmp/ustara-database/bootstrap.sql
+          # Browser login E2E uses a DIFFERENT non-superuser identity, never a production account.
+          # It inherits only the ephemeral migration owner's permissions on this disposable database.
+          docker exec "$service" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c "CREATE ROLE ustara_login_test LOGIN PASSWORD 'ci_ephemeral_only_ustara_55'"
+          docker exec "$service" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c 'GRANT ustara_account_test TO ustara_login_test'
+      - name: v66 read-only database readiness — full ledger and least-privilege login
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v66-db-readiness.js
+      - name: Full backend unit suite — no ignored failures
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ustara-v55"
+          (cd backend && npm test) | tee "$RUNNER_TEMP/ustara-v55/backend.tap"
+      - name: Full frontend unit suite — no ignored failures
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd frontend && npm test) | tee "$RUNNER_TEMP/ustara-v55/frontend.tap"
+      - name: v156 enforce complete backend/frontend unit transcripts — no reduced suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node backend/scripts/v156-unit-coverage.js "$RUNNER_TEMP/ustara-v55" > "$RUNNER_TEMP/ustara-v55/unit-coverage.json"
+      - name: Nine real PostgreSQL suites — zero SKIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd backend && node scripts/v54-staging.js) | tee "$RUNNER_TEMP/ustara-v55/staging.log"
+      - name: Real Chrome login E2E — mobile 390px and desktop 1440px; zero SKIP
+        shell: bash
+        timeout-minutes: 5
+        env:
+          # An explicitly isolated, non-superuser test account; NO production database.
+          USTARA_TEST_DATABASE_URL: postgresql://ustara_login_test:ci_ephemeral_only_ustara_55@127.0.0.1:5432/ustara_test_db
+          USTARA_LOGIN_E2E: '1'
+          USTARA_LOGIN_WRITE_TESTS: I_AUTHORIZE_TEST_DATA
+        run: |
+          set -euo pipefail
+          if command -v google-chrome >/dev/null 2>&1; then
+            export USTARA_CHROME_BINARY=google-chrome
+          elif command -v chromium >/dev/null 2>&1; then
+            export USTARA_CHROME_BINARY=chromium
+          elif command -v chromium-browser >/dev/null 2>&1; then
+            export USTARA_CHROME_BINARY=chromium-browser
+          else
+            echo 'Chrome/Chromium missing: E2E NOT_VERIFIED' >&2
+            exit 1
+          fi
+          (cd backend && node --test test/login.browser.e2e.test.js) | tee "$RUNNER_TEMP/ustara-v55/browser.tap"
+          echo "USTARA_CHROME_BINARY=$USTARA_CHROME_BINARY" >> "$GITHUB_ENV"
+      - name: Build real Vite frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          node frontend/scripts/validate-production-api.mjs
+          (cd frontend && npm run build) | tee "$RUNNER_TEMP/ustara-v55/build.log"
+      - name: Create and check the CI-built SPA fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp frontend/dist/index.html frontend/dist/404.html
+          node frontend/scripts/verify-pages-build.mjs frontend/dist
+      - name: Real Chrome smoke of the exact built production bundle
+        shell: bash
+        timeout-minutes: 3
+        env:
+          USTARA_PAGES_BUILD_SMOKE: '1'
+        run: |
+          set -euo pipefail
+          # The browser loads frontend/dist, NOT Vite's dev server.
+          # HTTP binds only to localhost and blocks external API connections.
+          (cd backend && node --test test/pagesBuild.browser.e2e.test.js) | tee "$RUNNER_TEMP/ustara-v55/published-browser.tap"
+      - name: Release evidence gate — fail closed
+        shell: bash
+        env:
+          USTARA_V156_REQUIRE_COMPLETE_MATRIX: '1'
+        run: |
+          set -euo pipefail
+          node backend/scripts/v55-release-gate.js "$RUNNER_TEMP/ustara-v55" | tee "$RUNNER_TEMP/ustara-v55/release.json"
+      - name: Upload EXACT verified frontend build for Pages, no rebuilding
+        uses: actions/upload-artifact@v4
+        with:
+          name: ustara-v62-pages-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: frontend/dist/
+          if-no-files-found: error
+          include-hidden-files: true # safe: strict publish-tree validation allows only .nojekyll
+          retention-days: 7
+
+      - name: Write sanitized CI diagnostic even on failure
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ustara-v55"
+          if test -f backend/scripts/v56-ci-summary.js; then
+            node backend/scripts/v56-ci-summary.js "$RUNNER_TEMP/ustara-v55" frontend/dist > "$RUNNER_TEMP/ustara-v55/ci-summary.json"
+          else
+            printf '%s\n' '{"version":"v56","kind":"redacted_diagnostics_only","releaseGate":"NOT_VERIFIED","productionReady":false}' > "$RUNNER_TEMP/ustara-v55/ci-summary.json"
+          fi
+          cat "$RUNNER_TEMP/ustara-v55/ci-summary.json"
+      - name: Upload only redacted diagnostic (not raw logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ustara-v58-ci-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ustara-v55/ci-summary.json
+          if-no-files-found: error
+          retention-days: 14

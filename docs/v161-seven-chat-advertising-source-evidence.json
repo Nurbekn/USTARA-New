@@ -1,0 +1,289 @@
+{
+  "version": "v161",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "previousSourceTraces": 42,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 49,
+  "notYetTraced": 136,
+  "decisions": [
+    {
+      "id": 39,
+      "decision": "Real-time chat va post ulashish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/customerBarberChat.js",
+        "backend/database/migrations/20261219_customer_barber_chat.sql",
+        "frontend/src/pages/chat/ChatV161.jsx",
+        "frontend/src/pages/user/social/PostCard.jsx"
+      ],
+      "tests": [
+        "backend/test/v161PrivateChat.unit.test.js",
+        "frontend/test/v161ChatModel.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Private chat REST/polling foundation; 6-second polling is NOT true push real-time. Browser, real PostgreSQL, abuse controls and lost-ACK idempotency not verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 40,
+      "decision": "Chat tezkor javoblar va keyingi AI",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/chat/chatModelV161.js",
+        "frontend/src/pages/chat/ChatV161.jsx"
+      ],
+      "tests": [
+        "frontend/test/v161ChatModel.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Three languages and 3 preset human quick replies. AI generation/inference is not implemented."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 41,
+      "decision": "AI va odam chatini farqlash",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/customerBarberChat.js",
+        "backend/database/migrations/20261219_customer_barber_chat.sql",
+        "frontend/src/pages/chat/ChatV161.jsx"
+      ],
+      "tests": [
+        "backend/test/v161PrivateChat.unit.test.js",
+        "frontend/test/v161ChatModel.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Human sender provenance enforced in API; AI sender route and end-to-end provenance verification not implemented."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 42,
+      "decision": "Profil bron qilish tugmasining ustuvorligi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/BarberPublicProfile.jsx",
+        "frontend/src/pages/user/barber/BarberPublicProfile.css"
+      ],
+      "tests": [
+        "frontend/test/profileNavigationV116.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Booking CTA exists; mobile browser prominence/accessibility not reverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 43,
+      "decision": "Belgilangan reklamalar, onlayn to‘lovsiz",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/UserHome.jsx",
+        "backend/controllers/adminPromotions.js"
+      ],
+      "tests": [
+        "frontend/test/v131FollowedHomeSafety.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Public ads labelled, no online payments; live campaign visibility and accessibility E2E unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 44,
+      "decision": "Admin reklama kampaniya boshqaruvi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/adminPromotions.js",
+        "backend/routes/admin.js",
+        "frontend/src/pages/AdminPanel.jsx"
+      ],
+      "tests": [
+        "backend/test/promotions.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Admin-only enable/disable with duration exists; real DB, concurrency and billing proof not verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 45,
+      "decision": "Sartarosh tasdiqlanishi Admin orqali",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/barbersController.js",
+        "backend/routes/barbers.js",
+        "frontend/src/pages/AdminPanel.jsx"
+      ],
+      "tests": [
+        "backend/test/barber-profile.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Admin role guard exists; real verification lifecycle and audit evidence E2E missing."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "knownGaps": [
+    {
+      "id": 18,
+      "missingImplementation": [
+        "Bron boshlanishidan oldin avtomatik mijoz eslatmasi va kechikish holati E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 22,
+      "missingImplementation": [
+        "Hozirgi avtomatik Smart Booking opening trigger faqat cancellation uchun; xizmat erta yakunlanganda qolgan vaqtni taklif qilish implementatsiyasi aniqlanmadi."
+      ]
+    },
+    {
+      "id": 24,
+      "missingImplementation": [
+        "Admin pause/resume SQL va worker unit-testlangan, lekin haqiqiy PostgreSQL parallel lock/race va brauzer E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 25,
+      "missingImplementation": [
+        "Site/Telegram callbacklar bir xizmatda ishlaydi, real webhook/polling parallel E2E dalili yo‘q."
+      ]
+    },
+    {
+      "id": 26,
+      "missingImplementation": [
+        "Manual guest navbat hali haqiqiy PostgreSQL va mobil E2E bilan tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 28,
+      "missingImplementation": [
+        "QR approval transaction real database race test bilan yakuniy tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 29,
+      "missingImplementation": [
+        "Real DB va barber/mobile browser E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 30,
+      "missingImplementation": [
+        "QR va explicit consent bilan bog‘langan manual mijoz eligible; avtomatik ustuvorlik/haqiqiy DB race to‘liq E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 31,
+      "missingImplementation": [
+        "FIFO va manual override real parallel PostgreSQL transaction va mobil E2E bilan tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 32,
+      "missingImplementation": [
+        "Manual reorder real PostgreSQL parallel execution and barber browser E2E not verified."
+      ]
+    },
+    {
+      "id": 33,
+      "missingImplementation": [
+        "Transactional audit real database rollback and review UI not verified."
+      ]
+    },
+    {
+      "id": 34,
+      "missingImplementation": [
+        "Real timezone/midnight and concurrency database coverage remains incomplete."
+      ]
+    },
+    {
+      "id": 35,
+      "missingImplementation": [
+        "Public estimates are approximate; real database and mobile-browser timing not verified."
+      ]
+    },
+    {
+      "id": 36,
+      "missingImplementation": [
+        "Read-only day timeline is unit-tested; real authenticated browser/mobile E2E is not verified."
+      ]
+    },
+    {
+      "id": 37,
+      "missingImplementation": [
+        "Customer bookings filtering works in sources; live DB and browser E2E not verified."
+      ]
+    },
+    {
+      "id": 38,
+      "missingImplementation": [
+        "Followed-barber ranking lacks full authenticated browser E2E."
+      ]
+    },
+    {
+      "id": 39,
+      "missingImplementation": [
+        "Private chat REST/polling foundation; 6-second polling is NOT true push real-time. Browser, real PostgreSQL, abuse controls and lost-ACK idempotency not verified."
+      ]
+    },
+    {
+      "id": 40,
+      "missingImplementation": [
+        "Three languages and 3 preset human quick replies. AI generation/inference is not implemented."
+      ]
+    },
+    {
+      "id": 41,
+      "missingImplementation": [
+        "Human sender provenance enforced in API; AI sender route and end-to-end provenance verification not implemented."
+      ]
+    },
+    {
+      "id": 42,
+      "missingImplementation": [
+        "Booking CTA exists; mobile browser prominence/accessibility not reverified."
+      ]
+    },
+    {
+      "id": 43,
+      "missingImplementation": [
+        "Public ads labelled, no online payments; live campaign visibility and accessibility E2E unverified."
+      ]
+    },
+    {
+      "id": 44,
+      "missingImplementation": [
+        "Admin-only enable/disable with duration exists; real DB, concurrency and billing proof not verified."
+      ]
+    },
+    {
+      "id": 45,
+      "missingImplementation": [
+        "Admin role guard exists; real verification lifecycle and audit evidence E2E missing."
+      ]
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

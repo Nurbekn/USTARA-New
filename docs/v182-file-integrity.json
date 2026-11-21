@@ -1,0 +1,16 @@
+{
+  "version": "v182",
+  "base": "v181",
+  "previousFiles": 1409,
+  "currentFiles": 1420,
+  "removedFiles": 0,
+  "modifiedFiles": 23,
+  "addedFiles": 11,
+  "originalRegisterSHA256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "oldSqlMigrationsChanged": false,
+  "forwardMigrations": 57,
+  "rollbackFiles": 2,
+  "archiveCrc": "PENDING",
+  "postgresqlIntegration": "NOT_RUN",
+  "productionReady": false
+}

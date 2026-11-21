@@ -1,0 +1,48 @@
+'use strict';
+const express=require('express');
+const auth=require('../middleware/authMiddleware');
+const handlers=require('../controllers/walkinQueueController').createHandlers();
+const router=express.Router();
+const qr=require('../controllers/walkinQrController').createHandlers();
+const {publicQrRateLimit}=require('../middleware/qrPublicRateLimit');
+const queueNotify=require('../controllers/queueTelegramController').createHandlers();
+// Anonymous QR requests never reveal queue labels or ticket numbers.
+router.get('/public/:barberId',publicQrRateLimit,require('../controllers/queuePublicController').createPublicSummary());
+router.post('/qr-requests',publicQrRateLimit,qr.requestJoin);
+router.post('/qr-status',publicQrRateLimit,qr.requestStatus);
+const selfExit=require('../controllers/queueSelfExitController').createHandlers();
+router.post('/qr-leave',publicQrRateLimit,selfExit.leaveQr);
+router.post('/telegram/opt-in',publicQrRateLimit,queueNotify.optIn);
+router.post('/telegram/opt-out',publicQrRateLimit,queueNotify.optOut);
+router.post('/telegram/offer-consent',publicQrRateLimit,queueNotify.offerConsent);
+const offers=require('../controllers/smartBookingController');
+const manual=require('../controllers/manualQueueController');
+router.post('/offers/:id/decision',publicQrRateLimit,offers.decide);
+router.post('/offers/:id/services',publicQrRateLimit,offers.services);
+router.post('/offers/:id/confirm-booking',auth,publicQrRateLimit,offers.confirm);
+// Non-QR walk-ins require a customer-initiated claim. QR proof is never reused.
+router.post('/offers/:id/decision/customer',auth,offers.manualDecision);
+router.post('/offers/:id/services/customer',auth,offers.manualServices);
+router.post('/offers/:id/confirm-booking/customer',auth,offers.manualConfirm);
+router.post('/manual/claim',auth,publicQrRateLimit,manual.claim);
+router.get('/manual/mine',auth,manual.mine);
+router.post('/manual/:id/revoke',auth,manual.revoke);
+router.post('/manual/:id/leave',auth,selfExit.leaveManual);
+router.get('/offers/mine',auth,offers.mine);
+router.patch('/offers/:id/cancel',auth,offers.cancel);
+router.post('/qr-tokens',auth,qr.tokenCreate);
+router.get('/qr-pending',auth,qr.pendingList);
+router.patch('/qr-pending/:id',auth,qr.decide);
+// Existing barber-only queue routes.
+router.get('/mine',auth,handlers.list);
+router.get('/day-close/preview',auth,handlers.dayClosePreview);
+router.post('/day-close',auth,handlers.closeDay);
+router.post('/day-close/reopen',auth,handlers.reopenDay);
+router.post('/walk-ins',auth,handlers.join);
+router.post('/walk-ins/:id/claim-code',auth,manual.claimCode);
+router.post('/call-next',auth,handlers.callNext);
+router.post('/:id/arrive',auth,handlers.markArrived);
+router.post('/:id/start',auth,handlers.startService);
+router.patch('/:id/finish',auth,handlers.finish);
+router.patch('/:id/reorder',auth,handlers.reorder);
+module.exports=router;

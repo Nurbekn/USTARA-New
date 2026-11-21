@@ -1,0 +1,203 @@
+{
+  "version": "v159",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "previousSourceTraces": 28,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 35,
+  "notYetTraced": 150,
+  "decisions": [
+    {
+      "id": 24,
+      "decision": "Smart Booking markaziy Admin qoidalari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/adminSmartBookingRules.js",
+        "backend/services/smartBookingOffers.js",
+        "backend/database/migrations/20261218_smart_booking_admin_rules.sql"
+      ],
+      "tests": [
+        "backend/test/v159SmartBookingAdminRules.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Admin pause/resume SQL va worker unit-testlangan, lekin haqiqiy PostgreSQL parallel lock/race va brauzer E2E hali bajarilmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 25,
+      "decision": "Telegram va saytda taklifning bitta natijasi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "backend/services/smartBookingOffers.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingTelegram.unit.test.js",
+        "backend/test/smartBookingOffers.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Site/Telegram callbacklar bir xizmatda ishlaydi, real webhook/polling parallel E2E dalili yo‘q."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 26,
+      "decision": "Walk-in navbatga tez qo‘shish",
+      "originalStatus": "Qisman: v21 manual + v22 QR so‘rovi",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "backend/test/walkinQueue.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Manual guest navbat hali haqiqiy PostgreSQL va mobil E2E bilan tasdiqlanmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 28,
+      "decision": "QR mehmon so‘rovi va sartarosh tasdig‘i",
+      "originalStatus": "Qisman: v22 QR + barber tasdiq",
+      "code": [
+        "backend/controllers/walkinQrController.js",
+        "backend/controllers/walkinQrController.js"
+      ],
+      "tests": [
+        "backend/test/walkinQr.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "QR approval transaction real database race test bilan yakuniy tasdiqlanmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 29,
+      "decision": "Walk-in tasdiq kutayotganlar ro‘yxati",
+      "originalStatus": "Qisman: v22 pending QR ro‘yxati",
+      "code": [
+        "backend/controllers/walkinQrController.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "backend/test/queueReorderAdminQr.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Real DB va barber/mobile browser E2E hali bajarilmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 30,
+      "decision": "Walk-in navbati bo‘shagan vaqt uchun ustuvor",
+      "originalStatus": "Qisman: v27 QR waiting FIFO prioritet va booking",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "backend/services/smartBookingOffers.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingOffers.unit.test.js",
+        "backend/test/manualQueueClaims.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "QR va explicit consent bilan bog‘langan manual mijoz eligible; avtomatik ustuvorlik/haqiqiy DB race to‘liq E2E tasdiqlanmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 31,
+      "decision": "FIFO navbat, qo‘lda yakuniy qaror",
+      "originalStatus": "Qisman: v21 FIFO + v23 sababli override",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "backend/controllers/walkinQueueController.js"
+      ],
+      "tests": [
+        "backend/test/queueReorderAdminQr.unit.test.js",
+        "backend/test/walkinQueue.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "FIFO va manual override real parallel PostgreSQL transaction va mobil E2E bilan tasdiqlanmagan."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "knownGaps": [
+    {
+      "id": 18,
+      "missingImplementation": [
+        "Bron boshlanishidan oldin avtomatik mijoz eslatmasi va kechikish holati E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 22,
+      "missingImplementation": [
+        "Hozirgi avtomatik Smart Booking opening trigger faqat cancellation uchun; xizmat erta yakunlanganda qolgan vaqtni taklif qilish implementatsiyasi aniqlanmadi."
+      ]
+    },
+    {
+      "id": 24,
+      "missingImplementation": [
+        "Admin pause/resume SQL va worker unit-testlangan, lekin haqiqiy PostgreSQL parallel lock/race va brauzer E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 25,
+      "missingImplementation": [
+        "Site/Telegram callbacklar bir xizmatda ishlaydi, real webhook/polling parallel E2E dalili yo‘q."
+      ]
+    },
+    {
+      "id": 26,
+      "missingImplementation": [
+        "Manual guest navbat hali haqiqiy PostgreSQL va mobil E2E bilan tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 28,
+      "missingImplementation": [
+        "QR approval transaction real database race test bilan yakuniy tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 29,
+      "missingImplementation": [
+        "Real DB va barber/mobile browser E2E hali bajarilmagan."
+      ]
+    },
+    {
+      "id": 30,
+      "missingImplementation": [
+        "QR va explicit consent bilan bog‘langan manual mijoz eligible; avtomatik ustuvorlik/haqiqiy DB race to‘liq E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 31,
+      "missingImplementation": [
+        "FIFO va manual override real parallel PostgreSQL transaction va mobil E2E bilan tasdiqlanmagan."
+      ]
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "smartBookingAdminControl": "UNIT_TESTED_ONLY",
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

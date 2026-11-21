@@ -1,0 +1,7 @@
+.bpv-report { margin: .75rem 0 1.1rem; padding: .85rem; border: 1px solid var(--border, #445366); border-radius: 12px; }
+.bpv-report-toggle { background: transparent; border: 0; text-decoration: underline; color: inherit; cursor: pointer; padding: .4rem 0; }
+.bpv-report form { display: grid; gap: .75rem; max-width: 32rem; }
+.bpv-report label { display: grid; gap: .3rem; font-weight: 600; }
+.bpv-report select, .bpv-report textarea { box-sizing: border-box; width: 100%; border: 1px solid var(--border, #445366); border-radius: 8px; padding: .65rem; background: var(--surface-1, #fff); color: var(--text, #17212c); }
+.bpv-report form>button { padding: .7rem 1rem; border-radius: 8px; background: var(--accent, #2369bb); color: white; border: 0; cursor: pointer; }
+.bpv-report form>button:disabled { opacity: .55; cursor: not-allowed; }

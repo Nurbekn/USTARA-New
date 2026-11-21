@@ -1,0 +1,143 @@
+{
+  "version": "v155",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "auditedDecisions": 7,
+  "unreviewedDecisions": 178,
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "decisions": [
+    {
+      "id": 5,
+      "decision": "Bir nechta xizmatni bir bron bilan olish",
+      "originalStatus": "Qisman: v28 Smart Booking 2–20 xizmatni bitta bron bilan tasdiqlaydi",
+      "code": [
+        "backend/services/multiBooking.js",
+        "frontend/src/pages/queue/serviceBundle.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingConfirmation.unit.test.js",
+        "frontend/test/serviceBundle.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 6,
+      "decision": "Bitta sahifadagi kalendar va 5 daqiqalik slotlar",
+      "originalStatus": "Qisman: v10 yagona 5 daqiqalik slot grid",
+      "code": [
+        "backend/services/slotGrid.js",
+        "frontend/src/pages/user/barber/availableSlots.js"
+      ],
+      "tests": [
+        "frontend/test/availableSlots.test.js",
+        "frontend/test/v84SlotQuoteIntegrity.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 27,
+      "decision": "Mijoz jonli navbati va joyidagi QR",
+      "originalStatus": "Qisman: v24 QR shaxsiy navbat holati",
+      "code": [
+        "backend/services/v154PublicQueueLink.js",
+        "frontend/src/pages/queue/QueueCheckIn.jsx"
+      ],
+      "tests": [
+        "backend/test/v154QrPagesLinks.unit.test.js",
+        "frontend/test/v154QrSiteDestination.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 75,
+      "decision": "Smart Support yordam markazi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/help/HelpCenter.jsx",
+        "frontend/src/pages/help/helpModel.js"
+      ],
+      "tests": [
+        "frontend/test/v137HelpCenter.test.js",
+        "frontend/test/v138HelpLanguages.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 76,
+      "decision": "O‘zbek rus ingliz tillari va Admin tarjimasi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/utils/siteLocale.js",
+        "frontend/src/pages/adminLanguage.js"
+      ],
+      "tests": [
+        "frontend/test/v151DocumentLocale.test.js",
+        "frontend/test/v138HelpLanguages.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 107,
+      "decision": "Ommaviy profil havolasini ko‘rish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/publicShare.js",
+        "frontend/src/pages/user/barber/PublicProfileShare.jsx"
+      ],
+      "tests": [
+        "frontend/test/v136ShareBasePath.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    },
+    {
+      "id": 165,
+      "decision": "Smart Link Preview",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/publicProfilePreview.js",
+        "backend/controllers/publicProfilePreview.js"
+      ],
+      "tests": [
+        "backend/test/v135PublicPreview.unit.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "unitExecution": "NOT_INFERRED",
+      "postgresE2E": "NOT_RUN",
+      "browserE2E": "NOT_RUN",
+      "productionVerified": false
+    }
+  ],
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false,
+  "note": "Evidence paths are pointers for review; not proof of runtime behavior, deployment or completed decisions."
+}

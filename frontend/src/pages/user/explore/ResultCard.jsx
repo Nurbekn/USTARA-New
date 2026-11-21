@@ -1,26 +1,27 @@
 import { formatNumber } from "../../../utils/format";
 import { Link, useLocation } from "react-router-dom";
-import { sampleBarberDetails } from "../../home/sampleData";
+import { customerCoreUi } from "../coreLocale.js";
+import { siteLocalePath } from "../../../utils/siteLocale.js";
 import { Avatar } from "../../../components/Avatar";
 import Icon from "../../../components/Icon";
-import { knownNumber, nameOf, providersFor, servicesFor } from "./catalog";
+import { knownNumber, nameOf, providersFor, servicesFor, listingPrice, bookingProfileQuery, distanceKm, validPoint } from "./catalog";
 
-function Price({ min, max }) {
+function Price({ min, max, ui }) {
   return (
     <span className="ex-price">
       {knownNumber(min)
-        ? `${formatNumber(min)}${knownNumber(max) && max !== min ? ` – ${formatNumber(max)}` : ""} so‘m${max == null ? " dan" : ""}`
-        : "Narx ko‘rsatilmagan"}
+        ? `${formatNumber(min)}${knownNumber(max) && max !== min ? ` – ${formatNumber(max)}` : ""} ${ui.cardCurrency}${max == null ? ` ${ui.cardFrom}` : ""}`
+        : ui.cardPriceNone}
     </span>
   );
 }
-function Rating({ item }) {
+function Rating({ item, ui }) {
   return (
     <span className="ex-rating">
       <Icon name="star" size={16} />
-      {knownNumber(item.rating) ? item.rating.toFixed(1) : "Reyting yo‘q"}
+      {knownNumber(item.rating) ? item.rating.toFixed(1) : ui.cardRatingNone}
       <span>
-        {knownNumber(item.reviewCount) ? `(${item.reviewCount} sharh)` : ""}
+        {knownNumber(item.reviewCount) ? `(${item.reviewCount} ${ui.cardReviews})` : ""}
       </span>
     </span>
   );
@@ -31,19 +32,22 @@ export default function ResultCard({
   catalog,
   makeUrl,
   detail = false,
+  userLocation = null,
+  lang = "uz",
+  compareSelected = false,
+  compareFull = false,
+  onToggleCompare = null,
 }) {
   const location = useLocation();
-  const base = location.pathname.startsWith("/demo") ? "/demo" : "/user";
-  const sampleDetails = type === "barbers" ? sampleBarberDetails[item.id] : null;
+  const ui = customerCoreUi(lang).explore;
+  const profileUrl = siteLocalePath(`${location.pathname.startsWith("/user/") ? "/user" : ""}/barbers/${encodeURIComponent(item.id)}`, lang);
   const service = type === "services";
   const services = service ? [] : servicesFor(item, type, catalog);
   const providers = service ? providersFor(item, catalog) : null;
-  const prices = services.map((s) => s.minPrice).filter(knownNumber);
-  const min = knownNumber(item.startingPrice)
-    ? item.startingPrice
-    : prices.length
-      ? Math.min(...prices)
-      : null;
+  const selectedServiceId = new URLSearchParams(location.search).get("service");
+  const price = listingPrice(item, type, catalog, selectedServiceId);
+  const selectedService = services.find(s => String(s.id) === selectedServiceId);
+  const bookingQuery = bookingProfileQuery(selectedServiceId, services);
   return (
     <article className={`ex-result ex-result-${type}`}>
       {type === "salons" &&
@@ -51,13 +55,14 @@ export default function ResultCard({
           <img
             className="ex-salon-image"
             src={item.image}
-            alt={nameOf(item)}
+            alt={nameOf(item, type)}
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="ex-salon-image ex-image-placeholder">
             <Icon name="pin" size={32} />
-            <span>Salon rasmi qo‘shilmagan</span>
+            <span>{ui.cardSalonNoImage}</span>
           </div>
         ))}
       <div className="ex-result-body">
@@ -66,7 +71,7 @@ export default function ResultCard({
             <Avatar
               photo={item.avatarPhoto}
               id={item.avatar}
-              name={nameOf(item)}
+              name={nameOf(item, type)}
               size={56}
             />
           )}
@@ -76,23 +81,28 @@ export default function ResultCard({
             </span>
           )}
           <div>
-            <h3>{nameOf(item)}</h3>
+            <h3>{nameOf(item, type)}</h3>
             {type === "barbers" && item.salonName && <p>{item.salonName}</p>}
-            {service && <p>{item.category || "Kategoriya ko‘rsatilmagan"}</p>}
+            {service && <p>{item.category || ui.cardCategoryNone}</p>}
           </div>
         </div>
         {!service && (
           <>
-            <Rating item={item} />
+            <Rating item={item} ui={ui} />
             <p className="ex-address">
               <Icon name="pin" size={17} />
-              {item.address || "Manzil ko‘rsatilmagan"}
+              {item.address || ui.cardAddress}
             </p>
+            {validPoint(userLocation) && validPoint(item.location) && (
+              <p className="ex-address" aria-label={ui.cardDistanceLabel}>
+                {distanceKm(userLocation, item.location).toFixed(1)} km ({ui.cardDistance})
+              </p>
+            )}
           </>
         )}
         {service ? (
           <p className="ex-description">
-            {item.description || "Tavsif hali qo‘shilmagan."}
+            {item.description || ui.cardDescriptionNone}
           </p>
         ) : (
           <div className="ex-service-tags">
@@ -110,7 +120,7 @@ export default function ResultCard({
                 </Link>
               ))
             ) : (
-              <span>Xizmatlar hali qo‘shilmagan</span>
+              <span>{ui.cardServicesNone}</span>
             )}
             {!detail && services.length > 3 && (
               <span>+{services.length - 3}</span>
@@ -119,27 +129,45 @@ export default function ResultCard({
         )}
         {type === "salons" && (
           <p className="ex-hours">
-            Ish vaqti: {item.openingHours || "Ko‘rsatilmagan"}
+            {ui.cardHours} {item.openingHours || ui.cardNone}
           </p>
         )}
         <div className="ex-result-footer">
           {type !== "salons" && (
             <Price
-              min={service ? item.minPrice : min}
-              max={service ? item.maxPrice : null}
+              ui={ui}
+              min={price.min}
+              max={selectedService ? price.max : service ? price.max : null}
             />
           )}
           {!service && !detail && (
-            <Link className="ex-action" to={makeUrl({ profile: item.id })}>
-              {type === "barbers" ? "Profilni ko‘rish" : "Salonni ko‘rish"}
-              <Icon name="arrow" size={17} />
-            </Link>
+            <div className="ex-result-actions">
+              <Link className="ex-action" to={type === "barbers" ? profileUrl : makeUrl({ profile: item.id })}
+                state={type === "barbers" ? { from: location.pathname + location.search } : undefined}>
+                {ui.cardProfile}
+                <Icon name="arrow" size={17} />
+              </Link>
+              {type === "barbers" && typeof onToggleCompare === "function" && (
+                <button type="button" className="ex-action ex-compare-pick" aria-pressed={compareSelected}
+                  aria-label={`${nameOf(item, type)}: ${compareSelected ? ui.compareRemove : ui.cardCompare}`}
+                  disabled={!compareSelected && compareFull} onClick={() => onToggleCompare(item.id)}>
+                  {compareSelected ? ui.cardCompared : ui.cardCompare}
+                </button>
+              )}
+              {type === "barbers" && services.length > 0 && (
+                <Link className="ex-action ex-action-primary" to={siteLocalePath(`${profileUrl.split("?")[0]}?${bookingQuery}`, lang)} state={{ from: location.pathname + location.search }}>
+                  {ui.cardBook}
+                  <Icon name="arrow" size={17} />
+                </Link>
+              )}
+            </div>
           )}
         </div>
-        {detail && sampleDetails && <>
-          <p className="ex-description">{sampleDetails.about}</p>
-          <Link className="ex-action" to={`${base}/barbers/${item.id}?demo=1`} state={{ from: location.pathname + location.search }}>Profilga o‘tish <Icon name="arrow" size={17} /></Link>
-        </>}
+        {detail && type === "barbers" && (
+          <Link className="ex-action" to={profileUrl} state={{ from: location.pathname + location.search }}>
+            {ui.cardProfile} <Icon name="arrow" size={17} />
+          </Link>
+        )}
         {service && (
           <div className="ex-provider-links">
             <Link
@@ -152,7 +180,7 @@ export default function ResultCard({
                 category: null,
               })}
             >
-              Sartaroshlar ({providers.barbers.length})
+              {ui.barbers} ({providers.barbers.length})
               <Icon name="arrow" size={17} />
             </Link>
             <Link

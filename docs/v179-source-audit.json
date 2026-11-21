@@ -1,0 +1,132 @@
+{
+  "version": "v179",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 165,
+  "indexedNew": 7,
+  "indexedTotal": 172,
+  "notYetIndexed": 13,
+  "sourcePartiallyImplemented": 5,
+  "requirementsNotImplemented": 0,
+  "explicitlyCancelled": 2,
+  "decisions": [
+    {
+      "id": 165,
+      "decision": "Smart Link Preview",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/publicProfilePreview.js",
+        "backend/controllers/publicProfilePreview.js",
+        "frontend/src/pages/user/barber/publicShare.js"
+      ],
+      "tests": [
+        "backend/test/v135PublicPreview.unit.test.js",
+        "frontend/test/v135PublicLinkPreview.test.js"
+      ],
+      "missingImplementation": [
+        "A sanitized public profile OG/Twitter preview exists for approved active barbers. External Telegram/WhatsApp crawler fetch, HTTPS domain, SPA deep link and CDN caching are unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 166,
+      "decision": "Takroriy akkaunt va sartaroshxona rad etiladi",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/database/migrations/20261113_unified_accounts.sql",
+        "backend/database/migrations/20261226_single_address_barber_shops.sql"
+      ],
+      "tests": [
+        "backend/test/v172SingleAddressShop.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Canonical users.phone and one shop per barber have unique constraints. Duplicate organizations with different owners/addresses are not reliably detected and should not be automatically merged. Real PostgreSQL concurrency unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 167,
+      "decision": "Ish vaqtini uzaytirish maxsus workflow BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "The dedicated workday-extension workflow was cancelled by user decision and must not be reintroduced."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 168,
+      "decision": "Faqat o‘zi uchun bron qilish",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/multiBooking.js",
+        "backend/controllers/bookingsController.js"
+      ],
+      "tests": [
+        "backend/test/bookings.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Customer booking uses the authenticated profile ID, not a submitted customer identity. Separate planned phone/manual bookings are not part of this flow. Real PostgreSQL/browser cross-account checks unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 169,
+      "decision": "Mijozning vaqt to‘qnashuvchi bronlari taqiqlanadi",
+      "originalStatus": "Qisman: v14 DB exclusion migratsiyasi va API 409 himoyasi",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/multiBooking.js",
+        "backend/database/migrations/20261130_customer_time_overlap.sql"
+      ],
+      "tests": [
+        "backend/test/bookingConcurrency.postgres.integration.test.js"
+      ],
+      "missingImplementation": [
+        "Application conflict checks and PostgreSQL exclusion constraint exist; database test is present but was not executed on a live database in this release."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 170,
+      "decision": "Barber matching qayta muhokamasi BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "User cancelled the additional matching re-discussion; do not invent an automatic matching workflow."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 171,
+      "decision": "Portfolio muallifi ko‘rsatiladi",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/shopGalleryV173.js",
+        "frontend/src/pages/shops/ShopPublicV172.jsx",
+        "frontend/src/pages/user/social/PostCard.jsx"
+      ],
+      "tests": [
+        "backend/test/v179GalleryAttribution.unit.test.js",
+        "frontend/test/v179PortfolioAttribution.test.js"
+      ],
+      "missingImplementation": [
+        "Server-sourced author credit now appears on the public shop gallery and already exists on Ilhom posts. A shop currently has one owner, not verified multi-staff authors; real database/browser E2E remains untested."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramCrawler": "NOT_RUN",
+  "productionReady": false
+}

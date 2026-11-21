@@ -1,0 +1,23 @@
+# USTARA v38 — fayl yaxlitligi hisobot
+
+- Asos ZIP: `USTARA-4-Bosqich-Queue-Self-Exit-v37.zip`. Original SHA256: `6a97e235df77011ce0a2821c82b813ce9df09092f86ba4d391d048110b46d20c`
+- v37 arxivida 605 fayl; v38 manba papkasida yangi manifestdan oldin 612 fayl.
+- Quyidagi mavjud fayllargina maqsadli o‘zgargan:
+  - `backend/package.json`
+  - `backend/services/smartBookingConfirmation.js`
+  - `backend/services/smartBookingTelegram.js`
+  - `backend/test/smartBookingTelegram.unit.test.js`
+  - `docs/USTARA_LATEST_CHECKPOINT.md`
+  - `docs/USTARA_PROGRESS.md`
+  - `frontend/src/pages/queue/ManualQueue.jsx`
+- Quyidagi fayllar yangidan qo‘shildi (va mana shu manifest ham):
+  - `backend/SMART_BOOKING_V38.md`
+  - `backend/test/v38BookingLifecycle.unit.test.js`
+  - `backend/test/v38TelegramDelivery.unit.test.js`
+  - `docs/USTARA_185_AUDIT_V38.md`
+  - `docs/USTARA_V38_10_ISH.md`
+  - `frontend/src/pages/queue/manualQueueModel.js`
+  - `frontend/test/manualQueueModelV38.test.js`
+- `docs/USTARA_185_NAZORAT.csv` SHA256 **v37 bilan aynan bir xil**; 41 oldingi SQL migratsiya o‘zgarmagan.
+- `.env`, `node_modules`, `dist`, log, kalit va DB backup zipga kiritilmaydi.
+- Unit/mock PASS ≠ real PostgreSQL/Telegram/browser integratsiya PASS.

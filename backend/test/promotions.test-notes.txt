@@ -1,0 +1,2 @@
+New promotion window validation has unit coverage in promotions.unit.test.js.
+Admin DB endpoints require 20261123_admin_promotions.sql migration and have not been integration-tested against the user's DB.

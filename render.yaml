@@ -1,0 +1,44 @@
+# USTARA backend — Render Blueprint (Neon database is managed separately).
+# Configures a free Node web service only. No migrations or seed operations run.
+# Add real credentials in Render Dashboard; do not commit them to Git.
+services:
+  - type: web
+    name: ustara-api-release
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    autoDeployTrigger: "off"
+    healthCheckPath: /api/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22.16.0"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OTP_HMAC_KEY
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: OTP_DELIVERY_ADAPTER
+        value: telegram
+      - key: TELEGRAM_UPDATE_MODE
+        value: webhook
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false

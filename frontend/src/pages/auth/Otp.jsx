@@ -1,105 +1,90 @@
 import ArrowIcon from "../../components/ArrowIcon";
-import { useEffect, useRef, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { savePasswordRecord } from "./credentials";
-import { readCustomerProfile, saveCustomerProfile } from "../user/data/profile";
-import { createAccount } from "../barber/data/store";
+import SiteLanguageSelect from "../../components/SiteLanguageSelect.jsx";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { siteLocalePath } from "../../utils/siteLocale.js";
+import { authLocale, authUi, localizedOtpError } from "./authLocale.js";
 import { AuthLayout } from "./components/AuthParts";
-import { formatPhone } from "./utils/phone";
-import { getAccount, isValidPhone, setSession } from "./utils/session";
+import { clearRegistration, getRegistration, subscribeRegistration, registrationBlocked, registrationDeadline, otpError, verifyRegistration, resendRegistration, refreshRegistration } from "./utils/registration";
 import "./auth-ui.css";
 
 const LENGTH = 5;
-const RESEND_SECONDS = 60;
-const TEST_CODE = "12345"; // Local demo only; no SMS is sent.
 
 export default function Otp() {
-  const { state } = useLocation();
+  const pending = useSyncExternalStore(subscribeRegistration, getRegistration, () => null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const lang = authLocale(location.search);
+  const ui = authUi(lang);
   const [code, setCode] = useState(Array(LENGTH).fill(""));
   const codeRef = useRef(code);
   const [status, setStatus] = useState("idle");
-  const [seconds, setSeconds] = useState(RESEND_SECONDS);
-  const [resendCycle, setResendCycle] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
+  const [now, setNow] = useState(Date.now);
+  const [entryRole] = useState(pending?.role || "customer");
   const refs = useRef([]);
-  const finished = useRef(false);
+  const inFlight = useRef(false);
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    const deadline = Date.now() + RESEND_SECONDS * 1000;
-    const refresh = () =>
-      setSeconds(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const refresh = () => setNow(Date.now());
     const timer = window.setInterval(refresh, 1000);
     document.addEventListener("visibilitychange", refresh);
     return () => {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [resendCycle]);
+  }, []);
 
   useEffect(() => {
     refs.current[0]?.focus({ preventScroll: true });
   }, []);
 
-  if (
-    !isValidPhone(state?.phone) ||
-    !["customer", "barber", "login"].includes(state?.role)
-  ) {
-    return <Navigate to="/signup" replace />;
-  }
+  useEffect(() => {
+    if (!pending?.sessionToken || pending.stage !== 'otp') return;
+    let active = true;
+    let running = false;
+    const refresh = async () => {
+      if (running || inFlight.current || document.visibilityState === 'hidden' || getRegistration()?.retryAt > Date.now()) return;
+      running = true;
+      try { await refreshRegistration(); }
+      catch (error) { if (active && error.code) setSubmitError(lang === "uz" ? otpError(error) : localizedOtpError(error, lang)); }
+      finally { running = false; }
+    };
+    refresh();
+    const timer = pending.deliveryPending ? window.setInterval(refresh, 3000) : null;
+    document.addEventListener('visibilitychange', refresh);
+    window.addEventListener('focus', refresh);
+    return () => { active = false; clearInterval(timer); document.removeEventListener('visibilitychange', refresh); window.removeEventListener('focus', refresh); };
+  }, [pending?.sessionToken, pending?.deliveryPending, pending?.stage, lang]);
 
-  function finish() {
-    const { phone, role } = state;
-    if (role !== "login" && state.passwordRecord)
-      savePasswordRecord(phone, state.passwordRecord);
-    if (role === "barber") {
-      createAccount({
-        nameConfirmed: false,
-        firstName: "",
-        lastName: "",
-        phone: `+998 ${formatPhone(phone.slice(4))}`,
-        avatar: null,
-        avatarPhoto: "",
-        specialty: state.specialty,
-        salonName: "",
-      });
-      setSession({ role, phone, setupDone: false, authenticated: true });
-    } else if (role === "customer") {
-      saveCustomerProfile(phone, {
-        ...readCustomerProfile(phone),
-        nameConfirmed: false,
-      });
-      setSession({ role, phone, authenticated: true });
-    } else {
-      const account = getAccount();
-      if (!account || account.phone !== phone) {
-        navigate("/login", { replace: true });
-        return;
-      }
-      setSession({ ...account, authenticated: true });
-    }
-    navigate("/complete-profile", { replace: true });
-  }
+  const waiting = pending?.deliveryPending === true;
+  const busy = status === "verifying" || status === "resending";
+  const resendDeadline = Math.max(pending?.resendAt || 0, pending?.retryAt || 0);
+  const seconds = Math.max(0, Math.ceil((resendDeadline - now) / 1000));
+  const expired = pending && registrationDeadline(pending) <= now;
+  const countdown = (time) => `${String(Math.floor(time / 60)).padStart(2, "0")}:${String(time % 60).padStart(2, "0")}`;
+  const blocked = registrationBlocked(pending, now);
+  const otpExpired = pending && !waiting && pending.otpExpiresAt <= now;
+  const signupPath = siteLocalePath((pending?.role || entryRole) === "barber" ? "/signup/sartarosh" : "/signup", lang);
 
-  function verify(digits) {
-    if (finished.current || digits.length !== LENGTH || !digits.every(Boolean))
-      return;
+  async function verify(digits) {
+    if (inFlight.current || !pending || expired || blocked || otpExpired
+      || digits.length !== LENGTH || !digits.every((digit) => /^\d$/.test(digit))) return;
+    inFlight.current = true;
+    setStatus("verifying");
     setSubmitError("");
-    if (digits.join("") !== TEST_CODE) {
-      setStatus("error");
-      return;
-    }
-    finished.current = true;
     try {
-      finish();
-    } catch {
-      finished.current = false;
-      setSubmitError(
-        "Sessiyani saqlab bo‘lmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.",
-      );
+      await verifyRegistration(digits.join(""));
+      navigate(siteLocalePath("/complete-profile", lang), { replace: true });
+    } catch (error) {
+      if (error.code === "invalid_otp") {
+        codeRef.current = Array(LENGTH).fill("");
+        setCode(codeRef.current);
+        window.requestAnimationFrame(() => refs.current[0]?.focus());
+      }
+      setSubmitError(lang === "uz" ? otpError(error) : localizedOtpError(error, lang));
       setStatus("error");
-    }
+    } finally { inFlight.current = false; }
   }
 
   function updateCode(next) {
@@ -110,6 +95,7 @@ export default function Otp() {
   }
 
   function enterDigits(index, value) {
+    if (inFlight.current) return;
     const digits = value.replace(/\D/g, "").slice(0, LENGTH);
     if (value && !digits) return;
     const start = digits.length === LENGTH ? 0 : index;
@@ -143,30 +129,41 @@ export default function Otp() {
     }
   }
 
-  function handleResend() {
-    if (seconds > 0 || finished.current) return;
-    setResendCycle((cycle) => cycle + 1);
-    setSeconds(RESEND_SECONDS);
-    updateCode(Array(LENGTH).fill(""));
-    refs.current[0]?.focus();
-    // Local demo: keep the test code. The user will implement real SMS later.
+  async function handleResend() {
+    if (inFlight.current || seconds > 0 || expired || blocked) return;
+    inFlight.current = true;
+    setStatus("resending");
+    setSubmitError("");
+    try {
+      await resendRegistration();
+      setNow(Date.now);
+      updateCode(Array(LENGTH).fill(""));
+      refs.current[0]?.focus();
+    } catch (error) {
+      setSubmitError(lang === "uz" ? otpError(error) : localizedOtpError(error, lang));
+      setStatus("error");
+    } finally { inFlight.current = false; }
   }
 
+  if (!pending) return <AuthLayout className="au-page--otp"><h1 className="au-title">{ui.missingSession}</h1><p className="au-sub" role="alert">{submitError || ui.missingSessionHelp}</p><Link className="au-btn" to={signupPath}>{ui.restart}</Link></AuthLayout>;
+  if (pending.stage !== "otp") return <Navigate to={siteLocalePath("/complete-profile", lang)} replace />;
+
   return (
-    <>
       <AuthLayout className="au-page--otp">
+        <SiteLanguageSelect className="au-otp-language" />
         <button
           type="button"
           className="au-link-back"
-          onClick={() => navigate(-1)}
+          disabled={busy}
+          onClick={() => navigate(signupPath)}
         >
-          <ArrowIcon direction="left" /> Orqaga
+          <ArrowIcon direction="left" /> {ui.back}
         </button>
-        <h1 className="au-title">Tasdiqlash kodi</h1>
-        <p className="au-sub" id="otp-description">
-          <b>+998 {formatPhone(state.phone.slice(4))}</b> uchun {LENGTH} xonali
-          test kodini kiriting. SMS hozircha yuborilmaydi.
+        <h1 className="au-title">{ui.otpTitle}</h1>
+        <p className="au-sub au-otp-intro" id="otp-description">
+          <b>{pending.phone.replace(/^(\+998)(\d{2})(\d{3})(\d{2})(\d{2})$/, "$1 $2 $3 $4 $5")}</b>
         </p>
+        {!expired && !blocked && <a className="au-btn au-otp-telegram" href="https://t.me/ustara_booking_bot">{ui.openBot}</a>}
         <form
           className="au-otp-form"
           onSubmit={(event) => {
@@ -174,11 +171,12 @@ export default function Otp() {
             verify(codeRef.current);
           }}
           noValidate
+          aria-busy={busy}
         >
           <div
             className={`au-otp${status === "error" ? " is-error" : ""}`}
             role="group"
-            aria-label="Tasdiqlash kodi"
+            aria-label={ui.otpTitle}
           >
             {code.map((digit, index) => (
               <input
@@ -188,6 +186,7 @@ export default function Otp() {
                 }}
                 className={digit ? "is-filled" : ""}
                 type="text"
+                disabled={busy}
                 inputMode="numeric"
                 autoComplete={index === 0 ? "one-time-code" : "off"}
                 maxLength={LENGTH}
@@ -199,66 +198,39 @@ export default function Otp() {
                   enterDigits(index, event.clipboardData.getData("text"));
                 }}
                 onFocus={(event) => event.target.select()}
-                aria-label={`${index + 1}-raqam`}
+                aria-label={`${index + 1} ${ui.otpDigit}`}
                 aria-invalid={status === "error"}
                 aria-describedby={`otp-description${status === "error" ? " otp-error" : ""}`}
               />
             ))}
           </div>
-          {status === "error" && (
+          {(status === "error" || submitError || expired || blocked || otpExpired) && (
             <p className="au-error au-center" id="otp-error" role="alert">
-              {submitError || "Kod noto‘g‘ri. Qayta urinib ko‘ring."}
+              {submitError || (blocked ? ui.blocked : expired ? ui.sessionExpired : ui.codeExpired)}
             </p>
           )}
           <button
             type="submit"
             className="au-btn"
-            disabled={!code.every(Boolean)}
+            disabled={busy || expired || blocked || otpExpired || !code.every(Boolean)}
           >
-            Tasdiqlash <ArrowIcon />
+            {status === "verifying" ? ui.check : ui.verify} <ArrowIcon />
           </button>
         </form>
         <div className="au-foot">
           <button
             type="button"
-            className="au-text-btn"
-            disabled={seconds > 0}
-            onClick={() => handleResend()}
+            className="au-text-btn au-otp-resend"
+            disabled={busy || seconds > 0 || expired || blocked}
+            onClick={handleResend}
           >
-            {seconds > 0 ? `Qayta yuborish (${seconds}s)` : "Qayta yuborish"}
-          </button>
-          <button
-            type="button"
-            className="au-text-btn au-otp-help"
-            onClick={() => setShowHelp(true)}
-            aria-haspopup="dialog"
-          >
-            Kod kelmadimi?
+            {status === "resending" ? ui.resending : <>
+              <span>{ui.resend}</span>
+              {seconds > 0 && <span className="au-otp-countdown" role="timer" aria-label={ui.resendCountdown}>{countdown(seconds)}</span>}
+            </>}
           </button>
         </div>
+        {expired && <p className="au-foot"><Link to={signupPath} onClick={clearRegistration}>{ui.restartSignup}</Link></p>}
       </AuthLayout>
-      {showHelp && (
-        <div className="au-help-overlay">
-          <div className="au-help-modal">
-            <h3>Kod kelmadimi?</h3>
-
-            <p>
-              SMS xabari kelishi biroz vaqt olishi mumkin. Quyidagilarni
-              tekshirib ko‘ring:
-            </p>
-
-            <ul>
-              <li>Telefon raqamingiz to‘g‘ri kiritilganmi?</li>
-              <li>Telefoningiz tarmoq signaliga egami?</li>
-              <li>SMS xabarlar bloklanmaganmi?</li>
-            </ul>
-
-            <button type="button" onClick={() => setShowHelp(false)}>
-              Tushunarli
-            </button>
-          </div>
-        </div>
-      )}
-    </>
   );
 }

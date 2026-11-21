@@ -1,0 +1,8 @@
+.admin-booking-filters{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:18px 0}
+.admin-booking-filters label{display:flex;flex-direction:column;gap:6px;font-size:13px;min-width:145px}
+.admin-booking-filters input,.admin-booking-filters select{min-height:44px;border:1px solid #cbd6e2;background:white;color:#182238;border-radius:9px;padding:9px;max-width:100%}
+.admin-booking-filters button,.admin-booking-pages button{min-height:44px;border:0;background:#1c6de5;color:white;padding:10px 15px;border-radius:9px;cursor:pointer}
+.admin-booking-filters button:disabled,.admin-booking-pages button:disabled{opacity:.5;cursor:not-allowed}
+.admin-booking-pages{display:flex;align-items:center;justify-content:center;gap:16px;margin:18px 0;flex-wrap:wrap}
+.admin-booking-control :is(button,input,select):focus-visible{outline:3px solid #60a5fa;outline-offset:2px}
+@media(max-width:750px){.admin-booking-filters label{flex:1 1 150px}.admin-booking-filters button{width:100%}}

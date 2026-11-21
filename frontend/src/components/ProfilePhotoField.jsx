@@ -23,7 +23,7 @@ export default function ProfilePhotoField({ value = "", name = "", onChange, onB
     onBusyChange?.(true);
     try {
       const photo = await prepareProfilePhoto(file);
-      if (version === versionRef.current) onChange(photo);
+      if (version === versionRef.current) await onChange(photo);
     } catch (cause) {
       if (version === versionRef.current) setError(cause.message || "Rasmni ochib bo‘lmadi. Qayta urinib ko‘ring.");
     } finally {

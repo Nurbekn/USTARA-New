@@ -1,0 +1,18 @@
+.hc-page{width:min(960px,100%);margin:0 auto;padding:clamp(18px,4vw,40px) 16px 96px;color:var(--text,#e9eef8)}
+.hc-header{margin-bottom:22px}.hc-header h1{margin:4px 0 12px;font-size:clamp(1.6rem,3.5vw,2.5rem)}.hc-header p{line-height:1.6;max-width:70ch}
+.hc-eyebrow{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4c94eb}
+.hc-intro,.hc-card,.hc-search,.hc-empty{border:1px solid var(--border,rgba(140,160,190,.3));background:var(--card,rgba(18,29,49,.9));border-radius:16px;padding:16px}
+.hc-intro{margin-bottom:18px}.hc-intro>button{font:inherit;font-weight:700;color:inherit;background:transparent;border:0;cursor:pointer;text-align:left}.hc-intro ol{line-height:2;margin-bottom:0;padding-left:26px}
+.hc-page a{color:#79b9ff;text-underline-offset:3px}.hc-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.hc-search label{font-weight:600}.hc-search input{min-width:200px;flex:1;max-width:100%;padding:10px 12px;border-radius:9px;border:1px solid #6a7c94;background:var(--bg,#0d172a);color:inherit;font:inherit}
+.hc-search button,.hc-categories button,.hc-empty button{font:inherit;border:1px solid #62768f;border-radius:10px;padding:9px 12px;color:inherit;background:transparent;cursor:pointer}
+.hc-categories{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}.hc-categories button[aria-pressed=true]{background:#164f91;border-color:#75b3f4;color:#fff}
+.hc-count{font-size:.88rem;opacity:.78}.hc-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px}.hc-card h2{font-size:1.08rem;margin:0 0 10px}.hc-card p{line-height:1.65;margin:0 0 14px}.hc-links{display:flex;flex-wrap:wrap;gap:12px;font-size:.9rem}.hc-footer{margin-top:28px;line-height:1.6;font-size:.9rem;opacity:.85}
+.hc-page :is(button,a,input):focus-visible{outline:3px solid #95cdff;outline-offset:3px}
+@media(max-width:480px){.hc-page{padding:22px 12px 100px}.hc-search input{flex-basis:100%}.hc-list{grid-template-columns:1fr}}
+
+@media(prefers-reduced-motion:reduce){.hc-page *{scroll-behavior:auto}}
+/* v138: visible keyboard-accessible language choice; no viewport overflow. */
+.hc-language{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.hc-language label{font-weight:600}
+.hc-language select{max-width:100%;border:1px solid #6a7c94;border-radius:9px;color:inherit;background:var(--bg,#0d172a);padding:9px 12px;font:inherit;cursor:pointer}
+.hc-page select:focus-visible{outline:3px solid #95cdff;outline-offset:3px}

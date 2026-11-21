@@ -152,6 +152,28 @@
   text-transform: none;
 }
 
+.au-captcha-image {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.au-captcha-image canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+.au-captcha-refresh {
+  min-height: 44px;
+}
+.au-captcha-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  line-height: 1.5;
+}
+
 .au-input,
 .au-phone,
 .au-password {
@@ -836,12 +858,7 @@
 .au-page--otp .au-text-btn:not(:disabled):hover { text-decoration: underline; }
 .au-page--otp .au-text-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 .au-page--otp .au-text-btn { min-height: 44px; padding: 8px 0; font-size: 14px; }
-.au-page--otp .au-foot > .au-text-btn:not(.au-otp-help) {
-  padding-inline: 16px;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.5;
-}
+.au-page--otp .au-otp-countdown { font-variant-numeric: tabular-nums; }
 .au-page--otp .au-text-btn:disabled { opacity: 1; color: var(--muted); cursor: not-allowed; }
 .au-otp-form { min-width: 0; width: 100%; }
 .au-otp-form > .au-btn { margin-top: 16px; }
@@ -921,3 +938,135 @@
   .au-page--recovery { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .au-page--recovery .au-card { padding: 24px 20px; }
 }
+
+.au-telegram-notice { padding: 16px; margin: 18px 0; border: 1px solid var(--au-border, #334155); border-radius: 14px; background: rgba(59,130,246,.06); }
+.au-telegram-notice p { margin: 10px 0; font-size: 14px; line-height: 1.6; }
+.au-telegram-notice .au-btn { min-height: 44px; text-align: center; text-decoration: none; }
+
+/* Registration — focused visual hierarchy, independent of other auth screens. */
+.au-page--signup .au-card {
+  border: 1px solid rgba(148, 163, 184, .23);
+  background: linear-gradient(155deg, rgba(27, 43, 65, .98), rgba(13, 24, 42, .98));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, .22);
+}
+.au-page--signup .au-signup-heading .au-title { margin: 0 0 20px; font-size: clamp(1.5rem, 4.4vw, 1.8rem); line-height: 1.2; }
+.au-page--signup :is(.au-form, .au-registration-fields) { gap: 12px; }
+.au-page--signup .au-field { gap: 4px; }
+.au-page--signup .au-label { font-size: 14px; }
+.au-page--signup .au-seg { margin-bottom: 20px; }
+@media (min-width: 640px) {
+  .au-page--signup { padding-block: 12px 24px; }
+  .au-page--signup .au-card { margin-block: 12px; padding: 24px; }
+  .au-page--signup :is(.au-input, .au-phone, .au-password, .au-btn) { min-height: 48px; }
+  .au-page--signup :is(.au-password-entry, .au-password input) { height: 46px; }
+  .au-page--signup :is(.au-password-entry input, .au-password-mask) { line-height: 46px; }
+  .au-page--signup .au-password button { height: 44px; min-height: 44px; }
+  .au-page--signup .au-foot { margin-top: 12px; }
+}
+.au-signup-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 20px; }
+.au-signup-steps span { display: flex; align-items: center; gap: 6px; min-width: 0; color: #aab7cc; font-size: .7rem; line-height: 1.3; }
+.au-signup-steps b { flex: 0 0 auto; width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid #516278; border-radius: 50%; font-size: .7rem; }
+.au-signup-steps .is-current { color: #fff; font-weight: 700; }
+.au-signup-steps .is-current b { background: #2563eb; border-color: #2563eb; }
+.au-page--signup .au-seg { border-radius: 15px; }
+.au-page--signup .au-btn { border-radius: 13px; font-weight: 750; }
+@media (max-width: 420px) {
+  .au-signup-steps { gap: 4px; }
+  .au-signup-steps span { font-size: .62rem; gap: 4px; }
+  .au-signup-steps b { width: 20px; height: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .au-page--signup .au-card { animation: none; }
+}
+
+.au-otp-success { margin: 16px 0; color: #86efac; font-size: 14px; line-height: 1.5; }
+
+/* USTARA mobile-first signup refinement: concise, immediately understandable. */
+.au-page--signup .au-card { padding-block: 22px; }
+.au-page--signup .au-signup-heading .au-title { margin-bottom: 14px; }
+.au-page--signup .au-seg { margin-bottom: 14px; }
+.au-page--signup .au-form, .au-page--signup .au-registration-fields { gap: 11px; }
+.au-page--signup .au-field { gap: 5px; }
+.au-page--signup .au-foot { margin-top: 12px; }
+.au-page--signup .au-btn { min-height: 50px; }
+.au-page--signup .au-card :focus-visible { outline-offset: 3px; }
+@media(max-width:480px) {
+ .au-page--signup { padding-inline: 12px; }
+ .au-page--signup .au-card { padding: 20px 16px; border-radius: 20px; }
+ .au-page--signup .au-signup-heading .au-title { font-size: 1.5rem; }
+}
+
+/* Compact, mobile-first Telegram registration OTP. */
+.au-page--otp .au-otp-intro { margin: 6px auto 12px; }
+.au-page--otp .au-telegram-notice--compact { padding: 0; border: 0; background: transparent; margin: 14px auto 10px; max-width: 300px; }
+.au-page--otp .au-telegram-notice--compact .au-btn { display: flex; align-items: center; justify-content: center; width: 100%; }
+.au-page--otp .au-otp { margin-block: 18px 10px; }
+.au-page--otp .au-otp-form > .au-btn { margin-top: 12px; }
+.au-page--otp .au-foot { margin-top: 8px; gap: 0; }
+
+/* Compact OTP screen; all overrides are scoped away from signup/login. */
+.au-page--otp {
+  --au-width: 380px;
+  --primary: #3b82f6;
+  --border: #334155;
+  --muted: #94a3b8;
+  --text: #f8fafc;
+  background: #0b1220;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.au-page--otp .au-top { display: none; }
+.au-page--otp .au-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: #111c2e;
+  backdrop-filter: none;
+}
+.au-page--otp .au-link-back { margin-bottom: 12px; min-height: 44px; font-size: 14px; }
+.au-page--otp .au-title { font-size: 24px; line-height: 1.25; margin-bottom: 12px; }
+.au-page--otp .au-otp-intro { font-size: 16px; margin: 0 0 16px; line-height: 1.5; }
+.au-page--otp .au-btn { min-height: 48px; font-size: 16px; border-radius: 12px; box-shadow: none; }
+.au-page--otp .au-otp-telegram {
+  color: #93c5fd;
+  background: transparent;
+  border-color: #334155;
+  text-decoration: none;
+}
+.au-page--otp .au-otp-telegram:focus-visible,
+.au-page--otp .au-btn:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+.au-page--otp .au-otp {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 292px;
+  margin: 16px auto;
+}
+.au-page--otp .au-otp input {
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+  padding: 0;
+  border-radius: 12px;
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+  font-size: 24px;
+  caret-color: #93c5fd;
+}
+.au-page--otp .au-otp input:focus { outline: 2px solid #60a5fa; outline-offset: 2px; border-color: #60a5fa; }
+.au-page--otp .au-otp.is-error input { border-color: #ef4444; }
+.au-page--otp .au-otp-form > .au-btn { margin-top: 0; }
+.au-page--otp .au-otp-resend { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; font-size: 14px; }
+.au-page--otp .au-error { margin: 0 0 12px; font-size: 14px; }
+@media (hover: hover) {
+  .au-page--otp .au-otp-telegram:hover { background: #1e293b; }
+  .au-page--otp .au-otp-form > .au-btn:not(:disabled):hover { background: #2563eb; }
+}
+@media (max-height: 520px) {
+  .au-page--otp .au-card { margin-block: 0; }
+}
+
+/* v143: compact locale selector in authentication screens. OTP hides its outer header. */
+.au-language select, .au-otp-language select { max-width: 132px; min-height: 36px; border-radius: 8px; padding: 4px 6px; font: inherit; color: var(--text); background: var(--page-background); border: 1px solid var(--border); }
+.au-otp-language { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.au-language { display: inline-flex; }
+@media (max-width: 380px) { .au-language select { max-width: 96px; font-size: 0.78rem; } }

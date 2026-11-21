@@ -140,7 +140,8 @@
   gap: 4px;
 }
 
-.navbar-links button {
+.navbar-links button,
+.navbar-links a {
   width: 100%;
   padding: 13px 12px;
   border: 0;
@@ -155,7 +156,8 @@
     color 0.2s ease;
 }
 
-.navbar-links button:hover {
+.navbar-links button:hover,
+.navbar-links a:hover {
   background: var(--surface-hover);
   color: var(--text);
 }
@@ -258,7 +260,8 @@
     margin-inline: auto;
   }
 
-  .navbar-links button {
+  .navbar-links button,
+.navbar-links a {
     width: auto;
     padding: 10px;
     white-space: nowrap;
@@ -291,7 +294,8 @@
     gap: 14px;
   }
 
-  .navbar-links button {
+  .navbar-links button,
+.navbar-links a {
     padding-inline: 12px;
     font-size: var(--font-button);
   }
@@ -313,3 +317,7 @@
     transition: none;
   }
 }
+
+/* v137 help link follows the same sizing/focus rules as public menu buttons. */
+.navbar-links a { display:block; text-decoration:none; }
+.navbar-links a:focus-visible { outline: 3px solid #95cdff; outline-offset: 2px; }

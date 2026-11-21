@@ -1,0 +1,154 @@
+{
+  "version": "v158",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "previousSourceTraces": 21,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 28,
+  "notYetTraced": 157,
+  "decisions": [
+    {
+      "id": 17,
+      "decision": "Sartarosh belgilagan bekor qilish qoidalari",
+      "originalStatus": "Qisman: v17 sartarosh belgilaydigan cancellation muddati va izohi, bron paytidagi DB snapshot, mijoz oldindan ko‘radigan UI va server deadline tekshiruvi qo‘shildi",
+      "code": [
+        "backend/controllers/cancellationPolicyController.js",
+        "backend/services/cancellationTerms.js"
+      ],
+      "tests": [
+        "backend/test/cancellationPolicy.unit.test.js",
+        "backend/test/cancellationTerms.unit.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "missingImplementation": [],
+      "productionVerified": false
+    },
+    {
+      "id": 18,
+      "decision": "Smart Booking eslatma va kechikish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "backend/services/telegramBookingNotifications.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingOffers.unit.test.js",
+        "backend/test/bookingNotificationAfterCommit.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Bron boshlanishidan oldin avtomatik mijoz eslatmasi va kechikish holati E2E tasdiqlanmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 19,
+      "decision": "Bo‘shagan vaqt taklifi 5 daqiqa amal qiladi",
+      "originalStatus": "Qisman: v28 Smart Booking haqiqiy ko‘p xizmatli tasdiq",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "frontend/src/pages/queue/manualQueueModel.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingOffers.unit.test.js",
+        "frontend/test/offerActionStateV45.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "missingImplementation": [],
+      "productionVerified": false
+    },
+    {
+      "id": 20,
+      "decision": "Takliflar ketma-ket mos mijozga yuboriladi",
+      "originalStatus": "Qisman: v28 tasdiqlashda ko‘p xizmat; QR FIFO saqlandi",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "backend/services/queueOfferLifecycle.js"
+      ],
+      "tests": [
+        "backend/test/smartBookingOffers.unit.test.js",
+        "backend/test/v46QueueLifecycle.unit.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "missingImplementation": [],
+      "productionVerified": false
+    },
+    {
+      "id": 21,
+      "decision": "Takliflar bugungi jadvalda ko‘rinadi",
+      "originalStatus": "Qisman: v27 barber ro‘yxatida booking/Telegram delivery",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "frontend/src/pages/barber/components/TodaySmartBookingOffersV158.jsx"
+      ],
+      "tests": [
+        "backend/test/v158TodaySmartBookingOffers.unit.test.js",
+        "frontend/test/v158TodaySmartBookingOffers.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "missingImplementation": [],
+      "productionVerified": false
+    },
+    {
+      "id": 22,
+      "decision": "Xizmat tugagach vaqtni qayta taqsimlash",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/services/bookingStatusService.js",
+        "backend/database/migrations/20261208_smart_booking_offers.sql"
+      ],
+      "tests": [
+        "backend/test/v38BookingLifecycle.unit.test.js",
+        "backend/test/smartBookingOffers.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Hozirgi avtomatik Smart Booking opening trigger faqat cancellation uchun; xizmat erta yakunlanganda qolgan vaqtni taklif qilish implementatsiyasi aniqlanmadi."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 23,
+      "decision": "Keldi Boshladi Tugadi va kelmadi holatlari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "backend/test/v95QueueServiceStarted.unit.test.js",
+        "frontend/test/v100ServiceFinishConfirmation.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "missingImplementation": [],
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "knownGaps": [
+    {
+      "id": 18,
+      "missingImplementation": [
+        "Bron boshlanishidan oldin avtomatik mijoz eslatmasi va kechikish holati E2E tasdiqlanmagan."
+      ]
+    },
+    {
+      "id": 22,
+      "missingImplementation": [
+        "Hozirgi avtomatik Smart Booking opening trigger faqat cancellation uchun; xizmat erta yakunlanganda qolgan vaqtni taklif qilish implementatsiyasi aniqlanmadi."
+      ]
+    }
+  ],
+  "todayOffersView": "UNIT_TESTED_ONLY",
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

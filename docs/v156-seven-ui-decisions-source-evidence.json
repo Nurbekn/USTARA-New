@@ -1,0 +1,120 @@
+{
+  "version": "v156",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "previousSourceTraces": 7,
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 14,
+  "notYetTraced": 171,
+  "decisions": [
+    {
+      "id": 1,
+      "decision": "Bosh sahifa kartalari adaptiv",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/UserHome.jsx",
+        "frontend/src/pages/user/UserHome.css"
+      ],
+      "tests": [
+        "frontend/test/customerHome.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 2,
+      "decision": "Sartarosh bosh paneli",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/barber/Dashboard.jsx",
+        "frontend/src/pages/barber/data/earnings.js"
+      ],
+      "tests": [
+        "frontend/test/v147BarberInsightsLanguages.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 3,
+      "decision": "Instagram uslubidagi sartarosh profili",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/BarberPublicProfile.jsx",
+        "frontend/src/pages/user/barber/publicShare.js"
+      ],
+      "tests": [
+        "frontend/test/publicProfile.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 4,
+      "decision": "Ilhom tasma postlari va reaksiyalari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/Social.jsx",
+        "frontend/src/pages/user/social/model.js"
+      ],
+      "tests": [
+        "frontend/test/socialModel.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 7,
+      "decision": "Platforma Admin boshqaruv markazi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/AdminPanel.jsx",
+        "frontend/src/pages/adminLanguage.js"
+      ],
+      "tests": [
+        "frontend/test/v139AdminLanguages.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 8,
+      "decision": "Kunlik jadval tanaffus va maxsus kunlar",
+      "originalStatus": "Qisman: v18 maxsus kunlar; v19 haftalik/ko‘p tanaffus",
+      "code": [
+        "frontend/src/pages/barber/components/CalendarExceptionsEditor.jsx",
+        "frontend/src/pages/barber/data/calendarExceptions.js"
+      ],
+      "tests": [
+        "frontend/test/calendarExceptions.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    },
+    {
+      "id": 9,
+      "decision": "Sartarosh bronlar ro‘yxati va kalendari",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/barber/Bookings.jsx",
+        "frontend/src/pages/barber/components/BookingCard.jsx"
+      ],
+      "tests": [
+        "frontend/test/v147BarberInsightsLanguages.test.js"
+      ],
+      "sourceStatus": "REFERENCES_PRESENT_ONLY",
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "releaseReadiness": "NOT_VERIFIED",
+  "productionReady": false
+}

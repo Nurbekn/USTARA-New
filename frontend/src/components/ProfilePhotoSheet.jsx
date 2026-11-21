@@ -6,18 +6,20 @@ function PhotoEditor({ value, name, onSave, onClose, onSaved, onBusyChange, erro
   const busy = useRef(false);
   const [error, setError] = useState("");
 
-  function changePhoto(avatarPhoto) {
+  async function changePhoto(avatarPhoto) {
     setError("");
+    busy.current = true;
+    onBusyChange?.(true);
     try {
-      if (onSave(avatarPhoto) === false) throw new Error("Photo could not be saved");
-    } catch {
-      setError("Rasm saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
-      return;
+      if (await onSave(avatarPhoto) === false) throw new Error("Profil rasmi serverda saqlanmadi.");
+      onClose();
+      onSaved?.(avatarPhoto);
+    } catch (cause) {
+      setError(cause.message || "Profil rasmi serverda saqlanmadi.");
+    } finally {
+      busy.current = false;
+      onBusyChange?.(false);
     }
-    busy.current = false;
-    onBusyChange?.(false);
-    onClose();
-    onSaved?.(avatarPhoto);
   }
 
   return (

@@ -1,0 +1,37 @@
+{
+  "version": "v176",
+  "sourceVersion": "v175",
+  "previousFileCount": 1364,
+  "oldFilesPreserved": true,
+  "oldFilesMissing": [],
+  "oldFilesChanged": [
+    "USTARA-New/.github/workflows/v55-verify.yml",
+    "USTARA-New/frontend/src/pages/barber/Bookings.jsx"
+  ],
+  "protectedFilesUnchanged": 61,
+  "protectedFilesChanged": [],
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "indexedTotal": 151,
+  "notYetIndexed": 34,
+  "tests": {
+    "frontend": {
+      "passed": 1687,
+      "failed": 0
+    },
+    "backend": {
+      "passed": 1656,
+      "failed": 29,
+      "failureNamesMatchV175": true
+    },
+    "targeted": {
+      "passed": 9,
+      "failed": 0
+    },
+    "sourceGraph": "PASS",
+    "jsxSyntax": "PASS"
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionBuild": "NOT_RUN",
+  "productionReady": false
+}

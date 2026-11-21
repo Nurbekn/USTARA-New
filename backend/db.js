@@ -1,16 +1,10 @@
 const { Pool } = require("pg");
 require("dotenv").config();
-
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
+const { createPoolConfig } = require("./database/poolConfig");
+const pool = new Pool(createPoolConfig(process.env));
 
 pool.on("error", (error) => {
-  console.error("PostgreSQL ulanishidagi xato:", error.message);
+  console.error("PostgreSQL ulanishidagi xato, kod:", error.code || "unknown");
 });
 
 module.exports = pool;

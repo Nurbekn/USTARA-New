@@ -1,0 +1,53 @@
+{
+  "version": "v175",
+  "sourceVersion": "v174",
+  "oldFiles": 1357,
+  "oldFilesPreserved": true,
+  "missingFiles": [],
+  "changedExistingFiles": [
+    "USTARA-New/frontend/src/pages/user/barber/BarberPublicProfile.css",
+    "USTARA-New/frontend/src/pages/user/barber/BarberPublicProfile.jsx"
+  ],
+  "addedFilesBeforeDocumentation": [
+    "USTARA-New/backend/scripts/v175-seven-identity-navigation-decisions.mjs",
+    "USTARA-New/backend/test/v175SevenIdentityNavigationDecisions.unit.test.js",
+    "USTARA-New/docs/v175-source-audit.json",
+    "USTARA-New/frontend/src/pages/user/barber/publicNavigationV175.js",
+    "USTARA-New/frontend/test/v175PublicBarberNavigation.test.js"
+  ],
+  "protectedFilesUnchanged": 61,
+  "protectedChanges": [],
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "auditIndexed": 144,
+  "auditNotYetIndexed": 41,
+  "tests": {
+    "frontend": {
+      "passed": 1681,
+      "failed": 0
+    },
+    "backend": {
+      "passed": 1653,
+      "failed": 29,
+      "previousFailuresUnchanged": true,
+      "missingModules": {
+        "express": 11,
+        "jsonwebtoken": 9,
+        "bcrypt": 6,
+        "pg": 3
+      }
+    },
+    "targeted": {
+      "passed": 55,
+      "failed": 0
+    },
+    "newTests": {
+      "passed": 8,
+      "failed": 0
+    }
+  },
+  "realPostgreSQL": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionBuild": "NOT_RUN",
+  "liveTelegram": "NOT_RUN",
+  "productionReady": false
+}

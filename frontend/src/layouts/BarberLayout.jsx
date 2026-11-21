@@ -1,10 +1,14 @@
 import { Suspense } from "react";
 import Loading from "../components/Loading";
+import ContextGuideV166 from "../components/onboarding/ContextGuideV166";
+import { getSession } from "../pages/auth/utils/session";
+import SiteLanguageSelect from "../components/SiteLanguageSelect";
+import { getSiteUi, readSiteLocale, siteLocalePath } from "../utils/siteLocale.js";
 import { BrandSymbol } from "../components/brand/BrandLogo";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import AvailabilityBadge from "../pages/barber/components/AvailabilityBadge";
-import { Avatar } from "../components/Avatar";
+import VerifiedAvatar from "../components/VerifiedAvatar";
 import { STATUS, useBarber } from "../pages/barber/data/store";
 import "../pages/barber/barber.css";
 
@@ -49,8 +53,8 @@ const NAV = [
     ),
   },
   {
-    to: "/barber/schedule",
-    label: "Jadval",
+    to: "/barber/queue",
+    label: "Navbat",
     icon: icon(
       <>
         <circle cx="12" cy="12" r="9" />
@@ -59,8 +63,8 @@ const NAV = [
     ),
   },
   {
-    to: "/barber/portfolio",
-    label: "Ishlarim",
+    to: "/barber/services",
+    label: "Xizmatlar",
     icon: icon(
       <>
         <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -82,8 +86,10 @@ const NAV = [
 ];
 
 export default function BarberLayout() {
-  const { profile, bookings } = useBarber();
-  const { pathname } = useLocation();
+  const { profile, bookings, status, error } = useBarber();
+  const { pathname, search } = useLocation();
+  const lang = readSiteLocale(search);
+  const ui = getSiteUi(lang).barber;
   const pending = bookings.filter((b) => b.status === STATUS.PENDING).length;
 
   useEffect(() => {
@@ -95,38 +101,43 @@ export default function BarberLayout() {
   }, [pathname]);
 
   return (
-    <div className={`bx-app ${pathname.replace(/\/+$/, "") === "/barber/portfolio" ? "bx-app-portfolio" : ""}`}>
+    <div lang={lang} className={`bx-app ${pathname.replace(/\/+$/, "") === "/barber/portfolio" ? "bx-app-portfolio" : ""}`}>
       <header className="bx-top">
-        <Link to="/barber" className="bx-logo" aria-label="Ustara — bosh sahifa">
+        <Link to={siteLocalePath("/barber", lang)} className="bx-logo" aria-label={ui.homeLabel}>
           <BrandSymbol size={40} />
         </Link>
         <div className="bx-top-right">
+          <SiteLanguageSelect />
+          <Link to={siteLocalePath("/help?category=barber", lang)} aria-label={ui.helpLabel} style={{ color: 'inherit', fontSize: 14, marginRight: 12 }}>{ui.help}</Link>
           <AvailabilityBadge profile={profile} />
-          <Link to="/barber/profile" aria-label="Profil">
-            <Avatar photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={36} />
+          <Link to={siteLocalePath("/barber/profile", lang)} aria-label={ui.profile}>
+            <VerifiedAvatar verified={profile.verification_status === "approved"} photo={profile.avatarPhoto} id={profile.avatar} name={profile.firstName} size={36} />
           </Link>
         </div>
       </header>
 
+      <ContextGuideV166 role="barber" pathname={pathname} lang={lang} accountId={getSession()?.accountId} key={getSession()?.accountId ?? "no-session"} />
       <main className="bx-main">
+        {status === "loading" && <p className="bx-muted" role="status">{ui.loading}</p>}
+        {status === "error" && <div className="bx-error" role="alert"><p>{error || ui.error}</p><button type="button" onClick={() => import("../pages/barber/data/store").then(({ refreshBarberData }) => refreshBarberData())}>{ui.retry}</button></div>}
         <Suspense fallback={<Loading />}><Outlet /></Suspense>
       </main>
 
-      <nav className="bx-nav" aria-label="Asosiy menyu">
+      <nav className="bx-nav" aria-label={ui.navLabel}>
         {NAV.map((item) => (
           <NavLink
             key={item.to}
-            to={item.to}
+            to={siteLocalePath(item.to, lang)}
             end={item.end}
             className="bx-nav-item"
           >
             <span className="bx-nav-icon">
               {item.to === "/barber/profile" ? (
-                <Avatar photo={profile.avatarPhoto} name={profile.firstName} size={24} className="bx-nav-avatar" />
+                <VerifiedAvatar verified={profile.verification_status === "approved"} photo={profile.avatarPhoto} name={profile.firstName} size={24} className="bx-nav-avatar" />
               ) : item.icon}
               {item.badge && pending > 0 && <i className="bx-dot">{pending}</i>}
             </span>
-            {item.label}
+            {ui[({"/barber":"home","/barber/bookings":"bookings","/barber/queue":"queue","/barber/services":"services","/barber/profile":"profile"})[item.to]] || item.label}
           </NavLink>
         ))}
       </nav>

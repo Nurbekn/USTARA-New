@@ -1,542 +1,137 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  Link,
-  useLocation,
-  useOutletContext,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import { Avatar } from "../../../components/Avatar";
-import VerifiedBadge from "../../../components/VerifiedBadge";
-import ArrowIcon from "../../../components/ArrowIcon";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { profileName } from "../../../utils/profileName.js";
+import BarberPublicBadgesV162 from "./BarberPublicBadgesV162.jsx";
+import VerifiedAvatar from "../../../components/VerifiedAvatar";
 import Sheet from "../../../components/Sheet";
+import { formatDate } from "../../../utils/format";
+import ArrowIcon from "../../../components/ArrowIcon";
 import Icon from "../../../components/Icon";
+import PageLoading from "../../../components/Loading";
+import { getSession } from "../../auth/utils/session";
+import { loadBarberProfile } from "./publicProfile.js";
+import { publicProfileTab, publicProfileTabLink, publicPostAriaLabel } from "./profileNavigation.js";
 import InlineBooking from "./InlineBooking";
-import { readDemoSocial, saveDemoSocial } from "./demoSocial";
-import { sampleBarbers, sampleBarberDetails } from "../../home/sampleData";
+import PublicQueueSummary from "./PublicQueueSummary";
+import ProfileIssueReport from "./ProfileIssueReport";
+import PublicProfileShare from "./PublicProfileShare.jsx";
+import PublishedShopLinkV172 from "../../shops/PublishedShopLinkV172.jsx";
 import "./BarberPublicProfile.css";
+import { readSiteLocale, siteLocalePath, siteLocaleSwitchUrl } from "../../../utils/siteLocale.js";
+import { publicProfileUi } from "./publicProfileLocale.js";
+import { publicBarberMapLinksV175, publicNavigationTextV175 } from "./publicNavigationV175.js";
+import { publicBarberPhoneHrefV178 } from "./publicPhoneV178.js";
 
 const TABS = [
   { id: "posts", label: "Postlar", icon: "grid" },
   { id: "services", label: "Xizmatlar", icon: "socialScissors" },
   { id: "hours", label: "Ish vaqti", icon: "clock" },
+  { id: "reviews", label: "Sharhlar", icon: "star" },
 ];
-const postStyle = (post) => ({
-  backgroundImage: `url(${post.image})`,
-  backgroundPosition: `${post.column * 50}% ${post.row * 50}%`,
-});
-const recordId = () => crypto.randomUUID();
-const toggleItem = (items, id) =>
-  items.includes(id) ? items.filter((item) => item !== id) : [...items, id];
 
-function ProfileContent({ barber, details, backTo, viewer, viewerId }) {
-  const [tab, setTab] = useState("posts");
+function ProfileMedia({ media, thumbnail = false, alt, ui = publicProfileUi() }) {
+  const [failed, setFailed] = useState(!media?.url);
+  return <div className={`bpv-media${thumbnail ? ' is-thumb' : ''}`}>
+    {failed ? <span className="bpv-media-placeholder"><Icon name={media?.type === 'video' ? 'grid' : 'camera'} size={28}/><span>{media?.type === 'video' ? ui.videoFailed : ui.imageFailed}</span></span> : media.type === 'video' ? <video src={media.url} controls={!thumbnail} muted={thumbnail} playsInline preload={thumbnail ? "none" : "metadata"} onError={() => setFailed(true)}/> : <img src={media.url} alt={media.alt || alt} loading={thumbnail ? 'lazy' : 'eager'} decoding="async" onError={() => setFailed(true)}/>}
+    {thumbnail && !failed && media?.type === 'video' && <span className="bpv-video-mark" aria-hidden="true">▷</span>}
+  </div>;
+}
+function ProfileContent({ barber, details, backTo, onRetry }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const lang = readSiteLocale(location.search);
+  const ui = publicProfileUi(lang);
+  const tab = publicProfileTab(location.search);
+  const bookingLink = publicProfileTabLink(location.search, "services");
+  function selectTab(nextTab) {
+    if (nextTab === tab) return;
+    navigate(publicProfileTabLink(location.search, nextTab), { state: location.state });
+  }
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [activePostId, setActivePostId] = useState(null);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [messagePressed, setMessagePressed] = useState(false);
-  const messageTimer = useRef(null);
-  const [comment, setComment] = useState("");
-  const [message, setMessage] = useState("");
-  const [notice, setNotice] = useState("");
-  const [social, setSocial] = useState(() =>
-    readDemoSocial(viewerId, barber.id),
-  );
-  const socialRef = useRef(social);
-  const commentInput = useRef(null);
-  const chatList = useRef(null);
-  const activePost = details.posts.find((post) => post.id === activePostId);
-  const viewerName =
-    [viewer.firstName, viewer.lastName].filter(Boolean).join(" ") ||
-    viewer.name ||
-    "Siz";
-  const comments = social.comments.filter(
-    (item) => item.postId === activePostId,
-  );
-  const verified = barber.verification?.approvedByAdmin === true;
-
-  useEffect(() => () => window.clearTimeout(messageTimer.current), []);
-
-  function openChat() {
-    if (messageTimer.current) return;
-    setMessagePressed(true);
-    messageTimer.current = window.setTimeout(() => {
-      messageTimer.current = null;
-      setMessagePressed(false);
-      setChatOpen(true);
-    }, 350);
-  }
-
-  useEffect(() => {
-    if (chatOpen && chatList.current)
-      chatList.current.scrollTop = chatList.current.scrollHeight;
-  }, [chatOpen, social.messages.length]);
-
-  function updateSocial(patch) {
-    const current = socialRef.current;
-    const next = {
-      ...current,
-      ...(typeof patch === "function" ? patch(current) : patch),
-    };
-    try {
-      saveDemoSocial(viewerId, barber.id, next);
-      socialRef.current = next;
-      setSocial(next);
-      setNotice("");
-      return true;
-    } catch {
-      setNotice(
-        "O‘zgarish saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.",
-      );
-      return false;
-    }
-  }
-
-  function addComment(event) {
-    event.preventDefault();
-    const text = comment.trim();
-    if (!text || !activePost) return;
-    if (
-      updateSocial((current) => ({
-        comments: [
-          ...current.comments,
-          { id: recordId(), postId: activePost.id, text, author: viewerName },
-        ],
-      }))
-    )
-      setComment("");
-  }
-
-  function sendMessage(event) {
-    event.preventDefault();
-    const text = message.trim();
-    if (!text) return;
-    if (
-      updateSocial((current) => ({
-        messages: [
-          ...current.messages,
-          { id: recordId(), text, time: new Date().toISOString() },
-        ],
-      }))
-    )
-      setMessage("");
-  }
-
-  return (
-    <div className="bpv-page bpv-page--social">
-      <div className="bpv-topbar">
-        <Link to={backTo} aria-label="Ustalarga qaytish">
-          <ArrowIcon direction="left" />
-        </Link>
-        <h1>
-          <span>{barber.name}</span>
-          <VerifiedBadge verification={barber.verification} />
-        </h1>
+  const [post, setPost] = useState(null);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const mapLinks = publicBarberMapLinksV175(barber);
+  const barberPhoneHref = publicBarberPhoneHrefV178(barber.phone);
+  const navigationText = publicNavigationTextV175(lang);
+  const name = profileName(barber) || ui.defaultName;
+  const error = details.errors?.[tab];
+  const needsLogin = typeof error === "string" && error.includes("tizimga kiring");
+  return <div className="bpv-page">
+    <div className="bpv-topbar"><Link to={backTo} aria-label={ui.back}><ArrowIcon direction="left"/></Link><h1>{name}</h1></div>
+    <header className="bpv-profile-head">
+      <div className="bpv-profile-row"><VerifiedAvatar verified photo={barber.avatar_url} name={name} size={76}/>
+        <dl className="bpv-stats"><div><dt>{details.errors?.posts ? '—' : details.posts.length}</dt><dd>{ui.post}</dd></div><div><dt>{details.services.length}</dt><dd>{ui.service}</dd></div><div><dt className="bpv-rating-number"><Icon name="star" size={16} filled/>{!details.errors?.reviews && details.reviewSummary.count ? details.reviewSummary.average.toFixed(1) : '—'}</dt><dd>{details.errors?.reviews ? ui.rating : `${details.reviewSummary.count} ${ui.review}`}</dd></div></dl>
       </div>
-      <header className="bpv-profile-head">
-        <div className="bpv-profile-row">
-          <div className="bpv-profile-avatar">
-            <Avatar photo={barber.avatarPhoto} name={barber.name} size={84} />
-          </div>
-          <dl className="bpv-stats">
-            <div>
-              <dt>{details.posts.length}</dt>
-              <dd>post</dd>
-            </div>
-            <div>
-              <dt>{details.services.length}</dt>
-              <dd>xizmat</dd>
-            </div>
-            <div>
-              <dt className="bpv-rating-number">
-                <Icon name="star" filled size={18} />
-                {barber.rating.toFixed(1)}
-              </dt>
-              <dd>reyting</dd>
-            </div>
-          </dl>
+      <div className="bpv-bio"><p className="bpv-category"><span className="bpv-approved"><Icon name="check" size={14}/>{ui.verified}</span>{barber.specialty || 'Sartarosh'}</p>
+        <BarberPublicBadgesV162 barberId={barber.id} lang={lang} />
+        {barber.salon_name && <p className="bpv-business">{barber.salon_name}</p>}
+        {barber.address && <details className="bpv-address"><summary><Icon name="pin" size={16}/><span>{barber.address}</span><Icon name="chevronRight" size={14}/></summary></details>}
+        <div className="bpv-bio-tools">{barberPhoneHref && <a className="bpv-map-link" href={barberPhoneHref}><Icon name="phone" size={16}/>{ui.callBarber}: {barber.phone}</a>}{mapLinks.length > 0 && <details className="bpv-navigation-v175"><summary className="bpv-map-link"><Icon name="pin" size={16}/>{navigationText.open}</summary><div className="bpv-navigation-options-v175" role="group" aria-label={navigationText.open}>{mapLinks.map(link => <a className="bpv-navigation-choice-v175" key={link.name} href={link.href} target="_blank" rel="noopener noreferrer">{link.name} <Icon name="external" size={13}/></a>)}</div><p className="bpv-navigation-hint-v175">{navigationText.hint}</p></details>}
+          {barber.bio && <button type="button" className="bpv-about-toggle" aria-expanded={aboutOpen} aria-controls="bpv-about" onClick={() => setAboutOpen(value => !value)}>{ui.about}</button>}
         </div>
-        <div className="bpv-bio">
-          <p className="bpv-category">
-            <Icon name="socialScissors" size={16} />
-            Sartarosh <span>· {details.experience} yil tajriba</span>
-          </p>
-          <div className="bpv-bio-tools">
-            {verified &&
-              (barber.verification.trusted || barber.verification.skilled) && (
-                <div className="bpv-credentials">
-                  {barber.verification.trusted && (
-                    <span>
-                      <Icon name="shield" size={17} />
-                      Ishonchli
-                    </span>
-                  )}
-                  {barber.verification.skilled && (
-                    <span>
-                      <Icon name="award" size={17} />
-                      Mahoratli
-                    </span>
-                  )}
-                </div>
-              )}
-            <button
-              type="button"
-              className="bpv-about-toggle"
-              aria-expanded={aboutOpen}
-              aria-controls="bpv-about"
-              onClick={() => setAboutOpen((previous) => !previous)}
-            >
-              <Icon name="info" size={16} />
-              Haqida
-            </button>
-          </div>
-          {aboutOpen && (
-            <p className="bpv-about-text" id="bpv-about">
-              {details.about}
-            </p>
-          )}
-          <a
-            className="bpv-salon"
-            href={`https://www.openstreetmap.org/?mlat=${barber.location.lat}&mlon=${barber.location.lng}#map=17/${barber.location.lat}/${barber.location.lng}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${barber.salonName}, ${barber.area} — xaritada ochish`}
-          >
-            <Icon name="pin" size={17} />
-            <span>
-              {barber.salonName} · {barber.area}
-            </span>
-            <Icon name="external" size={14} />
-          </a>
-        </div>
-        <div className="bpv-actions">
-          <button
-            type="button"
-            className={`bpv-follow${social.following ? " is-following" : ""}`}
-            aria-pressed={social.following}
-            onClick={() =>
-              updateSocial((current) => ({ following: !current.following }))
-            }
-          >
-            <Icon name={social.following ? "check" : "follow"} size={18} />
-            {social.following ? "Kuzatilmoqda" : "Kuzatish"}
-          </button>
-          <button
-            type="button"
-            className={`bpv-message-action${messagePressed ? " is-pressed" : ""}`}
-            aria-busy={messagePressed}
-            disabled={messagePressed}
-            onClick={openChat}
-          >
-            <Icon name="comment" size={19} />
-            Xabar yozish
-          </button>
-        </div>
-      </header>
-      <div
-        className="bpv-tabs"
-        role="group"
-        aria-label="Usta profili bo‘limlari"
-      >
-        {TABS.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            aria-pressed={tab === item.id}
-            aria-controls="bpv-content"
-            onClick={() => setTab(item.id)}
-          >
-            <Icon name={item.icon} size={21} />
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {aboutOpen && <p className="bpv-about-text" id="bpv-about">{barber.bio}</p>}
+        {Array.isArray(barber.certificates) && barber.certificates.length > 0 && <section className="bpv-certificates-v171" aria-label={({ uz: "Sertifikatlar", ru: "Сертификаты", en: "Certificates" })[lang]}>
+          <strong>{({ uz: "Sertifikatlar", ru: "Сертификаты", en: "Certificates" })[lang]}</strong>
+          <p className="bpv-about-text">{({ uz: "Sartarosh kiritgan ma’lumotlar — USTARA tomonidan tasdiqlanmagan.", ru: "Указаны барбером, не проверены USTARA.", en: "Self-reported by the barber; not verified by USTARA." })[lang]}</p>
+          <ul>{barber.certificates.map((c, i) => <li key={`${c.title}-${i}`}>{c.title} — {c.issuer} ({c.year})</li>)}</ul>
+        </section>}
+        <PublishedShopLinkV172 barberId={barber.id} />
+        <PublicProfileShare barber={barber} />
+        {getSession()?.role === "customer" && <Link className="bpv-chat-link" to={siteLocalePath(`/user/chat?barber=${barber.id}`,lang)}>{({uz:"Xabar yozish",ru:"Написать",en:"Message"})[lang]||"Xabar yozish"}</Link>}
+        <Link to={siteLocalePath("/help?topic=booking", lang)} className="bpv-help-link">{ui.help}</Link>
       </div>
-      <section
-        className="bpv-content"
-        id="bpv-content"
-        aria-label={TABS.find((item) => item.id === tab).label}
-      >
-        {tab === "posts" && (
-          <div className="bpv-posts">
-            {details.posts.map((post) => (
-              <button
-                type="button"
-                className="bpv-post"
-                key={post.id}
-                onClick={() => {
-                  setActivePostId(post.id);
-                  setComment("");
-                }}
-                aria-label={`${post.caption} Postni ochish`}
-              >
-                <span
-                  className="bpv-post-photo"
-                  style={postStyle(post)}
-                  role="img"
-                  aria-label={post.caption}
-                />
-                {social.likes.includes(post.id) && (
-                  <span className="bpv-post-liked" aria-hidden="true">
-                    <Icon name="heart" filled size={16} />
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-        {tab === "services" && (
-          <InlineBooking
-            barber={barber}
-            details={details}
-            viewer={viewer}
-            viewerId={viewerId}
-            bookingsPath={
-              backTo.startsWith("/demo")
-                ? "/demo/reservations"
-                : "/user/bookings"
-            }
-          />
-        )}
-        {tab === "hours" && (
-          <div className="bpv-schedule">
-            <div className="bpv-section-title">
-              <h2>Ish vaqti</h2>
-              <p>{barber.address} · Toshkent vaqti</p>
-            </div>
-            <dl className="bpv-hours">
-              {details.hours.map((hours) => (
-                <div key={hours.day}>
-                  <dt>{hours.day}</dt>
-                  <dd className={hours.isOff ? "is-off" : undefined}>
-                    {hours.isOff
-                      ? "Dam olish kuni"
-                      : `${hours.start} – ${hours.end}`}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-      </section>
-      <p className="bpv-notice" role="status">
-        {notice}
-      </p>
-
-      <Sheet
-        open={!!activePost}
-        title="Post"
-        onClose={() => setActivePostId(null)}
-      >
-        {activePost && (
-          <article className="bpv-feed-post">
-            <div className="bpv-feed-author">
-              <Avatar photo={barber.avatarPhoto} name={barber.name} size={32} />
-              <div>
-                <strong>{barber.name}</strong>
-                <span>{barber.salonName}</span>
-              </div>
-            </div>
-            <div
-              className="bpv-post-photo"
-              style={postStyle(activePost)}
-              role="img"
-              aria-label={activePost.caption}
-            />
-            <div className="bpv-reactions">
-              <button
-                type="button"
-                className={
-                  social.likes.includes(activePost.id) ? "is-liked" : ""
-                }
-                aria-label={
-                  social.likes.includes(activePost.id)
-                    ? "Yoqtirishni bekor qilish"
-                    : "Postni yoqtirish"
-                }
-                aria-pressed={social.likes.includes(activePost.id)}
-                onClick={() =>
-                  updateSocial((current) => ({
-                    likes: toggleItem(current.likes, activePost.id),
-                  }))
-                }
-              >
-                <Icon
-                  name="heart"
-                  filled={social.likes.includes(activePost.id)}
-                />
-              </button>
-              <button
-                type="button"
-                aria-label="Komment yozish"
-                onClick={() => commentInput.current?.focus()}
-              >
-                <Icon name="comment" />
-              </button>
-              <button
-                type="button"
-                className="bpv-save-post"
-                aria-label={
-                  social.saved.includes(activePost.id)
-                    ? "Saqlashni bekor qilish"
-                    : "Postni saqlash"
-                }
-                aria-pressed={social.saved.includes(activePost.id)}
-                onClick={() =>
-                  updateSocial((current) => ({
-                    saved: toggleItem(current.saved, activePost.id),
-                  }))
-                }
-              >
-                <Icon
-                  name="bookmark"
-                  filled={social.saved.includes(activePost.id)}
-                />
-              </button>
-            </div>
-            <p className="bpv-feed-caption">
-              <strong>{barber.name}</strong> {activePost.caption}
-            </p>
-            {social.likes.includes(activePost.id) && (
-              <p className="bpv-liked-label">Sizga yoqdi</p>
-            )}
-            <div className="bpv-comments" aria-live="polite">
-              {comments.map((item) => (
-                <div className="bpv-comment" key={item.id}>
-                  <Avatar name={item.author || "Siz"} size={28} />
-                  <p>
-                    <strong>{item.author || "Siz"}</strong> {item.text}
-                  </p>
-                </div>
-              ))}
-              {comments.length === 0 && (
-                <p className="bpv-empty-comments">Birinchi kommentni yozing.</p>
-              )}
-            </div>
-            <form className="bpv-comment-form" onSubmit={addComment}>
-              <label className="bpv-sr-only" htmlFor="bpv-comment-input">
-                Komment yozish
-              </label>
-              <input
-                ref={commentInput}
-                id="bpv-comment-input"
-                placeholder="Komment yozing…"
-                value={comment}
-                maxLength={500}
-                onChange={(event) => setComment(event.target.value)}
-              />
-              <button type="submit" disabled={!comment.trim()}>
-                Yuborish
-              </button>
-            </form>
-            <p className="bpv-notice" role="status">
-              {notice}
-            </p>
-          </article>
-        )}
-      </Sheet>
-
-      <Sheet
-        open={chatOpen}
-        title={barber.name}
-        onClose={() => setChatOpen(false)}
-      >
-        <div className="bpv-chat">
-          <p className="bpv-chat-note">
-            Xabarlar shu qurilmada saqlanadi. Ustaga yuborilmaydi.
-          </p>
-          <div
-            className="bpv-chat-messages"
-            ref={chatList}
-            role="log"
-            aria-label="Xabarlar"
-          >
-            {social.messages.length === 0 ? (
-              <div className="bpv-chat-empty">
-                <Avatar
-                  photo={barber.avatarPhoto}
-                  name={barber.name}
-                  size={64}
-                />
-                <strong>{barber.name}</strong>
-                <p>Suhbatni boshlash uchun xabar yozing.</p>
-              </div>
-            ) : (
-              social.messages.map((item) => (
-                <div className="bpv-chat-bubble" key={item.id}>
-                  <p>{item.text}</p>
-                  {item.time && (
-                    <time dateTime={item.time}>
-                      {new Date(item.time).toLocaleTimeString("uz-UZ", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </time>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-          <form className="bpv-message-form" onSubmit={sendMessage}>
-            <label className="bpv-sr-only" htmlFor="bpv-message-input">
-              Xabar yozish
-            </label>
-            <input
-              id="bpv-message-input"
-              value={message}
-              maxLength={1000}
-              placeholder="Xabar yozing…"
-              onChange={(event) => setMessage(event.target.value)}
-            />
-            <button
-              type="submit"
-              disabled={!message.trim()}
-              aria-label="Xabarni yuborish"
-            >
-              <Icon name="send" size={20} />
-            </button>
-          </form>
-          <p className="bpv-notice" role="status">
-            {notice}
-          </p>
-        </div>
-      </Sheet>
-    </div>
-  );
+      <div className="bpv-booking-actions">
+        {details.services.length > 0 ? <Link className="bpv-booking-jump" to={bookingLink} state={location.state}>
+          <Icon name="socialCalendar" size={19}/> {ui.book} <ArrowIcon direction="right"/>
+        </Link> : <p className="bpv-booking-unavailable" role="status">{ui.noService}</p>}
+        <p className="bpv-booking-hint">{ui.bookingHint}</p>
+      </div>
+    </header>
+    <ProfileIssueReport barberId={barber.id} lang={lang} />
+    <PublicQueueSummary barberId={barber.id} lang={lang} />
+    <div className="bpv-tabs" role="group" aria-label={ui.tabs}>{TABS.map(item => <button type="button" key={item.id} aria-pressed={tab === item.id} aria-controls="bpv-content" onClick={() => selectTab(item.id)}><Icon name={item.icon} size={18}/><span>{ui[item.id]}</span></button>)}</div>
+    <section className="bpv-content" id="bpv-content" tabIndex={-1} aria-label={ui[tab]}>
+      {error ? <div className="bpv-notice" role="alert"><p>{lang === "uz" ? error : needsLogin ? ui.loginRequired : ui.error}</p>{needsLogin
+        ? <Link className="bpv-retry" to={siteLocalePath("/login", lang)}>{ui.login}</Link>
+        : <button type="button" className="bpv-retry" onClick={onRetry}>{ui.retry}</button>}</div> : <>
+        {tab === 'posts' && (details.posts.length ? <div className="bpv-posts">{details.posts.map(item => <button type="button" className="bpv-post" key={item.id} aria-label={publicPostAriaLabel(item)} onClick={() => { setPost(item); setMediaIndex(0); }}><ProfileMedia key={`${item.id}-${item.media[0]?.url || "empty"}`} thumbnail ui={ui} media={item.media[0]} alt={`${name} ${ui.post}`}/>{item.featured === true && <span className="bpv-featured-mark" aria-label={lang === 'ru' ? 'Избранная работа' : lang === 'en' ? 'Featured work' : 'Tanlangan ish'}>★</span>}{item.media.length > 1 && <span className="bpv-media-count">{item.media.length}</span>}</button>)}</div> : <p className="bpv-notice">{ui.noPosts}</p>)}
+        {tab === 'services' && <InlineBooking barber={barber} details={details} bookingsPath="/user/bookings"/>}
+        {tab === 'hours' && (details.hours.length ? <div className="bpv-schedule"><p className="bpv-timezone">{ui.timezone}</p>{[1,2,3,4,5,6,0].map(day => { const hours = details.hours.find(item => item.day_of_week === day);return <div className={`bpv-hours-row${hours ? '' : ' is-off'}`} key={day}><span>{ui.days[day]}</span><strong>{hours ? `${hours.start_time} – ${hours.end_time}` : ui.off}</strong></div>; })}</div> : <p className="bpv-notice">{ui.noHours}</p>)}
+        {tab === 'reviews' && <div className="bpv-reviews">{details.reviews.length ? details.reviews.map(review => <article className="bpv-review" key={review.id}><strong>{review.customer || ui.customer}</strong><span className="bpv-review-stars"><Icon name="star" size={15} filled/>{review.rating}/5</span><p>{review.text || ui.noText}</p>{review.reply && <div><b>{ui.reply}</b><p>{review.reply}</p></div>}</article>) : <p className="bpv-notice">{ui.noReviews}</p>}</div>}
+      </>}
+    </section>
+    <Sheet open={!!post} title={ui.postTitle} className="bpv-post-modal" onClose={() => setPost(null)}>{post && <div className="bpv-post-detail"><div className="bpv-post-author"><VerifiedAvatar verified photo={barber.avatar_url} name={name} size={34}/><strong>{name}</strong></div><ProfileMedia key={`${post.id}-${mediaIndex}`} ui={ui} media={post.media[mediaIndex]} alt={`${name} ${ui.post}`}/>{post.media.length > 1 && <div className="bpv-media-switch" role="group" aria-label={ui.postImages}>{post.media.map((item,index) => <button type="button" key={index} aria-pressed={index === mediaIndex} onClick={() => setMediaIndex(index)}>{index + 1}</button>)}</div>}{post.caption && <p>{post.caption}</p>}{post.createdAt && <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>}</div>}</Sheet>
+  </div>;
 }
 
 export default function BarberPublicProfile() {
   const { id } = useParams();
-  const [params] = useSearchParams();
   const location = useLocation();
-  const { profile: viewer } = useOutletContext();
-  const base = location.pathname.startsWith("/demo") ? "/demo" : "/user";
-  const backTo =
-    location.state?.from?.startsWith(`${base}/`) ||
-    location.state?.from === base
-      ? location.state.from
-      : `${base}/explore?demo=1&type=barbers`;
-  const barber =
-    params.get("demo") === "1"
-      ? sampleBarbers.find((item) => item.id === id)
-      : null;
-  const details = barber ? sampleBarberDetails[id] : null;
-  if (!barber || !details)
-    return (
-      <div className="bpv-page bpv-empty">
-        <h1>Usta profili topilmadi</h1>
-        <p>Bu profil hali mavjud emas yoki serverdan yuklanmagan.</p>
-        <Link to={base}>Bosh sahifaga qaytish</Link>
-      </div>
-    );
-  const viewerId = viewer.phone || viewer.id || "demo-viewer";
-  return (
-    <ProfileContent
-      key={`${id}:${viewerId}`}
-      barber={barber}
-      details={details}
-      backTo={backTo}
-      viewer={viewer}
-      viewerId={viewerId}
-    />
-  );
+  const lang = readSiteLocale(location.search);
+  const ui = publicProfileUi(lang);
+  useOutletContext(); // Optional for guest route, where no customer layout is mounted.
+  const customerRoute = location.pathname.startsWith("/user/");
+  const [request, setRequest] = useState({ id: null, status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    loadBarberProfile(id, { token: customerRoute && getSession()?.role === "customer" ? getSession()?.token : undefined, signal: controller.signal })
+      .then((data) => { if (active) setRequest({ id, status: "ready", ...data }); })
+      .catch((error) => {
+        if (active) setRequest({ id, status: error.status === 404 && error.resource !== "services" ? "not_found" : "error", message: error.status === 401 ? ui.loginRequired : ui.error });
+      });
+    return () => { active = false; controller.abort(); };
+  }, [id, attempt, customerRoute, lang]);
+  const isCustomerRoute = location.pathname.startsWith('/user/');
+  const baseExplore = siteLocalePath(isCustomerRoute ? '/user/explore?type=barbers' : '/explore?type=barbers', lang);
+  const backTo = typeof location.state?.from === 'string'
+    && (/^\/user\/explore(?:\?|$)/.test(location.state.from) && isCustomerRoute
+      || /^\/explore(?:\?|$)/.test(location.state.from) && !isCustomerRoute)
+    ? siteLocaleSwitchUrl({ pathname: location.state.from.split('?')[0], search: location.state.from.includes('?') ? '?' + location.state.from.split('?').slice(1).join('?') : '' }, lang) : baseExplore;
+  const current = request.id === id ? request : { status: "loading" };
+  if (current.status === "loading") return <div className="bpv-page" aria-busy="true"><Link className="ex-back" to={backTo}><ArrowIcon direction="left" /> {ui.back}</Link><PageLoading label={ui.loading} /></div>;
+  if (current.status === "error") return <div className="bpv-page bpv-empty" role="alert"><h1>{ui.loadFailed}</h1><p>{current.message}</p><button className="ex-action" type="button" onClick={() => { setRequest({ id, status: "loading" }); setAttempt((value) => value + 1); }}>{ui.retry}</button><Link to={backTo}>{ui.back}</Link></div>;
+  if (current.status === "not_found" || !current.barber || !current.details) return <div className="bpv-page bpv-empty"><h1>{ui.notFound}</h1><p>{ui.notFoundHint}</p><Link to={backTo}>{ui.back}</Link></div>;
+  return <>{!customerRoute && <p className="bpv-guest-note" role="note">{ui.guest}</p>}<ProfileContent key={id} barber={current.barber} details={current.details} backTo={backTo} onRetry={() => { setRequest({ id, status: "loading" }); setAttempt(value => value + 1); }} /></>;
 }

@@ -1,46 +1,103 @@
-name: Deploy frontend to GitHub Pages
+name: Deploy verified frontend to GitHub Pages
 
+# v56: A direct push must NEVER deploy unverified code. The upstream job runs
+# the full backend/frontend/PG checks and fails closed when tests were skipped.
 on:
-  push:
+  workflow_run:
+    workflows:
+      - USTARA v55 isolated verification
+    types: [completed]
     branches: [main]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/deploy-pages.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read # read only the sanitized report from the upstream verified run
   pages: write
   id-token: write
 
+# Serialize ALL main deployments across different SHAs. Never allow a later
+# stale workflow_run webhook to cancel an already-running newer deployment.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: ustara-pages-main
+  cancel-in-progress: false
 
 jobs:
   build:
+    # PR/fork/dispatch workflow_runs are never eligible to deploy.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exactly the verified commit
         uses: actions/checkout@v4
-      - name: Setup Node.js
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Verify exact commit and current main SHA
+        uses: actions/github-script@v7
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const main = await github.rest.repos.getBranch({
+              owner: context.repo.owner, repo: context.repo.repo, branch: 'main'
+            });
+            if (main.data.commit.sha !== process.env.VERIFIED_SHA) {
+              core.setFailed('Verified commit is no longer main HEAD; no deploy');
+            }
+      - name: Retrieve sanitized proof from the exact upstream CI run
+        uses: actions/download-artifact@v4
+        with:
+          name: ustara-v58-ci-summary-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/ustara-verified
+      - name: Verify CI result, commit and production API configuration
+        shell: bash
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERIFIED_RUN_ID: ${{ github.event.workflow_run.id }}
+          VERIFIED_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          node frontend/scripts/verify-pages-evidence.mjs "$RUNNER_TEMP/ustara-verified/ci-summary.json"
+      - name: Check out verified commit integrity
+        shell: bash
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
+      - name: Setup Node.js for package-free artifact verification
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install dependencies
-        run: npm ci
-        working-directory: frontend
-      - name: Build
-        run: npm run build
-        working-directory: frontend
-      - name: Add SPA route fallback
-        run: cp dist/index.html dist/404.html
-        working-directory: frontend
+          node-version: '22'
+      - name: Download exact build produced by the verified upstream CI attempt
+        uses: actions/download-artifact@v4
+        with:
+          name: ustara-v62-pages-build-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: frontend/dist
+      - name: Verify exact CI-built tree, SPA fallback and SHA-256 before publication
+        shell: bash
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERIFIED_RUN_ID: ${{ github.event.workflow_run.id }}
+          VERIFIED_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          node frontend/scripts/verify-ci-build.mjs "$RUNNER_TEMP/ustara-verified/ci-summary.json" frontend/dist
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+      - name: Upload verified build artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
@@ -52,6 +109,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Re-check main HEAD before deployment
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Re-check current main before Pages deploy
+        uses: actions/github-script@v7
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const main = await github.rest.repos.getBranch({
+              owner: context.repo.owner, repo: context.repo.repo, branch: 'main'
+            });
+            if (main.data.commit.sha !== process.env.VERIFIED_SHA) {
+              core.setFailed('Main moved since CI verification; no deploy');
+            }
+      - name: Verify exact SHA in deployment job
+        shell: bash
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
+      - name: Deploy verified commit to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -69,7 +69,7 @@ const PERKS = [
   {
     icon: "pin",
     title: "Yaqin atrofda",
-    text: "GPS orqali sizga eng yaqin ustalar",
+    text: "GPS orqali sizga eng yaqin sartaroshlar",
   },
   {
     icon: "image",
@@ -92,7 +92,7 @@ const STEPS = [
   {
     icon: "scissors",
     title: "Sartaroshni tanlang",
-    text: "Yaqin ustalar ro'yxatidan ishlari va sharhlariga qarab tanlang.",
+    text: "Yaqin sartaroshlar ro'yxatidan ishlari va sharhlariga qarab tanlang.",
   },
   {
     icon: "clock",
@@ -141,7 +141,7 @@ function Home() {
           </p>
 
           <div className="hm-actions">
-            <Link to="/signup" className="hm-btn hm-btn-primary">
+            <Link to="/explore" className="hm-btn hm-btn-primary">
               Sartarosh topish
               <ArrowIcon />
             </Link>
@@ -233,7 +233,7 @@ function Home() {
             ))}
           </ul>
 
-          <Link to="/signup/usta" className="hm-btn hm-btn-primary">
+          <Link to="/signup/sartarosh" className="hm-btn hm-btn-primary">
             Sartarosh sifatida boshlash
             <ArrowIcon />
           </Link>

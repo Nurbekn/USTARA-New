@@ -1,0 +1,25 @@
+{
+  "version": "v184",
+  "source": "USTARA-v183-185-Privacy-Center-Own-Data-Export.zip",
+  "sourceFiles": 1429,
+  "sourceFilesRemoved": [],
+  "sourceFilesModified": [
+    "USTARA-New/backend/package.json",
+    "USTARA-New/backend/scripts/v182-prune-private-notes.cjs"
+  ],
+  "newFilesBeforeManifest": [
+    "USTARA-New/backend/services/privateNoteRetentionV184.js",
+    "USTARA-New/backend/test/v184PrivateNoteRetention.unit.test.js",
+    "USTARA-New/docs/v184-private-note-retention-safety.md",
+    "USTARA-New/docs/v184-test-results.md"
+  ],
+  "protectedSqlAndDecisionFileCount": 64,
+  "protectedFilesUnchanged": true,
+  "tests": {
+    "backendTargeted": "25/25 PASS",
+    "backendFull": "1709/1738 PASS (29 missing dependency failures)",
+    "frontendFull": "1715/1715 PASS"
+  },
+  "databaseDeletionExecuted": false,
+  "productionReady": false
+}

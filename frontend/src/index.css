@@ -226,3 +226,19 @@ h4 {
 .dm-section-heading a { display: inline-flex; align-items: center; gap: var(--space-2); }
 
 .ub-row-arrow { display: inline-flex; align-items: center; justify-content: center; }
+
+/* v141: compact, keyboard accessible language selection in every navigation shell */
+.ustara-site-language { display: inline-flex; align-items: center; min-width: 0; }
+.ustara-site-language select { max-width: 120px; min-height: 36px; padding: 5px 8px; border: 1px solid var(--border, #526078); border-radius: 9px; background: var(--surface, #162135); color: var(--text, #fff); font: inherit; font-size: 12px; cursor: pointer; }
+.ustara-site-language select:focus-visible { outline: 2px solid var(--primary, #60a5fa); outline-offset: 2px; }
+.ustara-site-language select option { color: #111827; background: #fff; }
+/* Keep header controls reachable on compact phones without changing the five-tab order. */
+.ustara-site-language .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.navbar-right .ustara-site-language select { max-width: 92px; }
+.uc-header-inner .ustara-site-language select, .bx-top-right .ustara-site-language select { max-width: 104px; }
+@media (max-width: 410px) {
+  .navbar-right { gap: 5px; }
+  .navbar-right .ustara-site-language select { max-width: 76px; padding-inline: 3px; font-size: 11px; }
+  .navbar-right .navbar-signup--top { min-width: 0; padding-inline: 9px; font-size: 12px; }
+  .uc-header-inner .ustara-site-language select, .bx-top-right .ustara-site-language select { max-width: 84px; padding-inline: 4px; }
+}

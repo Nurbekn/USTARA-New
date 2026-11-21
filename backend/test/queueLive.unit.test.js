@@ -1,0 +1,62 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {estimateWait,typicalMinutes}=require('../services/queueLiveEstimate');
+const dbPath=require.resolve('../db');
+require.cache[dbPath]={id:dbPath,filename:dbPath,loaded:true,exports:{}};
+const {createPublicSummary}=require('../controllers/queuePublicController');
+const {createHandlers,tokenHash,requestHash}=require('../controllers/walkinQrController');
+const {publicQrRateLimit}=require('../middleware/qrPublicRateLimit');
+const res=()=>{const state={status:200,body:null,headers:{}};return {status(n){state.status=n;return this;},json(x){state.body=x;return this;},set(k,v){state.headers[k]=v;return this;},state};};
+const data=rows=>({rows,rowCount:rows.length});
+test('ETA returns a bounded, visibly approximate range; no exact booked time',()=>{
+ assert.equal(typicalMinutes(0),20);
+ assert.equal(typicalMinutes(31),35);
+ assert.equal(typicalMinutes(10000),90);
+ assert.deepEqual(estimateWait(1,false,20),{min_minutes:0,max_minutes:30,approximate:true});
+ assert.deepEqual(estimateWait(2,true,20),{min_minutes:15,max_minutes:90,approximate:true});
+ assert.equal(estimateWait(0,true,20),null);
+ assert.equal(estimateWait(NaN,true,20),null);
+});
+test('public summary exposes only waiting count, current call and coarse ETA',async()=>{
+ let sql='',args;
+ const h=createPublicSummary({query:async(q,a)=>{sql=q;args=a;return data([{id:7,waiting_count:3,has_called:true,day_closed:false,typical_minutes:25,as_of:new Date()}]);}});
+ const response=res();await h({params:{barberId:'7'}},response);
+ assert.equal(response.state.status,200);assert.equal(response.state.body.barber_id,7);
+ assert.equal(response.state.body.waiting_count,3);assert.equal(response.state.body.currently_called,true);
+ assert.deepEqual(response.state.body.new_arrival_estimate,estimateWait(4,true,25));
+ assert.equal(response.state.headers['Cache-Control'],'no-store');
+ assert.deepEqual(args,[7]);assert.match(sql,/b.verification_status='approved'/);
+ assert.match(sql,/queue_date=/);assert.match(sql,/is_active/);
+ assert.ok(!Object.keys(response.state.body).some(k=>/label|ticket|user|booking_count|request_key/.test(k)));
+});
+test('anonymous reader cannot enumerate unapproved barber queue or access invalid IDs',async()=>{
+ let n=0;const h=createPublicSummary({query:async()=>{n++;return data([]);}});
+ let r=res();await h({params:{barberId:'0'}},r);assert.equal(r.state.status,400);
+ r=res();await h({params:{barberId:'abc'}},r);assert.equal(r.state.status,400);
+ r=res();await h({params:{barberId:'1e4'}},r);assert.equal(r.state.status,400);assert.equal(n,0);
+ r=res();await h({params:{barberId:'9'}},r);assert.equal(r.state.status,404);
+});
+test('QR status gives only its secret holder private position and called/finished state',async()=>{
+ const raw='d'.repeat(48),key='a'.repeat(32),base={status:'approved',pending_live:true,created_at:new Date(),position:2,queue_status:'waiting',queue_today:true,has_called:true,typical_minutes:20};
+ let row=base,sql,bindings;
+ const h=createHandlers({query:async(q,a)=>{sql=q;bindings=a;return data([row]);}});
+ const call=async()=>{const response=res();await h.requestStatus({body:{token:raw,request_id:key}},response);return response.state;};
+ let r=await call();assert.equal(r.status,200);assert.equal(r.body.status,'approved');
+ assert.equal(r.body.queue_status,'waiting');assert.equal(r.body.position,2);assert.ok(r.body.estimated_wait);
+ assert.deepEqual(bindings,[tokenHash(raw),requestHash(key)]);
+ assert.match(sql,/ROW_NUMBER\(\) OVER/);assert.match(sql,/queue_position ASC NULLS LAST/);
+ assert.ok(!Object.keys(r.body).some(k=>/label|barber_id|queue_entry_id|request_key/.test(k)));
+ row={...base,queue_status:'called',position:null};r=await call();assert.equal(r.body.queue_status,'called');assert.equal(r.body.position,null);
+ row={...base,queue_status:'served'};r=await call();assert.equal(r.body.estimated_wait,null);
+ row={...base,status:'rejected'};r=await call();assert.deepEqual(r.body,{status:'rejected'});
+ row={...base,status:'pending'};r=await call();assert.deepEqual(r.body,{status:'pending'});
+});
+test('public queue endpoint uses isolated IP-based limiter and does not bypass private routes',async()=>{
+ const routes=require('../routes/queue').stack.filter(x=>x.route);
+ assert.equal(routes[0].route.path,'/public/:barberId');
+ assert.equal(routes[0].route.stack[0].handle,publicQrRateLimit);
+ assert.deepEqual(routes.slice(1,3).map(x=>x.route.path),['/qr-requests','/qr-status']);
+ assert.ok(routes.slice(0,6).every(x=>x.route.stack[0].handle.name==='publicQrRateLimit'));
+ assert.ok(routes.slice(6).every(x=>x.route.stack[0].handle.name==='authMiddleware'));
+});

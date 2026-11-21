@@ -1,0 +1,186 @@
+raqam,qaror,asosiy_bosqich,holat,dalil_yoki_izoh
+1,Bosh sahifa kartalari adaptiv,6,Tekshiruv kerak,
+2,Sartarosh bosh paneli,6,Tekshiruv kerak,
+3,Instagram uslubidagi sartarosh profili,6,Tekshiruv kerak,
+4,Ilhom tasma postlari va reaksiyalari,8,Tekshiruv kerak,
+5,Bir nechta xizmatni bir bron bilan olish,3,Qisman: v28 Smart Booking 2–20 xizmatni bitta bron bilan tasdiqlaydi,"v28 QR accepted taklifida total duration aynan openingga teng, har bir xizmat serverdan qayta olinadi; ordered booking_services price/name snapshots. Umumiy normal booking oldin bor edi; real PG/E2E qolgan."
+6,Bitta sahifadagi kalendar va 5 daqiqalik slotlar,3,Qisman: v10 yagona 5 daqiqalik slot grid,Single/multi availability kelishildi; real PostgreSQL va E2E hali yo‘q
+7,Platforma Admin boshqaruv markazi,9,Tekshiruv kerak,
+8,Kunlik jadval tanaffus va maxsus kunlar,3,Qisman: v18 maxsus kunlar; v19 haftalik/ko‘p tanaffus,"v18 calendar-exceptions + v19 break-rules API/UI, 32 migratsiya; 367 backend, 143 frontend unit test. Real PostgreSQL/browser E2E hali yo‘q."
+9,Sartarosh bronlar ro‘yxati va kalendari,6,Tekshiruv kerak,
+10,Sayt va Telegram real-time bildirishnomalari,5,Tekshiruv kerak,
+11,Xizmatlarni tahrirlash va faolligini boshqarish,3,Tekshiruv kerak,
+12,Portfolio foto va video ishlari,8,Tekshiruv kerak,
+13,Tasdiqlangan tashrifdan keyin baho va javob,8,Tekshiruv kerak,
+14,Tasdiqlangan manzil va xarita,6,Tekshiruv kerak,
+15,Mavjud profil uslubi va tahrirlash,6,Tekshiruv kerak,
+16,Smart Search qidirish va filtrlar,6,Tekshiruv kerak,
+17,Sartarosh belgilagan bekor qilish qoidalari,3,"Qisman: v17 sartarosh belgilaydigan cancellation muddati va izohi, bron paytidagi DB snapshot, mijoz oldindan ko‘radigan UI va server deadline tekshiruvi qo‘shildi","v17: backend/controllers/cancellationPolicyController.js, services/bookingStatusService.js, services/cancellationTerms.js, 20261201_cancellation_policy.sql, frontend InlineBooking/Schedule/Bookings, 351 backend va 137 frontend testlar. Real PostgreSQL va browser E2E tekshiruvi HALI YO‘Q; jarima/onlayn to‘lov yo‘q."
+18,Smart Booking eslatma va kechikish,4,Tekshiruv kerak,
+19,Bo‘shagan vaqt taklifi 5 daqiqa amal qiladi,4,Qisman: v28 Smart Booking haqiqiy ko‘p xizmatli tasdiq,"5 min QR offer + 2 min customer JWT va QR proof; v28 service_ids (2–20 tagacha), duration equality va server price; 38 migratsiya. Real PG/Telegram mobil E2E yo‘q."
+20,Takliflar ketma-ket mos mijozga yuboriladi,4,Qisman: v28 tasdiqlashda ko‘p xizmat; QR FIFO saqlandi,Ketma-ket QR waiting; opt-in Telegram callback alohida; v28 1–20 xizmatning umumiy davomiyligi bo‘shagan vaqtga teng. Manual walk-in hali avtomatik taklif olmaydi.
+21,Takliflar bugungi jadvalda ko‘rinadi,4,Qisman: v27 barber ro‘yxatida booking/Telegram delivery,"Barber Queue UI ochilgan vaqt, tasdiqlangan booking ID va Telegram outbox statusini ko‘radi; to‘liq kalendar/timeline integratsiya qolgan."
+22,Xizmat tugagach vaqtni qayta taqsimlash,4,Tekshiruv kerak,
+23,Keldi Boshladi Tugadi va kelmadi holatlari,4,Tekshiruv kerak,
+24,Smart Booking markaziy Admin qoidalari,9,Tekshiruv kerak,
+25,Telegram va saytda taklifning bitta natijasi,5,Tekshiruv kerak,
+26,Walk-in navbatga tez qo‘shish,4,Qisman: v21 manual + v22 QR so‘rovi,Walk-in manual join va bir martalik QR bilan guest pending; faqat barber approve bo‘lganda queue INSERT. PostgreSQL/E2E pending.
+27,Mijoz jonli navbati va joyidagi QR,4,Qisman: v24 QR shaxsiy navbat holati,"QR token + request receipt egasiga navbat o‘rni, kutish ETA va chaqirish/served/missed/left; 15s polling. Mobile E2E va real DB sinovi qolgan."
+28,QR mehmon so‘rovi va sartarosh tasdig‘i,4,Qisman: v22 QR + barber tasdiq,"192-bit one-use token, SHA256 hash, public pending, barber approve/reject, atomic queue audit; test DB va mobile E2E hali yo‘q. v23: QR amal muddatini Admin 1–120 daqiqaga belgilaydi; faqat yangi kodlar; admin audit. PostgreSQL/E2E hali yoʻq."
+29,Walk-in tasdiq kutayotganlar ro‘yxati,4,Qisman: v22 pending QR ro‘yxati,Barber GET /api/queue/qr-pending va Navbat UI; begona barber/mijoz ko‘rolmaydi. Real PostgreSQL testi SKIP.
+30,Walk-in navbati bo‘shagan vaqt uchun ustuvor,4,Qisman: v27 QR waiting FIFO prioritet va booking,QR approved waiting mijozlardan boshlaydi; customer JWT bilan aniq duration/price tanlash shart. Qo‘lda walk-in nomzodlari hali qilinmagan.
+31,"FIFO navbat, qo‘lda yakuniy qaror",4,Qisman: v21 FIFO + v23 sababli override,"Barber only, transaction/advisory lock, eski roʻyxatni tekshiradi, manual reorder sabab va alohida audit. Real DB/E2E hali yoʻq."
+32,Navbatni qo‘lda o‘zgartirish,4,Qisman: v23 qoʻlda yuqori/pastga surish,"PATCH /api/queue/:id/reorder va Navbat UI, 10-200 belgi sabab, eski order 409, queue_position; real DB/E2E qolgan."
+33,Navbat tartibi sababi va audit,4,Qisman: v23 reorder reason audit,"walkin_queue_reorder_events: barber/entry/actor/old/new/reason va vaqt. Transaction rollback, unit tests PASS; DB integration SKIP."
+34,Ish kunining oxirida navbat himoyasi,4,Qisman: v21–v22 ish kuni himoyasi,Guest QR va barber approve vaqtida ochiq jadval tekshiriladi; eski navbatlar majburan bekor qilinmaydi.
+35,Mijozga navbat soni va taxminiy vaqt,4,Qisman: v24 public jonli navbat,"Approved barber uchun GET /api/queue/public/:id: walk-in soni, called indikatori va qo‘pol kutish oralig‘i (30s refresh); booking soni yoki ism ko‘rsatilmaydi. Haqiqiy DB/E2E hali yo‘q."
+36,Vertikal rangli bron timeline,6,Tekshiruv kerak,
+37,Bronlarim kelajak va tarix,6,Tekshiruv kerak,
+38,Kuzatilgan sartaroshlar Home boshida,6,Tekshiruv kerak,
+39,Real-time chat va post ulashish,8,Tekshiruv kerak,
+40,Chat tezkor javoblar va keyingi AI,8,Tekshiruv kerak,
+41,AI va odam chatini farqlash,8,Tekshiruv kerak,
+42,Profil bron qilish tugmasining ustuvorligi,6,Tekshiruv kerak,
+43,"Belgilangan reklamalar, onlayn to‘lovsiz",6,Tekshiruv kerak,
+44,Admin reklama kampaniya boshqaruvi,9,Tekshiruv kerak,
+45,Sartarosh tasdiqlanishi Admin orqali,9,Tekshiruv kerak,
+46,Sartarosh badge toifalari,9,Tekshiruv kerak,
+47,Badge Admin tekshiruv dalillari,9,Tekshiruv kerak,
+48,Badge nazorat va bekor qilish,9,Tekshiruv kerak,
+49,Dalilli shikoyat va apellyatsiya,9,Tekshiruv kerak,
+50,Sartarosh statistikasi taxminiy tushum,6,Tekshiruv kerak,
+51,No-showdan adolatli himoya,4,Tekshiruv kerak,
+52,Bron narx vaqt va manzil snapshoti,3,Qisman: v11 narx quote tekshiruvi va bron snapshoti unit testlari o‘tgan; real PostgreSQL E2E qolgan,"backend/services/bookingSelection.js, services/multiBooking.js, frontend/InlineBooking.jsx va price snapshot testlar; boshqa qaror elementlari keyin"
+53,Xavfsiz bronlarni avtomatik tasdiqlash,3,"Qisman dalil bor, to‘liq tekshirilmagan",backend/controllers/bookingsController.js va backend/services/multiBooking.js — auto-confirm; real DB sinovi kerak
+54,Sartarosh kela olmasa muqobil takliflar,3,Tekshiruv kerak,
+55,Ta’til va bronlar himoyasi,3,Qisman: v18 ta’tilni bronni buzmasdan rejalash,Mavjud faol bron bilan konflikt 409/rollback; 90 kungacha bir tranzaksiyada ta’til; real DB sinovi hali yo‘q
+56,Tasdiqlangan bron narxi o‘zgarmaydi,3,Qisman: v11 narx quote tekshiruvi va bron snapshoti unit testlari o‘tgan; real PostgreSQL E2E qolgan,"backend/services/bookingSelection.js, services/multiBooking.js, frontend/InlineBooking.jsx va price snapshot testlar; boshqa qaror elementlari keyin"
+57,Sartarosh aksiyalari va natijalari,7,Tekshiruv kerak,
+58,Mobilga mos qoramtir ko‘k dizayn,6,Tekshiruv kerak,
+59,Loading xatolik va offline kesh,6,Tekshiruv kerak,
+60,Mijoz beshta navigatsiya bo‘limi,6,Qisman: v33 mijozning 5 navigatsiya bo‘limi nomi va tartibi kelishuvga mos,"frontend/src/layouts/UserLayout.jsx — Asosiy, Sartaroshlar, Ilhom, Bronlar, Profil; Sartaroshlar havolasi /user/explore?type=barbers. 5 ta UI bo‘limini mobil E2E tekshirish kerak."
+61,Sartarosh beshta navigatsiya bo‘limi,6,Qisman: v21 kelishilgan 5 barber tabi,Bosh/Bronlar/Navbat/Xizmatlar/Profil tablari; Jadval/Ishlarim Home shortcutlarida. Mobil E2E hali yo‘q.
+62,Admin desktop sidebar,9,Tekshiruv kerak,
+63,Admin dashboard ko‘rsatkichlari,9,Tekshiruv kerak,
+64,Admin akkauntlar va xavfsizlik,9,Tekshiruv kerak,
+65,Admin sartarosh monitoringi,9,Tekshiruv kerak,
+66,Admin Booking Control Center,9,Tekshiruv kerak,
+67,Admin Telegram Control Center,9,Tekshiruv kerak,
+68,Admin System Control va rollback,9,Tekshiruv kerak,
+69,Demo va avtomatlashtirilgan test markazi,10,Tekshiruv kerak,
+70,Monitoring xizmatlar va ogohlantirish,9,Tekshiruv kerak,
+71,Xavfsiz zaxira va tiklash,10,Tekshiruv kerak,
+72,Bosqichli deployment va rollback,10,Tekshiruv kerak,
+73,Feature flags va bosqichli chiqarish,9,Tekshiruv kerak,
+74,Ixtiyoriy onboarding,6,Tekshiruv kerak,
+75,Smart Support yordam markazi,6,Tekshiruv kerak,
+76,O‘zbek rus ingliz tillari va Admin tarjimasi,6,Tekshiruv kerak,
+77,Mavjud signup va qisqa onboarding,2,Tekshiruv kerak,
+78,Kontekst onboarding ko‘rsatmalari,6,Tekshiruv kerak,
+79,Media optimallashtirish,8,Tekshiruv kerak,
+80,Shaxsiy va hamkorlikdagi to‘plamlar,8,Tekshiruv kerak,
+81,Professional Ilhom post muharriri,8,Tekshiruv kerak,
+82,Izoh javob pin va spam moderatsiyasi,8,Tekshiruv kerak,
+83,Admin kontent moderatsiyasi,9,Tekshiruv kerak,
+84,Security Center va sessiyalar,2,"Qisman (device sessions v7, DB tekshirish kerak)","v7: deviceSessions.js; account_device_sessions migration 20261128; login va ro‘yxatdan o‘tish uchun sid; authMiddleware sid revocation tekshiruvi; GET /api/auth/sessions/devices; POST /api/auth/sessions/devices/:id/revoke; DeviceSessionsPanel; offline unit test. Eski JWT 7 kunlik legacy rejimda; DB/browser integratsiyasi hali bajarilmagan. | v8: test/stage2AccountRecovery.postgres.integration.test.js qo‘shildi, authMiddleware inject test pool (production tekshiruvi o‘zgarmadi); real DB suite hali SKIP."
+85,Sartarosh offline amallari xavfsiz sinxron,4,Tekshiruv kerak,
+86,Smart Client Card shaxsiylik bilan,6,Tekshiruv kerak,
+87,Qayta bron qilish va sevimli to‘plamlar,6,Tekshiruv kerak,
+88,Mijoz bron izohi va ilova rasmi,3,Tekshiruv kerak,
+89,Smart Review kriteriyalar va moderatsiya,8,Tekshiruv kerak,
+90,Advanced Break Manager,3,Qisman: v19 ko‘p interval va takrorlanuvchi Break Manager,"v19 weekly/dated breaks server/UI, v20 real DB uchun opt-in concurrency regressiya testi tayyor. Real PostgreSQL hali sinovdan o‘tmadi."
+91,Portfolio tartibi va 6 ta pinned ish,8,Tekshiruv kerak,
+92,7 kunlik Smart Availability Explorer,6,Tekshiruv kerak,
+93,Profilni mijoz ko‘rinishida tekshirish,6,Tekshiruv kerak,
+94,Adolatli Smart Ranking,6,Tekshiruv kerak,
+95,2-3 sartarosh solishtirish,6,Tekshiruv kerak,
+96,Alohida kun yoki xizmat bronini pauza qilish,3,Tekshiruv kerak,
+97,Favorites va kuzatish,6,Tekshiruv kerak,
+98,Besh daqiqalik bron qoralamasi,3,Qisman: v15 guest draft + unit test,"5 daqiqalik sessionStorage qoralama, parol/JWT yozilmaydi; login va ro‘yxatdan o‘tishdan keyin tiklanadi, slot band emas. Real browser E2E qolgan."
+99,Bir sahifali progressiv booking,6,Qisman: v15 guest bir sahifali tanlov,Xizmat/sana/vaqt InlineBooking sahifasida tanlanadi; mobil brauzer E2E va barcha kutilgan UX holatlari qolgan.
+100,Server tasdig‘i bilan bron yakuniy oynasi,3,Qisman: v10 Telegram xatosi bronni bekor qilmaydi,Server commit va javob ajratildi; tasdiqlash UI E2E hali yo‘q
+101,Mijoz kechikishni xabar qilish,4,Tekshiruv kerak,
+102,"Mijoz check-in, sartarosh tasdig‘i",4,Tekshiruv kerak,
+103,Ixcham Smart Service Card,6,Tekshiruv kerak,
+104,Professional Finish Flow,4,Tekshiruv kerak,
+105,Bekor qilishdan keyin muqobil vaqtlari,3,Tekshiruv kerak,"v16 cancellation idempotent bo‘ldi, muqobil bo‘sh vaqtlarni taklif qilish hali qilinmagan"
+106,Xavfsiz bronni ko‘chirish,3,Qisman: v13 vaqt + xizmat tahriri UI/API,"GET replacement quote, atomar PATCH, old service-version check; real DB concurrency va E2E qolgan"
+107,Ommaviy profil havolasini ko‘rish,6,Tekshiruv kerak,
+108,Shaxsiy ustara.uz/@username havola,6,Tekshiruv kerak,
+109,"Sartarosh About, tajriba, sertifikat",6,Tekshiruv kerak,
+110,Bir sartarosh uchun ko‘p ish joyi,7,Tekshiruv kerak,
+111,Ko‘p xodimli sartaroshxona tashkiloti,7,Tekshiruv kerak,
+112,Egasi menejer sartarosh ruxsatlari,7,Tekshiruv kerak,
+113,Mavjud akkauntni jamoaga taklif,7,Tekshiruv kerak,
+114,Xodimni jamoatdan xavfsiz chiqarish,7,Tekshiruv kerak,
+115,Jamoa umumiy bron jadvali,7,Tekshiruv kerak,
+116,Sartaroshxona analitikasi,7,Tekshiruv kerak,
+117,Jamoa smenalari va tasdiqlash,7,Tekshiruv kerak,
+118,Jamoa ichidagi e’tirof,7,Tekshiruv kerak,
+119,O‘zbekiston uchun sodda bitta manzilli shop,7,Tekshiruv kerak,
+120,Sartaroshxona ommaviy profili,7,Tekshiruv kerak,
+121,Mijoz tasdiqlaydigan barber matching,3,Tekshiruv kerak,
+122,Jamoa xizmat katalogi va individual narxlar,7,Tekshiruv kerak,
+123,Sartaroshxona promo kampaniyalari,7,Tekshiruv kerak,
+124,Sartaroshxona galereyasi,7,Tekshiruv kerak,
+125,Sartaroshxona va barber baholari alohida,8,Tekshiruv kerak,
+126,Umumiy va shaxsiy walk-in navbat,4,Qisman: v29 individual walk-in akkauntga ixtiyoriy bog‘lash,"v21 barber-entered FIFO; v22 QR approvals; v29 manual ticket one-time hash-only claim (15min), customer JWT, account consent va revocation. Shop/jamoaviy navbat hamda real PG/mobil E2E hali bajarilmagan."
+127,Navbat ETA va chaqiruv xabarlari,4,Qisman: v27 alohida rozilikda Telegram taklifi va callback,"Navbat call push v25; v27 smart offer outbox/worker va a/r callback, 5min offer+2min customer login confirmation. Barchasi real PG/Telegram sinovini talab qiladi. v29: QRsiz manual mijoz rozilik bilan web Smart Booking taklifini oladi, Telegram avtomatik yoqilmaydi. Real PG/Telegram sinovi kerak. v31: Telegram callback consent+sent_at server lockidan keyin qayta tekshiriladi, stale button deny. Real PG/Telegram E2E hali yo‘q."
+128,Navbatdan ixtiyoriy chiqish,4,Qisman: v37 QR va oddiy navbatdan ixtiyoriy chiqish,"v37 POST /api/queue/qr-leave va /manual/:id/leave; navbat waiting/called -> left; unconfirmed Smart Booking bekor; QR uchun actor_source=qr_guest, manual uchun customer; 41-migratsiya va unit/UI testlar bor. Real PG va mobil E2E hali sinovdan o‘tmagan."
+129,Navbat chaqiruvi javob majburiy emas,4,"Qisman: v25 Telegram chaqiruvi, javob shart emas","Barber call-next FIFO, QR mehmon uni ticket holatida ko‘radi; mijozdan alohida tasdiq talab etilmaydi. v25: rozilik bergan mijozga Telegram chaqiruvi; mijozdan javob shart emas. Telegram/PG real test kutilmoqda."
+130,Boshqa sartaroshga rozilik bilan transfer,3,Tekshiruv kerak,
+131,Smart Notification Center,5,Tekshiruv kerak,
+132,Faqat slot bo‘shasa bildirish waitlist,4,Qisman: v30 faol taklifga bir vaqtning o‘zida bir entry,"v26 cancellation opening, v27 alohida Telegram opt-in, v29 manual consent, v30 pending+accepted uchun bitta active taklif partial UNIQUE. Real PG/Telegram va browser E2E hali tekshirilmagan."
+133,Smart Booking History,6,Tekshiruv kerak,
+134,Privacy Center,2,Tekshiruv kerak,
+135,Akkauntni vaqtincha faolsizlantirish,2,"Qisman bajarildi, real DB integratsiya tekshirilmagan","POST /api/auth/account/deactivate; login reactivate flag; parol bilan tasdiqlash, faol bron guard, JWT revocation, UI; 7 ta yangi unit test. 20261126_account_pause.sql migratsiyasi real PostgreSQLda bajarilmagan, queue integratsiyasi keyin. | v8: test/stage2AccountRecovery.postgres.integration.test.js qo‘shildi, authMiddleware inject test pool (production tekshiruvi o‘zgarmadi); real DB suite hali SKIP. | v34: Smart Booking confirm va manual queue claim/revoke user+customer FOR UPDATE OF c,u lock; 4 regression test PASS. Real PG/E2E hali sinovdan otmadi."
+136,Mehmon rejimi va vaqtincha tanlovlar,6,"Qisman: v15 guest profil, qidiruv va draft","Public approved barber katalogi, faol xizmatlar, ish vaqti va bo‘sh slotlar ochildi, login faqat commitda. Guest post/Ilhom va browser E2E hali cheklangan."
+137,Mijoz va sartarosh uchun alohida akkaunt,2,Tekshiruv kerak,
+138,Akkauntlar o‘rtasida oddiy chiqish kirish,2,Tekshiruv kerak,
+139,Bir telefon raqami faqat bitta akkaunt,2,"Qisman dalil bor, real DB tekshiruv kerak",Bitta telefon uchun users.phone UNIQUE bazaviy sxema; backend/test/authPolicy.unit.test.js va registrationService mavjud. PostgreSQL live E2E tekshirilmagan.
+140,Professional Account Recovery,2,Qisman: xavfsiz tiklash arizasi va Admin review qo‘shildi; real tasdiqlash va DB E2E qolgan,"v6 manualAccountRecoveryService/controller; POST /api/auth/account-recovery/start|status; Admin cases/review; frontend AccountRecovery; 20261127_manual_account_recovery.sql; 5 unit test o‘tdi. Bu so‘rov parol/telefonni tiklamaydi; identity proof va PostgreSQL integratsiyasi hali YO‘Q. | v8: test/stage2AccountRecovery.postgres.integration.test.js qo‘shildi, authMiddleware inject test pool (production tekshiruvi o‘zgarmadi); real DB suite hali SKIP."
+141,Smart Navigation 2GIS Yandex Google,6,Tekshiruv kerak,
+142,Smart Working Hours,6,Tekshiruv kerak,
+143,Smart Price Transparency,3,Qisman: v11 narx quote tekshiruvi va bron snapshoti unit testlari o‘tgan; real PostgreSQL E2E qolgan,"backend/services/bookingSelection.js, services/multiBooking.js, frontend/InlineBooking.jsx va price snapshot testlar; boshqa qaror elementlari keyin"
+144,Internet uzilganda Booking Recovery,3,Qisman: v9 server/frontend idempotency kod va unit test bor; real PostgreSQL sinovi yo‘q,Oldingi faol bronlar bilan to‘qnashuv va vaqt tekshiruvlari saqlangan
+145,Professional Booking Inbox,6,Tekshiruv kerak,
+146,Adaptive Booking Timeline,6,Tekshiruv kerak,
+147,Compact Client History,6,Tekshiruv kerak,
+148,Verified Sartaroshxona,7,Tekshiruv kerak,
+149,Safe Ownership Transfer,7,Tekshiruv kerak,
+150,Safe Block foydalanuvchilar orasida,8,Tekshiruv kerak,
+151,Smart Complaint Flow,9,Tekshiruv kerak,
+152,Safe No-Show tasdiqlash,4,Tekshiruv kerak,
+153,Safe Day Closing,4,Tekshiruv kerak,
+154,"Narx darhol kuchga kiradi, kelajak scheduler YO‘Q",3,Tekshiruv kerak,"Kelajak sanaga narx rejalash bekor, yangi narx hozirdan. Eski bron snapshoti saqlanadi"
+155,Egasi va ruxsatli menejer profilni tahrirlaydi,7,Tekshiruv kerak,
+156,Ko‘chish uchun maxsus workflow BEKOR,7,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+157,Xizmat tugadi uchun oddiy Ha Yo‘q tasdig‘i,4,"Qisman dalil bor, to‘liq tekshirilmagan",frontend kodida Ha/Yo‘q tasdiqlash qo‘shilgan; UI E2E tekshiruvi qolgan; murakkab Undo bekor qilingan
+158,Smart Image Optimization,8,Tekshiruv kerak,
+159,"Sartarosh telefoni ochiq, mijozniki o‘z bronida",6,"Qisman dalil bor, to‘liq tekshirilmagan",backend/controllers/bookingsController.js — tegishli telefon qaytishi mavjud; public phone tekshiruvi kerak
+160,Telefon orqali Quick Manual Booking,3,Tekshiruv kerak,
+161,Takrorlanuvchi tanaffuslar,3,Kod va unit test tayyor; DB/E2E qisman,"v19 weekly/dated breaks SQL/API/UI; v20 opt-in real PostgreSQL test kengaytirildi: rollback, effective breaks, booking-move concurrency. Test server yo‘qligi sabab SKIP; prod PASS emas."
+162,Smart Service Change mijoz boshlaydi,3,Qisman: v13 customer service-edit UI + server quote + PATCH,"Tanlangan xizmatlar, yangi narx/davomiylik, mos slotlar, expected_service_ids; real PostgreSQL va brauzer E2E hali qolgan"
+163,Sartarosh xizmat paytidagi alohida edit BEKOR,3,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+164,Manzil va tuman bo‘yicha qidiruv,6,Tekshiruv kerak,
+165,Smart Link Preview,8,Tekshiruv kerak,
+166,Takroriy akkaunt va sartaroshxona rad etiladi,2,Tekshiruv kerak,
+167,Ish vaqtini uzaytirish maxsus workflow BEKOR,3,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+168,Faqat o‘zi uchun bron qilish,3,Tekshiruv kerak,
+169,Mijozning vaqt to‘qnashuvchi bronlari taqiqlanadi,3,Qisman: v14 DB exclusion migratsiyasi va API 409 himoyasi,v14 exclusion constraint + API 409; v20 PostgreSQL bookingConcurrency testiga weekly-break vs booking-move parallel race qo‘shildi. Test hali DB server bo‘lmagani uchun SKIP.
+170,Barber matching qayta muhokamasi BEKOR,3,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+171,Portfolio muallifi ko‘rsatiladi,8,Tekshiruv kerak,
+172,Profil yashirish funksiyasi BEKOR,6,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+173,Mijozga faqat bo‘sh vaqt va navbat,6,Qisman: v20 customer privacy tuzatildi; navbat ETA va E2E qoldi,v20 GET available-slots: faqat o‘z profilidagi barber band intervallarni ko‘ra oladi; customer/guest/other barber faqat bo‘sh slotlarni oladi. Unit test PASS; real DB/browser va queue ETA hali yo‘q.
+174,Bron tafsilotida xarita va qo‘ng‘iroq,6,Tekshiruv kerak,
+175,Sartaroshxona yopilganda butunlay o‘chirish,7,Hozirgi backendda shop modeli topilmadi,backendda shop entity va shop deletion hozir mavjud emas
+176,Telefon orqali bron uchun alohida xabar shart emas,5,Tekshiruv kerak,
+177,Admin suspend qilsa bronlar xavfsiz boshqariladi,9,Tekshiruv kerak,
+178,Profildagi xatoni bir tugma bilan bildirish,9,Tekshiruv kerak,
+179,Private Booking Note,6,Tekshiruv kerak,
+180,Xizmat davomiyligi 5 daqiqalik qadam,3,Qisman: v10 5 daqiqalik validatsiya,Service input va tarixiy duration tekshiruvi; real DB sinovi qolgan
+181,Butun shop pauzasi HOZIRCHA KERAK EMAS,7,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+182,Profil preview takroriy savol BEKOR,6,Bekor qilingan yoki keyinga qoldirilgan,Foydalanuvchining so‘nggi qarori ustun; alohida workflow yaratilmadi
+183,Offline amalning oddiy saqlash holati,4,Tekshiruv kerak,
+184,"Faqat ochilgan slotlarga bron, kun limiti yo‘q",3,Tekshiruv kerak,
+185,Slot barcha mijozlar uchun ochiq,3,Tekshiruv kerak,

@@ -1,0 +1,132 @@
+{
+  "version": "v173",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 123,
+  "indexedNew": 7,
+  "indexedTotal": 130,
+  "notYetIndexed": 55,
+  "sourcePartiallyImplemented": 5,
+  "requirementsNotImplemented": 2,
+  "decisions": [
+    {
+      "id": 123,
+      "decision": "Sartaroshxona promo kampaniyalari",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Shop campaigns, budgets, eligibility and abuse controls are not implemented."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 124,
+      "decision": "Sartaroshxona galereyasi",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/shopGalleryV173.js",
+        "backend/database/migrations/20261227_shop_gallery_posts.sql",
+        "frontend/src/pages/shops/ShopGalleryV173.jsx",
+        "frontend/src/pages/shops/ShopPublicV172.jsx"
+      ],
+      "tests": [
+        "backend/test/v173ShopGallery.unit.test.js",
+        "frontend/test/v173ShopGallery.test.js"
+      ],
+      "missingImplementation": [
+        "Curated image posts from one owner. Multi-staff galleries, video curation, admin moderation and real PostgreSQL/Browser E2E remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 125,
+      "decision": "Sartaroshxona va barber baholari alohida",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Barber booking reviews exist, but salon-specific verified visits and separate rating rules do not."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 126,
+      "decision": "Umumiy va shaxsiy walk-in navbat",
+      "originalStatus": "Qisman: v29 individual walk-in akkauntga ixtiyoriy bog‘lash",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "backend/routes/queue.js"
+      ],
+      "tests": [
+        "backend/test/walkinQueue.unit.test.js",
+        "backend/test/manualQueueClaims.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Individual barber walk-in only, no shared shop queue or permission-scoped routing; PG/E2E unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 127,
+      "decision": "Navbat ETA va chaqiruv xabarlari",
+      "originalStatus": "Qisman: v27 alohida rozilikda Telegram taklifi va callback",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/queueLiveEstimate.js",
+        "backend/services/queueTelegramNotifications.js"
+      ],
+      "tests": [
+        "backend/test/v90PublicQueueEstimate.unit.test.js",
+        "backend/test/queueTelegramNotifications.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Estimated wait is approximate; Telegram/outbox real integrations not proven and shop-wide queue not implemented."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 128,
+      "decision": "Navbatdan ixtiyoriy chiqish",
+      "originalStatus": "Qisman: v37 QR va oddiy navbatdan ixtiyoriy chiqish",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/queueSelfExitController.js",
+        "backend/routes/queue.js"
+      ],
+      "tests": [
+        "backend/test/queueSelfExitV37.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Personal QR/manual self-exit exists, but shop-wide queue and real PG/browser tests remain."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 129,
+      "decision": "Navbat chaqiruvi javob majburiy emas",
+      "originalStatus": "Qisman: v25 Telegram chaqiruvi, javob shart emas",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "backend/controllers/queueTelegramController.js"
+      ],
+      "tests": [
+        "backend/test/walkinQueue.unit.test.js",
+        "backend/test/queueTelegramNotifications.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Call-next does not require customer acceptance; real Telegram and shop-specific queues unverified."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

@@ -1,0 +1,20 @@
+'use strict';
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+const audit = path.resolve(__dirname,'../scripts/v166-seven-guidance-decisions.mjs');
+test('v166 #74–#80 original source audit: #75/#76 counted only once',()=>{
+ const report=JSON.parse(execFileSync(process.execPath,[audit,'--json'],{encoding:'utf8'}));
+ assert.deepEqual(report.decisions.map(x=>x.id),[74,75,76,77,78,79,80]);
+ assert.deepEqual(report.alreadyIndexed,[75,76]);
+ assert.equal(report.previousSourceTraces,77);
+ assert.equal(report.reviewedDecisions,7);
+ assert.equal(report.newSourceTraces,5);
+ assert.equal(report.uniqueSourceTraces,82);
+ assert.equal(report.notYetTraced,103);
+ assert.equal(report.productionReady,false);
+ assert.equal(report.collaborativeCollections,'NOT_IMPLEMENTED');
+ assert.ok(report.decisions.every(x=>x.productionVerified===false));
+ assert.throws(()=>execFileSync(process.execPath,[audit,'--require-production'],{stdio:'pipe'}));
+});

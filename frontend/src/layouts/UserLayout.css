@@ -184,3 +184,20 @@
 
 .uc-nav-avatar { display: block; flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; object-fit: cover; outline: 2px solid transparent; outline-offset: 2px; }
 .uc-nav-item-active .uc-nav-avatar { outline-color: var(--accent); }
+
+/* Booking status inbox: authenticated live data, no placeholder notifications. */
+.uc-inbox-subtitle { color: var(--uc-muted); font-size: 13px; margin: -4px 0 12px; }
+.uc-inbox-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: min(340px, 50vh); overflow-y: auto; }
+.uc-inbox-items li a { display: grid; gap: 5px; padding: 12px; color: inherit; text-decoration: none; border-radius: 10px; }
+.uc-inbox-items li a:hover, .uc-inbox-items li a:focus-visible { background: rgba(80,140,230,.12); outline-offset: -2px; }
+.uc-inbox-items li span { color: var(--uc-muted); font-size: 12px; line-height: 1.4; }
+.uc-inbox-footer { display: block; padding-top: 12px; margin-top: 10px; border-top: 1px solid var(--uc-border); text-align: center; color: #68a7ff; font-size: 14px; text-decoration: none; }
+@media (max-width: 480px) { .uc-notification-panel { width: min(320px, calc(100vw - 24px)); padding: 14px; } }
+
+/* v174 #131: accessible, read-only current-status inbox filters. */
+.uc-inbox-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.uc-inbox-filters button, .uc-inbox-refresh { border: 1px solid var(--uc-border); background: transparent; border-radius: 9px; padding: 7px 9px; color: inherit; cursor: pointer; font: inherit; font-size: 12px; }
+.uc-inbox-filters button[aria-pressed="true"] { border-color: var(--accent); background: rgba(80,140,230,.15); }
+.uc-inbox-filters button:focus-visible, .uc-inbox-refresh:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uc-inbox-refresh { margin-bottom: 10px; }
+.uc-inbox-refresh:disabled { opacity: .5; cursor: default; }

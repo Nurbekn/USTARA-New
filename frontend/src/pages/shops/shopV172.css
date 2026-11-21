@@ -1,0 +1,20 @@
+.shop-v172{max-width:720px;margin:24px auto;padding:24px 18px;color:var(--text-primary,#eaf0fa);background:var(--surface,#12253e);border-radius:16px}
+.shop-v172 h1{font-size:1.6rem;margin:16px 0}.shop-v172 h2{font-size:1.05rem;margin-top:24px}.shop-v172-note{color:var(--text-secondary,#b3c5d9)}
+.shop-v172-form{display:grid;gap:18px}.shop-v172-form label{display:grid;gap:7px}.shop-v172-form input:not([type=checkbox]),.shop-v172-form textarea{width:100%;box-sizing:border-box;border:1px solid #6b84a2;border-radius:9px;padding:12px;color:inherit;background:#1b3654}
+.shop-v172-check{display:flex!important;align-items:center;gap:10px}.shop-v172-actions{display:flex;flex-wrap:wrap;gap:12px}.shop-v172 button,.shop-v172-cta{border-radius:10px;border:1px solid #759bc5;padding:10px 16px;color:inherit;background:#244b72;cursor:pointer}.shop-v172 button:disabled{opacity:.55;cursor:not-allowed}
+.shop-v172 address{font-style:normal;overflow-wrap:anywhere}.shop-v172 a{color:#a8d8ff}.shop-v172 a:focus-visible,.shop-v172 button:focus-visible{outline:3px solid #ffcf68;outline-offset:3px}
+
+/* v173: curated portfolio gallery — mobile-first, no new media upload. */
+.shop-v173-gallery{border-top:1px solid #516e89;margin-top:26px;padding-top:12px}
+.shop-v173-gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,155px),1fr));gap:12px;margin:14px 0}
+.shop-v173-gallery-card{margin:0;border:1px solid #54708c;border-radius:12px;padding:8px;min-width:0;background:#17304c}
+.shop-v173-gallery-card img{aspect-ratio:4/3;object-fit:cover;max-width:100%;width:100%;border-radius:7px;background:#20394f}
+.shop-v173-gallery-card label{display:flex;gap:8px;align-items:start;overflow-wrap:anywhere}
+.shop-v173-gallery-card figcaption{overflow-wrap:anywhere;font-size:.86rem}
+.shop-v173-gallery-move{display:flex;gap:6px;margin-top:6px}
+.shop-v173-gallery-move button{padding:5px 12px}
+.shop-v173-gallery-card input:focus-visible{outline:3px solid #ffcf68;outline-offset:2px}
+
+/* v179: visible, server-sourced author credit on public portfolio images. */
+.shop-v179-author{display:block;margin-top:6px;color:var(--text-secondary,#b3c5d9);font-size:.8rem;line-height:1.5}
+.shop-v179-author a{overflow-wrap:anywhere}

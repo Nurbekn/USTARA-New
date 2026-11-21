@@ -1,0 +1,40 @@
+{
+  "total": 185,
+  "sha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "originalUnchanged": true,
+  "counts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "examples": {
+    "verificationNeeded": [
+      1,
+      2,
+      3,
+      4,
+      7
+    ],
+    "partialEvidence": [
+      5,
+      6,
+      8,
+      17,
+      19
+    ],
+    "deferredOrCancelled": [
+      156,
+      163,
+      167,
+      170,
+      172
+    ],
+    "blockedOrUnknown": [
+      175
+    ]
+  },
+  "releaseReadiness": "NOT_VERIFIED",
+  "note": "This registry alone cannot prove production deployment or end-to-end functionality."
+}

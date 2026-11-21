@@ -1,0 +1,42 @@
+{
+  "version": "v177",
+  "sourceVersion": "v176",
+  "previousFileCount": 1374,
+  "oldFilesPreserved": true,
+  "oldFilesMissing": [],
+  "oldFilesChanged": [
+    "USTARA-New/.github/workflows/v55-verify.yml",
+    "USTARA-New/backend/routes/social.js",
+    "USTARA-New/frontend/src/pages/user/Social.css",
+    "USTARA-New/frontend/src/pages/user/Social.jsx",
+    "USTARA-New/frontend/src/pages/user/social/model.js",
+    "USTARA-New/frontend/test/v148CustomerJourneyLanguages.test.js"
+  ],
+  "protectedFilesUnchanged": 61,
+  "protectedFilesChanged": [],
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "indexedTotal": 158,
+  "notYetIndexed": 27,
+  "tests": {
+    "frontend": {
+      "passed": 1691,
+      "failed": 0
+    },
+    "backend": {
+      "passed": 1664,
+      "failed": 29,
+      "previousDependencyFailuresExpected": true
+    },
+    "targeted": {
+      "passed": 12,
+      "failed": 0
+    },
+    "sourceGraph": "PASS",
+    "jsxSyntax": "PASS"
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionBuild": "NOT_RUN",
+  "telegramE2E": "NOT_RUN",
+  "productionReady": false
+}

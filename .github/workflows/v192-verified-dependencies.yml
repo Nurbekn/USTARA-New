@@ -1,0 +1,56 @@
+name: USTARA v192 - verified dependency quality gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  backend-unit:
+    name: Backend unit tests with installed dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify dependency inventory
+        run: node scripts/v192-dependency-readiness.cjs backend
+      - name: Run full backend unit tests (no database)
+        run: npm run test:unit
+
+  frontend-unit-build:
+    name: Frontend unit tests and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify dependency inventory
+        run: node ../backend/scripts/v192-dependency-readiness.cjs frontend
+      - name: Run all frontend unit tests
+        run: npm run test:unit
+      - name: Verify frontend source graph
+        run: npm run preflight:graph
+      - name: Build frontend production assets
+        run: npm run build

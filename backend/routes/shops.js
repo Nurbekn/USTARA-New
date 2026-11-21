@@ -1,0 +1,14 @@
+const express=require('express');
+const auth=require('../middleware/authMiddleware');
+const {createSingleAddressShopHandlers}=require('../services/singleAddressShopV172');
+const routes=express.Router();
+const db=require('../db');
+const handlers=createSingleAddressShopHandlers(db);
+const gallery=require('../services/shopGalleryV173').createShopGalleryHandlers(db);
+routes.get('/mine',auth,handlers.mine);
+routes.put('/mine',auth,handlers.save);
+routes.get('/mine/gallery',auth,gallery.mine);
+routes.put('/mine/gallery',auth,gallery.save);
+routes.get('/by-barber/:barberId',handlers.byBarber);
+routes.get('/:id',handlers.byId);
+module.exports=routes;

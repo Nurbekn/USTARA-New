@@ -1,0 +1,45 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const jwt = require('jsonwebtoken');
+const { createOtpPostgresHarness } = require('./helpers/otpPostgres');
+test('barber workspace: haqiqiy PostgreSQL va media', { skip: process.env.USTARA_DISPOSABLE_OTP_TESTS !== 'I_AUTHORIZE_TEMP_DATABASE', timeout:90000 },async t=>{
+ const h=await createOtpPostgresHarness();t.after(()=>h.close());console.log('Workspace artefaktlari:',h.root);
+ await h.admin.query('CREATE EXTENSION btree_gist WITH SCHEMA public');
+ for(const name of ['20261115_slots_02_booking_no_overlap','20261116_account_profile_deletion_integrity','20261117_barber_profile','20261117_barber_profile_02_booking_acceptance','20261118_social_portfolio_reviews'])await h.admin.query(fs.readFileSync(path.join(__dirname,'../database/migrations',name+'.sql'),'utf8'));
+ const app=require('express')();app.use(require('cors')());app.use(require('express').json());
+ for(const route of ['barbers','services','bookings','social'])app.use('/api/'+route,require('../routes/'+route));
+ app.get('/api/media/:id',require('../controllers/socialController').mediaRead);
+ const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>new Promise(r=>server.close(r)));
+ const base='http://127.0.0.1:'+server.address().port;
+ async function person(role,phone){await h.admin.query('BEGIN');const u=(await h.admin.query('INSERT INTO users(phone,password,role) VALUES($1,$2,$3) RETURNING id,created_at',[phone,'unused-test',role])).rows[0];const p=(await h.admin.query(`INSERT INTO ${role==='barber'?'barbers':'customers'}(user_id,first_name,last_name,created_at${role==='barber'?',specialty':''}) VALUES($1,'Ali','Valiyev',$2${role==='barber'?",'barber'":''}) RETURNING id`,[u.id,u.created_at])).rows[0];await h.admin.query('COMMIT');return {id:u.id,profileId:p.id,role,sessionVersion:0,phone};}
+ const barber=await person('barber','+998900007001'),customer=await person('customer','+998900007002');
+ const token=jwt.sign(barber,process.env.JWT_SECRET,{expiresIn:'1h'});
+ const call=async(url,method='GET',body,authToken=token)=>{const r=await fetch(base+url,{method,headers:{authorization:'Bearer '+authToken,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,body:await r.json()};};
+ await h.admin.query("INSERT INTO barber_working_hours(barber_id,day_of_week,start_time,end_time) SELECT $1,day,'09:00','18:00' FROM generate_series(1,6) day",[barber.profileId]);
+ await t.test('pending sartaroshning saqlangan jadvali ham yuklanadi',async()=>{const r=await call('/api/barbers/working-hours');assert.equal(r.status,200);assert.equal(r.body.length,6);assert.equal((await call('/api/barbers/me')).body.barber.verification_status,'pending');});
+ await h.admin.query("UPDATE barbers SET verification_status='approved' WHERE id=$1",[barber.profileId]);
+ await t.test('daromad yo‘q paytida haqiqiy hisobot bo‘sh',async()=>{const r=await call('/api/barbers/earnings');assert.equal(r.status,200);assert.deepEqual(r.body.rows,[]);});
+ let service;
+ await t.test('xizmatning 5 va 60 daqiqasi qabul qilinadi, 65 rad etiladi',async()=>{for(const d of [5,60]){const r=await call('/api/services','POST',{name:'Soch '+d,price:50000,duration_minutes:d});assert.equal(r.status,201);service=r.body.data;}assert.equal((await call('/api/services','POST',{name:'Soch',price:50000,duration_minutes:65})).status,400);});
+ await h.admin.query("INSERT INTO bookings(customer_id,barber_id,service_id,booking_time,duration_minutes,status) VALUES($1,$2,$3,clock_timestamp()-INTERVAL '1 day',60,'completed')",[customer.profileId,barber.profileId,service.id]);
+ await t.test('daromad faqat o‘z yakunlangan bronidan hisoblanadi',async()=>{const r=await call('/api/barbers/earnings');assert.equal(r.body.rows.reduce((n,x)=>n+x.amount,0),50000);assert.equal(r.body.rows[0].count,1);assert.equal(r.body.basis,'current_service_price');});
+ const bytes=fs.readFileSync(path.join(__dirname,'../../frontend/public/images/fade-640.webp'));
+ const media=(await h.admin.query("INSERT INTO ustara_media(owner_user_id,content_type,content,byte_length) VALUES($1,'image/webp',$2,$3) RETURNING id",[barber.id,bytes,bytes.length])).rows[0];
+ const post=(await h.admin.query("INSERT INTO social_posts(barber_id,caption,media_ids) VALUES($1,'Yangi uslub',$2) RETURNING id",[barber.profileId,[media.id]])).rows[0];
+ await t.test('portfolio hisoblagichi nol, media URL haqiqiy rasmni beradi',async()=>{const r=await call('/api/barbers/me/portfolio');assert.equal(r.body.followerCount,0);assert.equal(r.body.posts.length,1);const image=await fetch(base+r.body.posts[0].media[0].url);assert.equal(image.status,200);assert.equal(image.headers.get('content-type'),'image/webp');});
+ await t.test('like va izohlar qayta so‘ralganda saqlanadi va boshqa rolga ko‘rinadi',async()=>{
+  const ct=jwt.sign(customer,process.env.JWT_SECRET,{expiresIn:'1h'}),url='/api/social/posts/'+post.id;
+  const liked=await call(url+'/like','PUT',{liked:true},ct);assert.equal(liked.status,200);assert.equal(liked.body.likeCount,1);
+  assert.equal((await call(url+'/like','PUT',{liked:true},ct)).body.likeCount,1);
+  assert.equal((await call(url,'GET',undefined,ct)).body.post.likedByMe,true);
+  assert.equal((await call(url)).body.post.likedByMe,false);
+  assert.equal((await call(url+'/comments','POST',{text:'Mijozdan izoh'},ct)).status,201);
+  assert.ok((await call(url+'/comments')).body.some(c=>c.text==='Mijozdan izoh'));
+  assert.equal((await call(url+'/comments','POST',{text:'Ustadan javob'})).status,201);
+  assert.ok((await call(url+'/comments','GET',undefined,ct)).body.some(c=>c.text==='Ustadan javob'));
+  assert.equal((await call(url)).body.post.commentCount,2);
+ });
+ if(process.env.USTARA_WORKSPACE_E2E==='1')await t.test('mobil jadval, xizmat stepperi, portfolio post va daromad',async()=>{await require('./helpers/barberWorkspaceMobile').runWorkspaceMobile({base,barber,token,artifacts:h.root,zeroEarnings:()=>h.admin.query("UPDATE bookings SET status='cancelled' WHERE barber_id=$1",[barber.profileId])});});
+});

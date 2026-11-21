@@ -1,0 +1,129 @@
+{
+  "version": "v178",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 158,
+  "indexedNew": 7,
+  "indexedTotal": 165,
+  "notYetIndexed": 20,
+  "sourcePartiallyImplemented": 5,
+  "requirementsNotImplemented": 1,
+  "explicitlyCancelled": 1,
+  "decisions": [
+    {
+      "id": 158,
+      "decision": "Smart Image Optimization",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/barber/BarberPublicProfile.jsx",
+        "frontend/src/pages/user/explore/ResultCard.jsx"
+      ],
+      "tests": [],
+      "missingImplementation": [
+        "Lazy image loading and asynchronous decoding exist; there is no verified automatic resizing, responsive image derivatives, CDN strategy, or measured real-device performance."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 159,
+      "decision": "Sartarosh telefoni ochiq, mijozniki o‘z bronida",
+      "originalStatus": "Qisman dalil bor, to‘liq tekshirilmagan",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/barberProfile.js",
+        "backend/controllers/barbersController.js",
+        "frontend/src/pages/user/barber/publicPhoneV178.js",
+        "frontend/src/pages/user/barber/BarberPublicProfile.jsx"
+      ],
+      "tests": [
+        "backend/test/v178PublicBarberPhone.unit.test.js",
+        "frontend/test/v178PublicPhoneDistricts.test.js"
+      ],
+      "missingImplementation": [
+        "Verified active barber canonical phone is returned on public profile and link is validated. Customer phone is not published there. Private booking-contact authorization and real guest/browser/PostgreSQL integrations remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 160,
+      "decision": "Telefon orqali Quick Manual Booking",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "The barber cannot yet create a normal booking using only an agreed telephone conversation. Do not confuse manual queue claims with manual bookings; do not bypass OTP by creating an account."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 161,
+      "decision": "Takrorlanuvchi tanaffuslar",
+      "originalStatus": "Kod va unit test tayyor; DB/E2E qisman",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/breakRulesController.js",
+        "backend/services/calendarSchedule.js"
+      ],
+      "tests": [
+        "backend/test/breakRules.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Recurring break CRUD and schedule checks have unit evidence; PostgreSQL overlap/race and browser E2E remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 162,
+      "decision": "Smart Service Change mijoz boshlaydi",
+      "originalStatus": "Qisman: v13 customer service-edit UI + server quote + PATCH",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/bookingModification.js",
+        "backend/controllers/bookingsController.js"
+      ],
+      "tests": [
+        "backend/test/bookingModification.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Authenticated customer change with concurrency and quote checks exists in source, but full PostgreSQL/browser E2E is not verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 163,
+      "decision": "Sartarosh xizmat paytidagi alohida edit BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "The user explicitly cancelled the barber-initiated separate in-service edit workflow. Do not implement or count it as missing."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 164,
+      "decision": "Manzil va tuman bo‘yicha qidiruv",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/explore/catalog.js",
+        "frontend/src/pages/user/Explore.jsx"
+      ],
+      "tests": [
+        "frontend/test/v178PublicPhoneDistricts.test.js",
+        "frontend/test/v117ExploreSearchContract.test.js"
+      ],
+      "missingImplementation": [
+        "Public address/district text search now offers bounded de-duplicated data-backed district suggestions. The API does not provide structured district/region and no reverse geocoding or live browser E2E has been verified."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

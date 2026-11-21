@@ -1,0 +1,39 @@
+{
+  "version": "v183",
+  "base": "v182",
+  "previousFiles": 1421,
+  "currentFiles": 1428,
+  "removedFiles": [],
+  "modifiedFiles": [
+    "backend/server.js",
+    "frontend/src/pages/barber/Profile.jsx",
+    "frontend/src/pages/user/Profile.jsx"
+  ],
+  "addedFiles": [
+    "backend/controllers/privacyExportV183.js",
+    "backend/routes/privacy.js",
+    "backend/test/v183PrivacyExport.unit.test.js",
+    "docs/v183-privacy-center-gap-closure.md",
+    "frontend/src/components/PrivacyExportV183.jsx",
+    "frontend/src/components/privacyExportV183.js",
+    "frontend/test/v183PrivacyExport.test.js"
+  ],
+  "oldSqlMigrationsChanged": false,
+  "originalRegisterChanged": false,
+  "testResults": {
+    "frontend": {
+      "pass": 1715,
+      "total": 1715
+    },
+    "backend": {
+      "pass": 1699,
+      "total": 1728
+    },
+    "newTargeted": {
+      "pass": 8,
+      "total": 8
+    }
+  },
+  "integration": "NOT_RUN",
+  "productionReady": false
+}

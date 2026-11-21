@@ -1,0 +1,142 @@
+{
+  "version": "v175",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 137,
+  "indexedNew": 7,
+  "indexedTotal": 144,
+  "notYetIndexed": 41,
+  "sourcePartiallyImplemented": 7,
+  "requirementsNotImplemented": 0,
+  "decisions": [
+    {
+      "id": 137,
+      "decision": "Mijoz va sartarosh uchun alohida akkaunt",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/registrationService.js",
+        "frontend/src/pages/auth/utils/session.js"
+      ],
+      "tests": [
+        "frontend/test/login.test.js",
+        "frontend/test/login.test.js"
+      ],
+      "missingImplementation": [
+        "Role-separated registration/login and session destinations exist. Real PostgreSQL access checks, cross-role horizontal privilege boundaries and browser E2E remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 138,
+      "decision": "Akkauntlar o‘rtasida oddiy chiqish kirish",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/auth/utils/session.js",
+        "frontend/src/pages/auth/utils/session.js"
+      ],
+      "tests": [
+        "frontend/test/v68CrossTabSession.test.js",
+        "frontend/test/login.test.js"
+      ],
+      "missingImplementation": [
+        "Logout clears browser session credentials and notifies other tabs; manually logging into another account uses existing login. Full browser/device revocation E2E is pending."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 139,
+      "decision": "Bir telefon raqami faqat bitta akkaunt",
+      "originalStatus": "Qisman dalil bor, real DB tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/database/schema.sql",
+        "backend/services/registrationService.js"
+      ],
+      "tests": [
+        "backend/test/authPolicy.unit.test.js"
+      ],
+      "missingImplementation": [
+        "DB UNIQUE and phone canonicalization exist; real parallel sign-up and PostgreSQL uniqueness tests remain unrun."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 140,
+      "decision": "Professional Account Recovery",
+      "originalStatus": "Qisman: xavfsiz tiklash arizasi va Admin review qo‘shildi; real tasdiqlash va DB E2E qolgan",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/manualAccountRecovery.js",
+        "backend/routes/auth.js"
+      ],
+      "tests": [
+        "backend/test/manualAccountRecovery.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Support case and Admin-review requests exist, but completed identity verification, credential/phone recovery workflow and live PostgreSQL/notification E2E are NOT implemented/verified. Admin status is not a credential reset."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 141,
+      "decision": "Smart Navigation 2GIS Yandex Google",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/barber/publicNavigationV175.js",
+        "frontend/src/pages/user/barber/BarberPublicProfile.jsx",
+        "frontend/src/pages/user/bookings/navigation.js"
+      ],
+      "tests": [
+        "frontend/test/v175PublicBarberNavigation.test.js",
+        "frontend/test/v125BookingContactNavigation.test.js"
+      ],
+      "missingImplementation": [
+        "Ommaviy profil/bookingda xarita pin-havolalari mavjud, koordinatasiz havola yo‘q. Haqiqiy marshrut hisobi, provayder URLlarining onlayn tekshiruvi, telefon qurilmalari va browser E2E bajarilmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 142,
+      "decision": "Smart Working Hours",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/barber/components/WorkingHours.jsx",
+        "backend/services/barberSetup.js"
+      ],
+      "tests": [
+        "frontend/test/v145AccountBarberLanguages.test.js",
+        "backend/test/bookings.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Haftalik ish vaqtini belgilash va nusxalash UI mavjud; real PG timezone, istisno kunlar va parallel bron konfliktlari to‘liq E2E qilinmagan."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 143,
+      "decision": "Smart Price Transparency",
+      "originalStatus": "Qisman: v11 narx quote tekshiruvi va bron snapshoti unit testlari o‘tgan; real PostgreSQL E2E qolgan",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/bookingSelection.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "backend/test/bookingPriceSnapshot.unit.test.js",
+        "backend/test/bookingSelection.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Xizmat narxlari va bronning server quote/snapshot qoidalari kodda bor; full transaction/PostgreSQL E2E va narx o‘zgarganda barcha UI holatlari tasdiqlanmagan. Platformada onlayn to‘lov tasdiqlanmaydi."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

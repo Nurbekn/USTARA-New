@@ -1,3 +1,6 @@
+import { useLocation } from "react-router-dom";
+import { readSiteLocale } from "../../utils/siteLocale.js";
+import { barberInsightsText, barberInsightsDate } from "./barberInsightsLocaleV147.js";
 import { useState } from "react";
 import PageHeader from "./components/PageHeader";
 import Stars from "./components/Stars";
@@ -14,11 +17,15 @@ const FILTERS = [
 ];
 
 export default function Reviews() {
+  const lang=readSiteLocale(useLocation().search);
+  const tr=barberInsightsText(lang);
   const { reviews } = useBarber();
   const { toast, show } = useToast();
   const [filter, setFilter] = useState("all");
   const [replying, setReplying] = useState(null); // review id
   const [text, setText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const { average, count, distribution } = getRatingSummary(reviews);
   const active = FILTERS.find((f) => f.id === filter);
@@ -31,23 +38,27 @@ export default function Reviews() {
     setText(review.reply);
   };
 
-  const sendReply = (id) => {
-    replyToReview(id, text.trim());
-    setReplying(null);
-    show("Javob saqlandi");
+  const sendReply = async (reviewId) => {
+    if (saving || !text.trim()) return;
+    setSaving(true); setError("");
+    try {
+      await replyToReview(reviewId, text);
+      setReplying(null); setText(""); show(tr("Javob saqlandi."));
+    } catch (cause) { setError(cause.message || tr("Javob saqlanmadi.")); }
+    finally { setSaving(false); }
   };
 
   return (
     <div className="bx-page">
-      <PageHeader back title="Sharhlar" subtitle="Mijozlaringiz fikri" />
+      <PageHeader back title={tr("Sharhlar")} subtitle={tr("Mijozlaringiz fikri")} />
 
       <section className="bx-card bx-rating">
         <div className="bx-rating-big">
           <strong>{count ? average.toFixed(1) : "—"}</strong>
           <Stars value={average} size={16} />
-          <span className="bx-muted">{count} ta sharh</span>
+          <span className="bx-muted">{tr("Mijozlar bahosi")}</span>
         </div>
-        <div className="bx-rating-bars">
+        {!count ? <p className="bx-muted">{tr("Hozircha sharhlar yo‘q.")}</p> : <div className="bx-rating-bars">
           {[5, 4, 3, 2, 1].map((n) => (
             <div key={n}>
               <span>{n}</span>
@@ -58,10 +69,10 @@ export default function Reviews() {
                   }}
                 />
               </div>
-              <small>{distribution[n]}</small>
+              <small>{distribution[n] ?? "—"}</small>
             </div>
           ))}
-        </div>
+        </div>}
       </section>
 
       <div className="bx-chips">
@@ -72,15 +83,15 @@ export default function Reviews() {
             className={`bx-chip ${filter === f.id ? "is-active" : ""}`}
             onClick={() => setFilter(f.id)}
           >
-            {f.label}
+            {tr(f.label)}
           </button>
         ))}
       </div>
 
       {list.length === 0 ? (
         <div className="bx-empty">
-          <strong>Sharh topilmadi</strong>
-          <p>Mijozlar xizmatdan keyin sharh qoldiradi.</p>
+          <strong>{tr("Sharhlar mavjud emas")}</strong>
+          <p>{tr("Yakunlangan bronlardan kelgan sharhlar shu yerda chiqadi.")}</p>
         </div>
       ) : (
         <div className="bx-list">
@@ -90,7 +101,7 @@ export default function Reviews() {
                 <Avatar name={r.customer} size={38} />
                 <div>
                   <strong>{r.customer}</strong>
-                  <span className="bx-muted">{dateLabel(r.date)}</span>
+                  <span className="bx-muted">{barberInsightsDate(r.date,lang) ?? dateLabel(r.date)}</span>
                 </div>
                 <Stars value={r.rating} />
               </div>
@@ -103,16 +114,17 @@ export default function Reviews() {
                     rows={3}
                     maxLength={200}
                     value={text}
-                    placeholder="Mijozga javob yozing..."
+                    placeholder={tr("Mijozga javob yozing...")}
                     onChange={(e) => setText(e.target.value)}
                   />
                   <div className="bx-inline-actions">
                     <button
                       type="button"
                       className="bx-btn bx-btn-sm bx-btn-primary"
-                      onClick={() => sendReply(r.id)}
+                      disabled={saving || !text.trim()}
+                      onClick={() => void sendReply(r.id)}
                     >
-                      Yuborish
+                      {saving ? tr("Saqlanmoqda…") : tr("Yuborish")}
                     </button>
                     <button
                       type="button"
@@ -122,12 +134,13 @@ export default function Reviews() {
                       Bekor
                     </button>
                   </div>
+                  {error && <p className="bx-error" role="alert">{error}</p>}
                 </div>
               ) : (
                 <>
                   {r.reply && (
                     <div className="bx-reply">
-                      <b>Sizning javobingiz</b>
+                      <b>{tr("Sizning javobingiz")}</b>
                       <p>{r.reply}</p>
                     </div>
                   )}
@@ -136,7 +149,7 @@ export default function Reviews() {
                     className="bx-link"
                     onClick={() => startReply(r)}
                   >
-                    {r.reply ? "Javobni tahrirlash" : "Javob yozish"}
+                    {r.reply ? tr("Javobni tahrirlash") : tr("Javob yozish")}
                   </button>
                 </>
               )}

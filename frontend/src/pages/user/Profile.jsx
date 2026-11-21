@@ -1,9 +1,17 @@
+import PhoneChangePanel from "../../components/phoneChange/PhoneChangePanel";
+import DeviceSessionsPanel from "../../components/DeviceSessionsPanel";
+import RevokeSessionsAction from "../../components/RevokeSessionsAction";
+import DeactivateAccountAction from "../../components/DeactivateAccountAction";
+import PrivacyExportV183 from "../../components/PrivacyExportV183";
+import CustomerTelegramV190 from "../../components/CustomerTelegramV190";
 import DateInput from "../../components/DateInput";
 import { formatDate } from "../../utils/format";
 import Icon from "../../components/Icon";
 import ArrowIcon from "../../components/ArrowIcon";
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { readSiteLocale, siteLocalePath } from "../../utils/siteLocale.js";
+import { v144InnerUi } from "../auth/innerLocaleV144.js";
 import { clearSession } from "../auth/utils/session";
 import L from "leaflet";
 import LocationPicker from "../../components/LocationPicker";
@@ -11,16 +19,35 @@ import { isValidLocation } from "../../components/locationSearch";
 import { Avatar } from "../../components/Avatar";
 import ProfilePhotoSheet from "../../components/ProfilePhotoSheet";
 import "./Profile.css";
+import PageLoading from "../../components/Loading";
+import { loadCustomerProfile, saveCustomerProfileToServer } from "./data/profile";
 
-const userMarker = L.divIcon({
+const userMarker = (label) => L.divIcon({
   className: "up-marker-wrap",
-  html: '<div class="up-marker">Siz shu yerdasiz</div>',
+  html: `<div class="up-marker">${label}</div>`,
   iconSize: [130, 38],
   iconAnchor: [65, 38],
 });
 
 export default function Profile() {
-  const { profile, setProfile } = useOutletContext();
+  const location = useLocation();
+  const lang = readSiteLocale(location.search);
+  const ui = v144InnerUi(lang).customer;
+  const marker = useMemo(() => userMarker(ui.mapHere), [lang]);
+  const [profile, setProfile] = useState(null);
+  const [loadState, setLoadState] = useState({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const saveController = useRef(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    Promise.resolve().then(() => loadCustomerProfile({ signal: controller.signal }))
+      .then((data) => { if (active) { setProfile(data); setLoadState({ status: "ready" }); } })
+      .catch((error) => { if (active) setLoadState({ status: "error", message: error.message }); });
+    return () => { active = false; controller.abort(); };
+  }, [attempt]);
+  useEffect(() => () => saveController.current?.abort(), []);
   const navigate = useNavigate();
   const logoutDialog = useRef(null);
   const [logoutError, setLogoutError] = useState("");
@@ -30,7 +57,7 @@ export default function Profile() {
   useEffect(() => {
     if (editor) editorHeading.current?.focus();
   }, [editor]);
-  const [draft, setDraft] = useState(profile);
+  const [draft, setDraft] = useState({ firstName: "", lastName: "", birthDate: "", address: "", location: null });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -40,10 +67,10 @@ export default function Profile() {
     try {
       clearSession();
     } catch {
-      setLogoutError("Hisobdan chiqib bo‘lmadi. Qayta urinib ko‘ring.");
+      setLogoutError(ui.logoutError);
       return;
     }
-    navigate("/login", { replace: true });
+    navigate(siteLocalePath("/login", lang), { replace: true });
   }
 
   function startEditing(section = "info") {
@@ -59,57 +86,78 @@ export default function Profile() {
   }
 
   function cancelEditing() {
+    if (saveController.current) return;
     setUploading(false);
     setDraft({ ...profile });
     setError("");
     setEditor(null);
   }
 
-  function saveProfile(event) {
+  async function saveProfile(event) {
     event.preventDefault();
-    if (uploading || editor === "phone") return;
+    if (uploading || saveController.current || editor === "phone") return;
     if (editor === "info" && (draft.firstName.trim().length < 2 || draft.lastName.trim().length < 2)) {
-      setError("Ism va familiyangizni to‘liq kiriting (kamida 2 belgi).");
+      setError(ui.nameError);
       return;
     }
     if (
       editor === "location" &&
       !isValidLocation(draft.location)
     ) {
-      setError("Manzilni qidiruv natijasidan tanlang yoki xaritada belgilang.");
+      setError(ui.locationError);
       return;
     }
+    if (!['info', 'location'].includes(editor)) {
+      setError(ui.unsupported);
+      return;
+    }
+    const controller = new AbortController();
+    saveController.current = controller;
+    setSaving(true); setError(""); setMessage("");
     try {
-      setProfile({
-        ...draft,
-        phone: profile.phone,
-        firstName: draft.firstName.trim(),
-        lastName: draft.lastName.trim(),
-        address: draft.address.trim(),
-      });
-    } catch {
-      setError("Profil saqlanmadi. Brauzer xotirasini tekshirib, qayta urinib ko‘ring.");
-      return;
+      const updated = await saveCustomerProfileToServer({
+        ...profile,
+        ...(editor === "info" ? { firstName: draft.firstName.trim(), lastName: draft.lastName.trim() } : {}),
+        ...(editor === "location" ? { address: draft.address, location: draft.location } : {}),
+      }, { signal: controller.signal });
+      if (!controller.signal.aborted) {
+        setProfile(updated); setEditor(null); setError(""); setMessage(ui.saved);
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        if (error.profileSaved) {
+          setEditor(null);
+          setLoadState({ status: "error", message: ui.savedReload });
+        } else setError(error.message || ui.saveError);
+      }
+    } finally {
+      if (!controller.signal.aborted) setSaving(false);
+      if (saveController.current === controller) saveController.current = null;
     }
-    setEditor(null);
-    setError("");
-    setMessage(editor === "location" ? "Joylashuvingiz saqlandi." : "Profil ma’lumotlari saqlandi.");
   }
+
+  if (loadState.status === "loading") return <PageLoading label={ui.loading} />;
+  if (loadState.status === "error") return <section className="up-profile" role="alert">
+    <h1>{ui.loadError}</h1><p className="up-error">{loadState.message}</p>
+    <button type="button" className="up-button up-primary" onClick={() => {
+      setLoadState({ status: "loading" }); setAttempt((value) => value + 1);
+    }}>{ui.retry}</button>
+  </section>;
 
   const shown = isEditing ? draft : profile;
   const fullName = [shown.firstName, shown.lastName].filter(Boolean).join(" ");
   const hasLocation = isValidLocation(profile.location);
 
   const titles = {
-    info: "Shaxsiy ma’lumotlar",
-    location: "Manzil",
-    phone: "Telefon raqami",
+    info: ui.info,
+    location: ui.location,
+    phone: ui.phone,
   };
 
   const descriptions = {
-    info: "Profilingizda ko‘rinadigan ma’lumotlarni yangilang.",
-    phone: "Hisobingizga bog‘langan telefon raqami.",
-    location: "Sizga yaqin ustalarni topish uchun joy tanlang.",
+    info: ui.infoHint,
+    phone: ui.phoneHint,
+    location: ui.locationHint,
   };
   const editorIcons = {
     info: "person",
@@ -118,11 +166,11 @@ export default function Profile() {
   };
 
   return (
-    <section className="up-profile" aria-label="Profil" key={editor || "overview"}>
+    <section className="up-profile" aria-label={ui.profile} key={editor || "overview"}>
       {isEditing ? (
         <>
-          <button type="button" className="up-back" onClick={cancelEditing}>
-            <ArrowIcon direction="left" /> Profilga qaytish
+          <button type="button" className="up-back" disabled={saving} onClick={cancelEditing}>
+            <ArrowIcon direction="left" /> {ui.back}
           </button>
           <div className="up-editor-heading">
             <span className="up-editor-symbol">
@@ -133,19 +181,20 @@ export default function Profile() {
             </h1>
             <p>{descriptions[editor]}</p>
           </div>
-          <form
+          {editor === "phone" ? <PhoneChangePanel currentPhone={profile.phone}/> : <form
             className={`up-editor up-editor-${editor}`}
             onSubmit={saveProfile}
           >
             {editor === "info" && (
               <div className="up-fields">
                 <label>
-                  <span>Ism</span>
+                  <span>{ui.first}</span>
                   <input
-                    placeholder="Ismingiz"
+                    placeholder={ui.firstPlaceholder}
                     name="firstName"
                     autoComplete="given-name"
                     maxLength={80}
+                    disabled={saving}
                     value={draft.firstName}
                     onChange={(e) =>
                       setDraft({ ...draft, firstName: e.target.value })
@@ -153,12 +202,13 @@ export default function Profile() {
                   />
                 </label>
                 <label>
-                  <span>Familiya</span>
+                  <span>{ui.last}</span>
                   <input
-                    placeholder="Familiyangiz"
+                    placeholder={ui.lastPlaceholder}
                     name="lastName"
                     autoComplete="family-name"
                     maxLength={80}
+                    disabled={saving}
                     value={draft.lastName}
                     onChange={(e) =>
                       setDraft({ ...draft, lastName: e.target.value })
@@ -167,55 +217,26 @@ export default function Profile() {
                 </label>
                 <label>
                   <span>
-                    Tug‘ilgan sana <small>Ixtiyoriy</small>
+                    {ui.birthday} <small>{ui.optional}</small>
                   </span>
                   <DateInput
                     name="birthDate"
                     autoComplete="bday"
                     value={draft.birthDate}
+                    disabled
                     onChange={(birthDate) =>
                       setDraft({ ...draft, birthDate })
                     }
                   />
+                  <small>{ui.birthdayUnavailable}</small>
                 </label>
-              </div>
-            )}
-            {editor === "phone" && (
-              <div className="up-phone-view">
-                <div className="up-number-card">
-                  <div className="up-number-label">
-                    <span>Joriy raqam</span>
-                    <span className="up-readonly">
-                      <Icon size={21} name="lock" />
-                      Faqat ko‘rish uchun
-                    </span>
-                  </div>
-                  <p className="up-current-number">
-                    {profile.phone || "Raqam kiritilmagan"}
-                  </p>
-                </div>
-                <div className="up-phone-explanation">
-                  <span className="up-explanation-icon">
-                    <Icon size={21} name="lock" />
-                  </span>
-                  <div>
-                    <h2>Raqamni almashtirish</h2>
-                    <p>
-                      Yangi telefon raqami SMS kodi bilan tasdiqlangandan so‘ng
-                      hisobingizga bog‘lanadi.
-                    </p>
-                    <span className="up-availability">
-                      Bu imkoniyat tez orada qo‘shiladi
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
             {editor === "location" && (
               <div className="up-location">
                 <LocationPicker
                   showEmptySummary={false}
-                  icon={userMarker}
+                  icon={marker}
                   value={draft.location}
                   address={draft.address}
                   onChange={(location) =>
@@ -236,21 +257,22 @@ export default function Profile() {
               <button
                 type="button"
                 className="up-button"
+                disabled={saving}
                 onClick={cancelEditing}
               >
-                {editor === "phone" ? "Tushunarli" : "Bekor qilish"}
+                {ui.cancel}
               </button>
               {editor !== "phone" && (
                 <button
                   type="submit"
                   className="up-button up-primary"
-                  disabled={uploading}
+                  disabled={uploading || saving || !["info", "location"].includes(editor)}
                 >
-                  Saqlash
+                  {saving ? ui.saving : ui.save}
                 </button>
               )}
             </div>
-          </form>
+          </form>}
         </>
       ) : (
         <>
@@ -258,8 +280,9 @@ export default function Profile() {
             <button
               type="button"
               className="up-avatar-button"
+              title={ui.editPhoto}
               onClick={() => startEditing("photo")}
-              aria-label="Profil rasmini o‘zgartirish"
+              aria-label={ui.editPhoto}
             >
               <Avatar className="up-user-avatar"
                 photo={profile.avatarPhoto}
@@ -272,21 +295,22 @@ export default function Profile() {
               </span>
             </button>
             <div className="up-identity-text">
-              <h1>{fullName || "Foydalanuvchi"}</h1>
+              <h1>{fullName || ui.user}</h1>
               {profile.phone && <p>{profile.phone}</p>}
               <button
                 type="button"
                 className="up-text-button"
                 onClick={() => startEditing("info")}
               >
-                Profilni tahrirlash <ArrowIcon />
+                {ui.edit} <ArrowIcon />
               </button>
             </div>
           </header>
           <p className="up-feedback" role="status">
             {message}
           </p>
-          <div className="up-menu" role="group" aria-label="Profil sozlamalari">
+          <div className="up-menu" role="group" aria-label={ui.settings}>
+            <Link className="up-menu-row" to={siteLocalePath("/user/chat",lang)}><span className="up-menu-icon"><Icon size={21} name="send" /></span><span className="up-menu-copy"><strong>{({uz:"Xabarlar",ru:"Сообщения",en:"Messages"})[lang]}</strong></span><span className="up-chevron"><Icon size={21} name="chevronRight" /></span></Link>
             <button
               type="button"
               className="up-menu-row"
@@ -296,9 +320,9 @@ export default function Profile() {
                 <Icon size={21} name="person" />
               </span>
               <span className="up-menu-copy">
-                <strong>Shaxsiy ma’lumotlar</strong>
+                <strong>{ui.info}</strong>
                 <span>
-                  {profile.birthDate ? formatDate(profile.birthDate) : "Ism, familiya va tug‘ilgan sana"}
+                  {profile.birthDate ? formatDate(profile.birthDate) : ui.infoDescription}
                 </span>
               </span>
               <span className="up-chevron">
@@ -314,8 +338,8 @@ export default function Profile() {
                 <Icon size={21} name="phone" />
               </span>
               <span className="up-menu-copy">
-                <strong>Telefon raqami</strong>
-                <span>{profile.phone || "Raqam kiritilmagan"}</span>
+                <strong>{ui.phone}</strong>
+                <span>{profile.phone || ui.phoneMissing}</span>
               </span>
               <span className="up-chevron">
                 <Icon size={21} name="chevronRight" />
@@ -330,12 +354,12 @@ export default function Profile() {
                 <Icon size={21} name="pin" />
               </span>
               <span className="up-menu-copy">
-                <strong>{hasLocation ? "Manzilni o‘zgartirish" : "Manzil tanlash"}</strong>
+                <strong>{hasLocation ? ui.changeLocation : ui.selectLocation}</strong>
                 <span className={hasLocation ? "up-saved-address" : undefined}>
                   {profile.address ||
                     (hasLocation
-                      ? "Xaritada belgilangan"
-                      : "Yaqin ustalarni topish uchun")}
+                      ? ui.mapSelected
+                      : ui.nearbyHint)}
                 </span>
               </span>
               <span className="up-chevron">
@@ -344,14 +368,19 @@ export default function Profile() {
             </button>
           </div>
           {hasLocation && (
-            <Link to="/user/explore?type=barbers&distance=5" className="up-nearby-link">
+            <Link to={siteLocalePath("/user/explore?type=barbers&distance=5", lang)} className="up-nearby-link">
               <Icon size={21} name="pin" />
-              <span>Yaqin ustalarni ko‘rish</span>
+              <span>{ui.nearby}</span>
               <span className="up-chevron">
                 <Icon size={21} name="chevronRight" />
               </span>
             </Link>
           )}
+          <DeviceSessionsPanel className="up-logout" />
+          <RevokeSessionsAction className="up-logout" />
+          <DeactivateAccountAction className="up-logout" />
+          <PrivacyExportV183 className="up-logout" />
+          <CustomerTelegramV190 className="up-logout" />
           <button
             type="button"
             className="up-logout"
@@ -361,7 +390,7 @@ export default function Profile() {
             }}
           >
             <Icon size={21} name="logout" />
-            Hisobdan chiqish
+            {ui.logout}
           </button>
           <dialog
             ref={logoutDialog}
@@ -372,9 +401,9 @@ export default function Profile() {
             <span className="up-logout-symbol">
               <Icon size={21} name="logout" />
             </span>
-            <h2 id="up-logout-title">Hisobdan chiqasizmi?</h2>
+            <h2 id="up-logout-title">{ui.logoutTitle}</h2>
             <p id="up-logout-description">
-              Hisobingizdan chiqasiz. Profil ma’lumotlaringiz saqlanadi.
+              {ui.logoutDescription}
             </p>
             {logoutError && (
               <p className="up-error" role="alert">
@@ -388,14 +417,14 @@ export default function Profile() {
                 autoFocus
                 onClick={() => logoutDialog.current.close()}
               >
-                Bekor qilish
+                {ui.cancel}
               </button>
               <button
                 type="button"
                 className="up-button up-confirm-logout"
                 onClick={confirmLogout}
               >
-                Ha, chiqish
+                {ui.confirmLogout}
               </button>
             </div>
           </dialog>
@@ -408,8 +437,12 @@ export default function Profile() {
         errorClassName="up-error"
         onClose={() => setPhotoOpen(false)}
         onBusyChange={setUploading}
-        onSave={(avatarPhoto) => setProfile({ ...profile, avatarPhoto, avatar: null })}
-        onSaved={(avatarPhoto) => setMessage(avatarPhoto ? "Profil rasmi yangilandi." : "Profil rasmi olib tashlandi.")}
+        onSave={async (avatarPhoto) => {
+          const updated = await saveCustomerProfileToServer({ ...profile, avatarPhoto });
+          setProfile(updated);
+          return updated;
+        }}
+        onSaved={(avatarPhoto) => setMessage(avatarPhoto ? ui.photoSaved : ui.photoRemoved)}
       />
     </section>
   );

@@ -1,4 +1,6 @@
 import BrandLogo from "./brand/BrandLogo";
+import SiteLanguageSelect from "./SiteLanguageSelect";
+import { getSiteUi, readSiteLocale, siteLocalePath } from "../utils/siteLocale.js";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
@@ -7,12 +9,14 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const lang = readSiteLocale(location.search);
+  const ui = getSiteUi(lang).public;
 
   function goToSection(sectionId) {
     setMenuOpen(false);
 
     if (location.pathname !== "/") {
-      navigate("/");
+      navigate(siteLocalePath("/", lang));
       setTimeout(() => {
         document.getElementById(sectionId)?.scrollIntoView({
           behavior: "smooth",
@@ -33,25 +37,26 @@ function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner container">
-        <Link to="/" className="navbar-logo" onClick={closeMenu}>
+        <Link to={siteLocalePath("/", lang)} className="navbar-logo" onClick={closeMenu}>
           <BrandLogo />
         </Link>
 
         {/* Phones: sign-up stays visible, right in front of the burger */}
         <div className="navbar-right">
+          <SiteLanguageSelect />
           <Link
-            to="/signup"
+            to={siteLocalePath("/signup", lang)}
             className="navbar-signup navbar-signup--top"
-            aria-label="Ro'yxatdan o'tish"
+            aria-label={ui.signup}
             onClick={closeMenu}
           >
-            Boshlash
+            {ui.start}
           </Link>
 
           <button
             className="navbar-menu-toggle"
             type="button"
-            aria-label={menuOpen ? "Menyuni yopish" : "Menyuni ochish"}
+            aria-label={menuOpen ? ui.menuClose : ui.menuOpen}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
           >
@@ -62,27 +67,29 @@ function Navbar() {
         </div>
 
         <div className={`navbar-menu ${menuOpen ? "is-open" : ""}`}>
-          <nav className="navbar-links" aria-label="Asosiy navigatsiya">
+          <nav className="navbar-links" aria-label={ui.mainNav}>
             <button type="button" onClick={() => goToSection("how-it-works")}>
-              Qanday ishlaydi?
+              {ui.how}
             </button>
 
             <button type="button" onClick={() => goToSection("about")}>
-              Biz haqimizda
+              {ui.about}
             </button>
 
             <button type="button" onClick={() => goToSection("contact")}>
-              Bog'lanish
+              {ui.contact}
             </button>
+
+            <Link to={siteLocalePath("/help", lang)} onClick={closeMenu}>{ui.help}</Link>
           </nav>
 
           <div className="navbar-actions">
-            <Link to="/login" className="navbar-login" onClick={closeMenu}>
-              Kirish
+            <Link to={siteLocalePath("/login", lang)} className="navbar-login" onClick={closeMenu}>
+              {ui.signIn}
             </Link>
 
-            <Link to="/signup" className="navbar-signup navbar-signup--menu" onClick={closeMenu}>
-              Boshlash 
+            <Link to={siteLocalePath("/signup", lang)} className="navbar-signup navbar-signup--menu" onClick={closeMenu}>
+              {ui.start} 
             </Link>
           </div>
         </div>

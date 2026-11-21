@@ -6,9 +6,10 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const validTime = (value) => typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 export function getAvailability(profile, now = new Date()) {
+  if (profile.acceptingBookings == null) return { isOpen: false, detail: "Bron qabul qilish holati serverdan olinmaydi" };
   const parts = Object.fromEntries(clock.formatToParts(now).map(({ type, value }) => [type, value]));
   const today = profile.hours?.find((h) => h.day === DAYS.indexOf(parts.weekday));
-  if (!profile.isAvailable) return { isOpen: false, detail: "Bron qabul qilish o'chirilgan" };
+  if (!profile.acceptingBookings) return { isOpen: false, detail: "Bron qabul qilish o'chirilgan" };
   if (!today) return { isOpen: false, detail: "Bugungi ish vaqti belgilanmagan" };
   if (today.isOff) return { isOpen: false, detail: "Bugun dam olish kuni" };
   if (!validTime(today.start) || !validTime(today.end) || today.start >= today.end) {

@@ -1,28 +1,36 @@
 import PageLoading from "../../components/Loading";
 import ArrowIcon from "../../components/ArrowIcon";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import Icon from "../../components/Icon";
 import ResultCard from "./explore/ResultCard";
+import ComparisonPanel from "./explore/ComparisonPanel";
+import { comparisonRows, toggleComparedBarber, visibleCompareIds } from "./explore/compareModel.js";
+const BarbersMap = lazy(() => import("./BarbersMap"));
 import {
   EMPTY_CATALOG,
   FILTER_KEYS,
-  REGIONS,
   TYPES,
   loadExploreCatalog,
   normalizeCatalog,
   selectResults,
   validPoint,
+  validExploreFilters,
+  publishedDistrictSuggestions,
 } from "./explore/catalog";
 import "./Explore.css";
-import { loadSampleCatalog } from "../home/sampleData";
+import { getSession } from "../auth/utils/session";
+import { customerCoreLocale, customerCoreUi } from "./coreLocale.js";
+import { siteLocalePath } from "../../utils/siteLocale.js";
 
 export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "/user/explore" }) {
-  const { profile } = useOutletContext();
+  const { profile = { location: null } } = useOutletContext() || {};
   const [params, setParams] = useSearchParams();
-  const sampleMode = params.get("demo") === "1";
+  const lang = customerCoreLocale(params);
+  const ui = customerCoreUi(lang).explore;
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [compareIds, setCompareIds] = useState([]);
   const [request, setRequest] = useState({
     status: "loading",
     catalog: EMPTY_CATALOG,
@@ -31,7 +39,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
     const controller = new AbortController();
     let active = true;
     Promise.resolve()
-      .then(() => (sampleMode ? loadSampleCatalog : loadCatalog)({ signal: controller.signal }))
+      .then(() => loadCatalog({ signal: controller.signal, token: getSession()?.token }))
       .then(normalizeCatalog)
       .then((catalog) => {
         if (active) setRequest({ status: "ready", catalog });
@@ -43,12 +51,14 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
       active = false;
       controller.abort();
     };
-  }, [loadCatalog, attempt, sampleMode]);
+  }, [loadCatalog, attempt]);
 
-  const type = ["barbers", "salons"].includes(params.get("type"))
+  const mapShown = params.get("map") === "1";
+  const type = ["barbers"].includes(params.get("type"))
     ? params.get("type")
     : "barbers";
   const { catalog, status } = request;
+  const publishedDistricts = status === "ready" ? publishedDistrictSuggestions(catalog) : [];
   const query = params.get("q") || "";
   const hasLocation = validPoint(profile.location);
   const activeFilters = FILTER_KEYS.filter((key) => params.get(key));
@@ -60,8 +70,17 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
   const detail = catalog[type].find((item) => String(item.id) === detailId);
   const min = params.get("min"),
     max = params.get("max");
-  const badRange = min && max && Number(min) > Number(max);
+  const needsLocation = params.get("sort") === "distance_asc" || !!params.get("distance");
+  const badFilters = !validExploreFilters(params) || (needsLocation && !hasLocation);
   const hasConstraints = !!query.trim() || activeFilters.length > 0;
+  const safeCompared = status === "ready" && !badFilters ? visibleCompareIds(compareIds, results) : [];
+  const compared = status === "ready" && !badFilters
+    ? comparisonRows(safeCompared, results, catalog, params.get("service"), profile.location) : [];
+  const compareFull = safeCompared.length >= 3;
+  function toggleCompare(id) {
+    if (status !== "ready" || badFilters) return;
+    setCompareIds(current => toggleComparedBarber(current, id, results));
+  }
 
   function changed(patch) {
     const next = new URLSearchParams(params);
@@ -72,6 +91,8 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
     return next;
   }
   function update(patch) {
+    // A different search/service context must never retain stale comparison cards.
+    if (Object.keys(patch).some(key => key !== "map")) setCompareIds([]);
     setParams(changed(patch), { replace: true });
   }
   function makeUrl(patch) {
@@ -79,41 +100,45 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
     return `${basePath}${value ? `?${value}` : ""}`;
   }
   function reset() {
+    setCompareIds([]);
     const next = new URLSearchParams();
     next.set("type", type);
-    if (sampleMode) next.set("demo", "1");
+    if (lang !== "uz") next.set("lang", lang);
+    if (mapShown) next.set("map", "1");
     setParams(next, { replace: true });
   }
   function retry() {
+    setCompareIds([]);
     setRequest({ status: "loading", catalog: EMPTY_CATALOG });
     setAttempt((value) => value + 1);
   }
   function filterLabel(key) {
     const value = params.get(key);
     if (key === "region" || key === "category") return value;
-    if (key === "min") return `${value} so‘mdan`;
-    if (key === "max") return `${value} so‘mgacha`;
+    if (key === "area") return `${ui.area}: ${value}`;
+    if (key === "min") return `${value} UZS ${ui.from.toLowerCase()}`;
+    if (key === "max") return `${value} UZS ${ui.to.toLowerCase()}`;
     if (key === "rating") return `${value}+ reyting`;
-    if (key === "distance") return `${value} km gacha`;
+    if (key === "distance") return `${value} km ${ui.upTo}`;
     if (key === "available") return "Bo‘sh vaqti bor";
-    return selectedService?.name || "Tanlangan xizmat";
+    return selectedService?.name || ui.service;
   }
 
   return (
     <section
       className="ex-page"
-      aria-label="Explore"
+      aria-label={ui.pageLabel}
       aria-busy={status === "loading"}
     >
       {detailId ? (
         <>
           <Link className="ex-back" to={makeUrl({ profile: null })}>
-            <ArrowIcon direction="left" /> Natijalarga qaytish
+            <ArrowIcon direction="left" /> {ui.back}
           </Link>
           {status === "loading" ? (
-            <Loading />
+            <Loading label={ui.loading} />
           ) : status === "error" ? (
-            <ErrorState onRetry={retry} />
+            <ErrorState onRetry={retry} ui={ui} />
           ) : detail ? (
             <div className="ex-detail">
               <ResultCard
@@ -121,14 +146,15 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                 type={type}
                 catalog={catalog}
                 makeUrl={makeUrl}
+                userLocation={profile.location}
                 detail
               />
             </div>
           ) : (
             <div className="ex-state">
               <Icon name="search" size={32} />
-              <h2>Profil topilmadi</h2>
-              <p>Bu profil hali mavjud emas yoki ma’lumotlari yuklanmagan.</p>
+              <h2>{ui.notFound}</h2>
+              <p>{ui.notFoundBody}</p>
             </div>
           )}
         </>
@@ -138,45 +164,38 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
             <Icon name="search" />
             <input
               type="search"
-              aria-label="Usta yoki salonni qidiring"
-              placeholder="Usta yoki salonni qidiring"
+              aria-label={ui.search}
+              placeholder={ui.searchPlaceholder}
               value={query}
+              maxLength={160}
               onChange={(e) => update({ q: e.target.value })}
             />
             {query && (
               <button
                 type="button"
-                aria-label="Qidiruvni tozalash"
+                aria-label={ui.clearQuery}
                 onClick={() => update({ q: null })}
               >
                 <Icon name="close" size={19} />
               </button>
             )}
           </div>
+          <p className="ex-search-help">{ui.helpPrefix} <Link to={siteLocalePath("/help?topic=search", lang)}>{ui.helpLink}</Link></p>
           <div className="ex-toolbar">
-            <div
-              className="ex-tabs"
-              role="group"
-              aria-label="Qidiruv kategoriyasi"
-            >
-              {Object.entries(TYPES).filter(([key]) => key !== "services").map(([key, label]) => (
-                <button
-                  type="button"
-                  key={key}
-                  aria-pressed={type === key}
-                  onClick={() =>
-                    update({
-                      type: key,
-                      profile: null,
-                      category: null,
-                      service:
-                        params.get("service"),
-                    })
-                  }
-                >
-                  {label}
-                </button>
-              ))}
+            <label className="ex-sort-label">
+              {ui.sort}
+              <select aria-label={ui.sortLabel} value={["price_asc", "price_desc", "name", "distance_asc"].includes(params.get("sort")) ? params.get("sort") : "relevance"}
+                onChange={(event) => update({ sort: event.target.value === "relevance" ? null : event.target.value })}>
+                <option value="relevance">{ui.relevance}</option>
+                <option value="price_asc">{ui.priceAsc}</option>
+                <option value="price_desc">{ui.priceDesc}</option>
+                <option value="name">{ui.nameSort}</option>
+                <option value="distance_asc" disabled={!hasLocation}>{ui.distanceSort}</option>
+              </select>
+            </label>
+            <div className="ex-view-switch" role="group" aria-label={ui.view}>
+              <button type="button" aria-pressed={!mapShown} onClick={() => update({ map: null })}>{ui.list}</button>
+              <button type="button" aria-pressed={mapShown} onClick={() => update({ map: '1' })}>{ui.map}</button>
             </div>
             <button
               type="button"
@@ -185,7 +204,7 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
               aria-controls="ex-filters"
               onClick={() => setFiltersOpen(!filtersOpen)}
             >
-              <span aria-hidden="true">☷</span> Filtrlar
+              <span aria-hidden="true">☷</span> {ui.filters}
               {activeFilters.length > 0 && (
                 <span className="ex-filter-count">{activeFilters.length}</span>
               )}
@@ -194,43 +213,46 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
           {filtersOpen && (
             <div id="ex-filters" className="ex-filters">
               <div className="ex-filters-title">
-                <h2>Qidiruvni aniqlashtiring</h2>
+                <h2>{ui.refine}</h2>
                 <button
                   type="button"
                   className="ex-text-button"
                   onClick={() => {
                     const next = new URLSearchParams(params);
                     FILTER_KEYS.forEach((key) => next.delete(key));
+                    setCompareIds([]);
                     setParams(next, { replace: true });
                   }}
                 >
-                  Filtrlarni tozalash
+                  {ui.clearFilters}
                 </button>
               </div>
               <div className="ex-filter-grid">
-                <label>
-                  Viloyat
-                  <select
-                    value={params.get("region") || ""}
-                    onChange={(e) => update({ region: e.target.value })}
-                  >
-                    <option value="">Barcha viloyatlar</option>
-                    {REGIONS.map((region) => (
-                      <option key={region}>{region}</option>
-                    ))}
-                  </select>
+                <label className="ex-area-filter">
+                  {ui.area}
+                  <input
+                    type="search"
+                    aria-label={ui.areaLabel}
+                    placeholder={ui.areaPlaceholder}
+                    value={params.get("area") || ""}
+                    maxLength={160}
+                    list="ex-public-districts-v178"
+                    onChange={(e) => update({ area: e.target.value })}
+                  />
+                  <datalist id="ex-public-districts-v178">{publishedDistricts.map(district => <option key={district} value={district}/>)}</datalist>
+                  <small>{ui.areaHint}</small>
                 </label>
                 <fieldset className="ex-price-filter">
-                  <legend>Narx oralig‘i, so‘m</legend>
+                  <legend>{ui.priceRange}</legend>
                   <div>
                     <input
                       type="number"
                       min="0"
                       step="1000"
-                      aria-label="Minimal narx"
-                      placeholder="Dan"
+                      aria-label={ui.minPrice}
+                      placeholder={ui.from}
                       value={min || ""}
-                      aria-invalid={!!badRange}
+                      aria-invalid={!!badFilters}
                       onChange={(e) => update({ min: e.target.value })}
                     />
                     <span>—</span>
@@ -238,71 +260,50 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                       type="number"
                       min="0"
                       step="1000"
-                      aria-label="Maksimal narx"
-                      placeholder="Gacha"
+                      aria-label={ui.maxPrice}
+                      placeholder={ui.to}
                       value={max || ""}
-                      aria-invalid={!!badRange}
+                      aria-invalid={!!badFilters}
                       onChange={(e) => update({ max: e.target.value })}
                     />
                   </div>
                 </fieldset>
                 <label>
-                  Reyting
-                  <select
-                    value={params.get("rating") || ""}
-                    onChange={(e) => update({ rating: e.target.value })}
-                  >
-                    <option value="">Barcha reytinglar</option>
-                    <option value="4">4.0 va yuqori</option>
-                    <option value="4.5">4.5 va yuqori</option>
-                    <option value="4.8">4.8 va yuqori</option>
-                  </select>
-                </label>
-                <label>
-                  Masofa
+                  {ui.distance}
                   <select
                     disabled={!hasLocation}
                     value={params.get("distance") || ""}
                     onChange={(e) => update({ distance: e.target.value })}
                   >
-                    <option value="">Istalgan masofa</option>
-                    <option value="1">1 km gacha</option>
-                    <option value="3">3 km gacha</option>
-                    <option value="5">5 km gacha</option>
-                    <option value="10">10 km gacha</option>
+                    <option value="">{ui.anyDistance}</option>
+                    <option value="1">1 km {ui.upTo}</option>
+                    <option value="3">3 km {ui.upTo}</option>
+                    <option value="5">5 km {ui.upTo}</option>
+                    <option value="10">10 km {ui.upTo}</option>
                   </select>
                 </label>
                 <label className="ex-service-filter">
-                  Xizmat <small>(ixtiyoriy)</small>
+                  {ui.service} <small>{ui.optional}</small>
                   <select
                     value={params.get("service") || ""}
                     onChange={(event) => update({ service: event.target.value, category: null })}
                   >
-                    <option value="">Barcha xizmatlar</option>
+                    <option value="">{ui.allServices}</option>
                     {catalog.services.map((service) => <option key={service.id} value={service.id}>{service.name}</option>)}
                   </select>
                 </label>
-                <label className="ex-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={params.get("available") === "1"}
-                    onChange={(e) =>
-                      update({ available: e.target.checked ? "1" : null })
-                    }
-                  />
-                  <span>Bo‘sh vaqti mavjud</span>
-                </label>
+
               </div>
               {!hasLocation && (
                 <p className="ex-filter-hint">
-                  Masofa bo‘yicha qidirish uchun{" "}
-                  <Link to={basePath === "/user/explore" ? "/user/profile" : "/demo/profile"}>profilingizda manzil tanlang</Link>.
+                  {ui.distance} bo‘yicha qidirish uchun{" "}
+                  <Link to={siteLocalePath("/user/profile", lang)}>{ui.locationLink}</Link>.
                 </p>
               )}
             </div>
           )}
           {activeFilters.length > 0 && (
-            <div className="ex-chips" aria-label="Tanlangan filtrlar">
+            <div className="ex-chips" aria-label={ui.selectedFilters}>
               {activeFilters.map((key) => (
                 <button
                   type="button"
@@ -316,27 +317,34 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
               ))}
             </div>
           )}
-          {badRange && (
+          {badFilters && (
             <p className="ex-error" role="alert">
-              Minimal narx maksimal narxdan katta bo‘lmasin.
+              {needsLocation && !hasLocation
+                ? ui.badLocation
+                : ui.badFilters}
             </p>
           )}
+          {status === "ready" && !badFilters && !mapShown && results.length > 1 &&
+            <p className="ex-compare-help">{ui.compareHint}</p>}
+          {compared.length > 0 && <ComparisonPanel rows={compared} lang={lang}
+            onRemove={id => setCompareIds(current => current.filter(value => value !== id))}
+            onClear={() => setCompareIds([])}/>}
           <div className="ex-results-heading">
-            <h2>{TYPES[type]}</h2>
+
             <span role="status" aria-live="polite">
               {status === "loading"
-                ? "Yuklanmoqda…"
+                ? ui.loading
                 : status === "error"
-                  ? "Yuklab bo‘lmadi"
-                  : `${badRange ? 0 : results.length} ta natija`}
+                  ? ui.loadError
+                  : `${badFilters ? 0 : results.length} ${ui.results}`}
             </span>
           </div>
           {status === "loading" ? (
-            <Loading />
+            <Loading label={ui.loading} />
           ) : status === "error" ? (
-            <ErrorState onRetry={retry} />
-          ) : results.length > 0 && !badRange ? (
-            <div className="ex-results">
+            <ErrorState onRetry={retry} ui={ui} />
+          ) : results.length > 0 && !badFilters ? (
+            mapShown ? <Suspense fallback={<p role="status">{ui.mapLoading}</p>}><BarbersMap barbers={results} userLocation={profile.location} selectedServiceId={params.get("service")} onShowList={() => update({ map: null })}/></Suspense> : <div className="ex-results">
               {results.map((item) => (
                 <ResultCard
                   key={item.id}
@@ -344,6 +352,11 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
                   type={type}
                   catalog={catalog}
                   makeUrl={makeUrl}
+                  userLocation={profile.location}
+                  lang={lang}
+                  compareSelected={safeCompared.includes(item.id)}
+                  compareFull={compareFull}
+                  onToggleCompare={toggleCompare}
                 />
               ))}
             </div>
@@ -354,17 +367,17 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
               </span>
               <h2>
                 {hasConstraints
-                  ? "Mos natijalar topilmadi"
-                  : "Hozircha ma’lumotlar yo‘q"}
+                  ? ui.noMatches
+                  : ui.noData}
               </h2>
               <p>
                 {hasConstraints
-                  ? "Boshqa nom bilan qidiring yoki filtrlarni kamaytiring."
-                  : `${TYPES[type]} haqidagi ma’lumotlar qo‘shilgach, shu yerda ko‘rinadi.`}
+                  ? ui.tryOther
+                  : ui.emptyCatalog}
               </p>
               {hasConstraints && (
                 <button type="button" className="ex-action" onClick={reset}>
-                  Qidiruv va filtrlarni tozalash
+                  {ui.reset}
                 </button>
               )}
             </div>
@@ -375,16 +388,16 @@ export default function Explore({ loadCatalog = loadExploreCatalog, basePath = "
   );
 }
 function Loading() {
-  return <PageLoading label="Ustalar yuklanmoqda…" />;
+  return <PageLoading label="Sartaroshlar yuklanmoqda…" />;
 }
-function ErrorState({ onRetry }) {
+function ErrorState({ onRetry, ui }) {
   return (
     <div className="ex-state" role="alert">
       <span className="ex-state-icon ex-state-warning">!</span>
-      <h2>Ma’lumotlarni yuklab bo‘lmadi</h2>
-      <p>Qayta urinib ko‘ring. Muammo davom etsa, biroz kuting.</p>
+      <h2>{ui.errorTitle}</h2>
+      <p>{ui.errorBody}</p>
       <button type="button" className="ex-action" onClick={onRetry}>
-        Qayta urinish
+        {ui.retry}
       </button>
     </div>
   );

@@ -1,0 +1,623 @@
+{
+  "info": {
+    "_postman_id": "7e8f8e9d-7718-47eb-8e67-7a5700010001",
+    "name": "Ustara — Register va Login",
+    "description": "Customer va barber ro‘yxatdan o‘tishi, kirishi, token va profil ruxsatlarini tekshiradi. So‘rovlarni yuqoridan pastga ketma-ket ishga tushiring. Har ishga tushishda telefonlar tasodifiy yaratiladi.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "customerFirstName",
+      "value": "Sinov"
+    },
+    {
+      "key": "customerLastName",
+      "value": "Mijoz"
+    },
+    {
+      "key": "barberFirstName",
+      "value": "Sinov"
+    },
+    {
+      "key": "barberLastName",
+      "value": "Usta"
+    },
+    {
+      "key": "customerPassword",
+      "value": "UstaraPass123"
+    },
+    {
+      "key": "barberPassword",
+      "value": "BarberPass123"
+    }
+  ],
+  "item": [
+    {
+      "name": "Customer Registration Start",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = String(Math.floor(1000000 + Math.random() * 9000000));",
+              "pm.environment.set('customerPhone', '+99890' + suffix);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Start: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.variables.set('customerSessionToken', body.sessionToken);",
+              "if (body.testOtp) pm.variables.set('customerOtp', body.testOtp);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{customerPhone}}\",\n  \"password\": \"{{customerPassword}}\",\n  \"role\": \"customer\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/start"
+        }
+      }
+    },
+    {
+      "name": "Customer Registration Verify",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionToken\": \"{{customerSessionToken}}\",\n  \"otp\": \"{{customerOtp}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/verify"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Verify: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer Registration Complete",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionToken\": \"{{customerSessionToken}}\",\n  \"firstName\": \"{{customerFirstName}}\",\n  \"lastName\": \"{{customerLastName}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/complete"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Customer Register: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('Customer profili javobda bor', () => { pm.expect(body.customer).to.be.an('object'); pm.expect(body.customer.id).to.be.a('number'); pm.expect(body.customer.phone).to.eql(pm.environment.get('customerPhone')); });",
+              "pm.test('Parol javobga chiqmagan', () => { pm.expect(body.customer).not.to.have.property('password'); pm.expect(pm.response.text()).not.to.include(pm.environment.get('customerPassword')); });",
+              "pm.environment.set('customerProfileId', String(body.customer.id));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Takroriy telefon bilan Register",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Takroriy telefon: HTTP 409', () => pm.response.to.have.status(409));",
+              "pm.test('Tushunarli duplicate xabari qaytdi', () => pm.expect(body.message).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{customerPhone}}\",\n  \"password\": \"{{barberPassword}}\",\n  \"role\": \"barber\",\n  \"specialty\": \"barber\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/start"
+        }
+      }
+    },
+    {
+      "name": "Barber Registration Start",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = String(Math.floor(1000000 + Math.random() * 9000000));",
+              "pm.environment.set('barberPhone', '+99891' + suffix);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Start: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.variables.set('barberSessionToken', body.sessionToken);",
+              "if (body.testOtp) pm.variables.set('barberOtp', body.testOtp);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{barberPhone}}\",\n  \"password\": \"{{barberPassword}}\",\n  \"role\": \"barber\",\n  \"specialty\": \"barber\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/start"
+        }
+      }
+    },
+    {
+      "name": "Barber Registration Verify",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionToken\": \"{{barberSessionToken}}\",\n  \"otp\": \"{{barberOtp}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/verify"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Verify: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barber Registration Complete",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionToken\": \"{{barberSessionToken}}\",\n  \"firstName\": \"{{barberFirstName}}\",\n  \"lastName\": \"{{barberLastName}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/registration/complete"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Barber Register: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('Barber profili va pending holati bor', () => { pm.expect(body.barber).to.be.an('object'); pm.expect(body.barber.id).to.be.a('number'); pm.expect(body.barber.phone).to.eql(pm.environment.get('barberPhone')); pm.expect(body.barber.verification_status).to.eql('pending'); });",
+              "pm.test('Parol javobga chiqmagan', () => { pm.expect(body.barber).not.to.have.property('password'); pm.expect(pm.response.text()).not.to.include(pm.environment.get('barberPassword')); });",
+              "pm.environment.set('barberProfileId', String(body.barber.id));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Customer Login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Token va customer javobi mavjud', () => { pm.expect(body.token).to.be.a('string').and.not.empty; pm.expect(body.customer.id).to.eql(Number(pm.environment.get('customerProfileId'))); });",
+              "pm.test('Parol javobga chiqmagan', () => { pm.expect(body.customer).not.to.have.property('password'); pm.expect(pm.response.text()).not.to.include(pm.environment.get('customerPassword')); });",
+              "const part = body.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+              "const payload = JSON.parse(atob(part + '='.repeat((4 - part.length % 4) % 4)));",
+              "pm.test('JWT role customer va ID users.id', () => { pm.expect(payload.role).to.eql('customer'); pm.expect(payload.id).to.be.a('number'); pm.expect(payload.profileId).to.eql(Number(pm.environment.get('customerProfileId'))); });",
+              "pm.environment.set('customerToken', body.token);",
+              "pm.environment.set('customerAccountId', String(payload.id));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{customerPhone}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/login"
+        }
+      }
+    },
+    {
+      "name": "Barber Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Barber Login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Token va barber javobi mavjud', () => { pm.expect(body.token).to.be.a('string').and.not.empty; pm.expect(body.barber.id).to.eql(Number(pm.environment.get('barberProfileId'))); });",
+              "pm.test('Parol javobga chiqmagan', () => { pm.expect(body.barber).not.to.have.property('password'); pm.expect(pm.response.text()).not.to.include(pm.environment.get('barberPassword')); });",
+              "const part = body.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+              "const payload = JSON.parse(atob(part + '='.repeat((4 - part.length % 4) % 4)));",
+              "pm.test('JWT role barber va ID users.id', () => { pm.expect(payload.role).to.eql('barber'); pm.expect(payload.id).to.be.a('number'); pm.expect(payload.profileId).to.eql(Number(pm.environment.get('barberProfileId'))); });",
+              "pm.environment.set('barberToken', body.token);",
+              "pm.environment.set('barberAccountId', String(payload.id));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{barberPhone}}\",\n  \"password\": \"{{barberPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/barbers/login"
+        }
+      }
+    },
+    {
+      "name": "Noto‘g‘ri parol bilan Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Noto‘g‘ri parol: HTTP 401', () => pm.response.to.have.status(401));",
+              "pm.test('Umumiy credential xabari qaytdi', () => pm.expect(body.message).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{customerPhone}}\",\n  \"password\": \"WrongPass999\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/login"
+        }
+      }
+    },
+    {
+      "name": "Noto‘g‘ri telefon bilan Login",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.environment.set('unknownPhone', '+99898' + String(Math.floor(1000000 + Math.random() * 9000000)));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Noto‘g‘ri telefon: HTTP 401', () => pm.response.to.have.status(401));",
+              "pm.test('Umumiy credential xabari qaytdi', () => pm.expect(body.message).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"{{unknownPhone}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/barbers/login"
+        }
+      }
+    },
+    {
+      "name": "Token bilan Customer profiliga kirish",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Customer profil: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Javob token egasining profilidir', () => { pm.expect(body.customer.id).to.eql(Number(pm.environment.get('customerProfileId'))); pm.expect(body.customer.phone).to.eql(pm.environment.get('customerPhone')); pm.expect(body.customer).not.to.have.property('password'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/me"
+        }
+      }
+    },
+    {
+      "name": "Token bilan Barber profilini olish",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Barber profili: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Profil token egasiga tegishli', () => { pm.expect(body.barber.id).to.eql(Number(pm.environment.get('barberProfileId'))); pm.expect(body.barber.first_name).to.eql(pm.variables.get('barberFirstName')); pm.expect(body.barber.last_name).to.eql(pm.variables.get('barberLastName')); pm.expect(body.barber.phone).to.eql(pm.environment.get('barberPhone')); pm.expect(body.barber.verification_status).to.eql('pending'); });",
+              "pm.test('Javobda parol yoki hash yo‘q', () => { pm.expect(body.barber).not.to.have.property('password'); pm.expect(body.barber).not.to.have.property('password_hash'); pm.expect(pm.response.text()).not.to.include(pm.environment.get('barberPassword')); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{barberToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/barbers/me"
+        }
+      }
+    },
+    {
+      "name": "Customer tokeni barber ruxsatini olmaydi",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Customer token barber endpointida rad etiladi: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/barbers/working-hours"
+        }
+      }
+    },
+    {
+      "name": "Token bilan Barber ish jadvaliga kirish",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('Barber tokenli profil yo‘li: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('O‘z ish jadvali ro‘yxat ko‘rinishida', () => pm.expect(body).to.be.an('array'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{barberToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/barbers/working-hours"
+        }
+      }
+    },
+    {
+      "name": "Barber tokeni customer ruxsatini olmaydi",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Barber token customer endpointida rad etiladi: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{barberToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers/me"
+        }
+      }
+    }
+  ]
+}

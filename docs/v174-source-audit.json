@@ -1,0 +1,127 @@
+{
+  "version": "v174",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 130,
+  "indexedNew": 7,
+  "indexedTotal": 137,
+  "notYetIndexed": 48,
+  "sourcePartiallyImplemented": 5,
+  "requirementsNotImplemented": 2,
+  "decisions": [
+    {
+      "id": 130,
+      "decision": "Boshqa sartaroshga rozilik bilan transfer",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No authenticated customer consent workflow, source and destination barber lock, or atomic cross-barber transfer exists. Do not silently replace a booked barber."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 131,
+      "decision": "Smart Notification Center",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/bookings/smartNotificationCenterV174.js",
+        "frontend/src/layouts/UserLayout.jsx",
+        "frontend/src/pages/user/bookings/notifications.js"
+      ],
+      "tests": [
+        "frontend/test/v174SmartNotificationCenter.test.js"
+      ],
+      "missingImplementation": [
+        "Read-only booking status snapshot with active/past filters and refresh. No persisted notification read state, Telegram outbox delivery timeline, push stream or browser E2E."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 132,
+      "decision": "Faqat slot bo‘shasa bildirish waitlist",
+      "originalStatus": "Qisman: v30 faol taklifga bir vaqtning o‘zida bir entry",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/services/smartBookingOffers.js",
+        "backend/database/migrations/20261208_smart_booking_offers.sql"
+      ],
+      "tests": [
+        "backend/test/queueOfferConsent.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Queue offer/opt-in foundation exists. User subscription to a specific unavailable slot and real PG/Telegram E2E not verified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 133,
+      "decision": "Smart Booking History",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/Bookings.jsx",
+        "frontend/src/pages/user/bookings/model.js"
+      ],
+      "tests": [
+        "frontend/test/bookingNotifications.test.js"
+      ],
+      "missingImplementation": [
+        "Customer booked/past status list exists, but true immutable Smart Booking decision events, delivery outcomes and status history are not exposed."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 134,
+      "decision": "Privacy Center",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "No cohesive privacy data/export/deletion/permission center verified. Account deactivation is a separate function, not a full privacy center."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 135,
+      "decision": "Akkauntni vaqtincha faolsizlantirish",
+      "originalStatus": "Qisman bajarildi, real DB integratsiya tekshirilmagan",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/routes/auth.js",
+        "frontend/src/components/DeactivateAccountAction.jsx"
+      ],
+      "tests": [
+        "backend/test/accountPause.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Password-backed temporary deactivation and session controls have source tests; real PostgreSQL/queue/telegram integration not demonstrated."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 136,
+      "decision": "Mehmon rejimi va vaqtincha tanlovlar",
+      "originalStatus": "Qisman: v15 guest profil, qidiruv va draft",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/user/barber/bookingDraft.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "frontend/test/bookingDraft.test.js"
+      ],
+      "missingImplementation": [
+        "Guest 5-minute browser-tab selection and public view exist, but login handoff, slot revalidation and full browser E2E remain."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

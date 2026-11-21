@@ -1,0 +1,146 @@
+{
+  "version": "v169",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "reviewedDecisions": 7,
+  "previousSourceTraces": 96,
+  "alreadyIndexed": [],
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 103,
+  "notYetTraced": 82,
+  "decisions": [
+    {
+      "id": 95,
+      "decision": "2-3 sartarosh solishtirish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/explore/compareModel.js",
+        "frontend/src/pages/user/explore/ComparisonPanel.jsx"
+      ],
+      "tests": [
+        "frontend/test/v132BarberComparison.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "2–3 barber comparison exists, but live API price/availability consistency and mobile browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 96,
+      "decision": "Alohida kun yoki xizmat bronini pauza qilish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/calendarExceptionsController.js",
+        "backend/controllers/barbersController.js"
+      ],
+      "tests": [
+        "backend/test/calendarExceptions.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Date closures/global barber acceptance exist. Service-specific pause controls and live DB conflict behavior NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 97,
+      "decision": "Favorites va kuzatish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/socialController.js",
+        "frontend/src/pages/user/UserHome.jsx"
+      ],
+      "tests": [
+        "frontend/test/v131FollowedHomeSafety.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Follow and saved-social-post foundations exist. Distinct favorite service collections and cross-device E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 98,
+      "decision": "Besh daqiqalik bron qoralamasi",
+      "originalStatus": "Qisman: v15 guest draft + unit test",
+      "code": [
+        "frontend/src/pages/user/barber/bookingDraft.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "frontend/test/v83GuestBookingDraft.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "TTL-bound guest draft exists, not a reserved slot. Real signup/login recovery browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 99,
+      "decision": "Bir sahifali progressiv booking",
+      "originalStatus": "Qisman: v15 guest bir sahifali tanlov",
+      "code": [
+        "frontend/src/pages/user/barber/InlineBooking.jsx",
+        "frontend/src/pages/user/barber/createBooking.js"
+      ],
+      "tests": [
+        "frontend/test/createBooking.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Single-page service/date/time flow exists. Full mobile accessibility and live availability E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 100,
+      "decision": "Server tasdig‘i bilan bron yakuniy oynasi",
+      "originalStatus": "Qisman: v10 Telegram xatosi bronni bekor qilmaydi",
+      "code": [
+        "frontend/src/pages/user/barber/bookingConfirmation.js",
+        "frontend/src/pages/user/barber/bookingReceipt.js"
+      ],
+      "tests": [
+        "frontend/test/v86BookingReceiptIntegrity.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Server-verified booking receipts and ambiguous-response handling exist; real transactional PostgreSQL/browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 101,
+      "decision": "Mijoz kechikishni xabar qilish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/bookingLateNoticeV169.js",
+        "frontend/src/pages/user/bookings/LateNoticeV169.jsx",
+        "frontend/src/pages/barber/components/BookingCard.jsx"
+      ],
+      "tests": [
+        "backend/test/v169BookingLateNotice.unit.test.js",
+        "frontend/test/v169LateArrivalNotice.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "New persistent single-notice flow and barber booking-card read; no guaranteed push/Telegram delivery, explicit acceptance, real PostgreSQL concurrency or browser E2E."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "telegramLateArrival": "NOT_IMPLEMENTED",
+  "productionReady": false,
+  "releaseReadiness": "NOT_VERIFIED"
+}

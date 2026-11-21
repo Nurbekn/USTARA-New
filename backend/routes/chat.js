@@ -1,0 +1,10 @@
+const router = require('express').Router();
+const auth = require('../middleware/authMiddleware');
+const chat = require('../services/customerBarberChat').createHandlers(require('../db'));
+router.use((req,res,next)=>{res.set('Cache-Control','no-store');next();});
+router.use(auth);
+router.get('/threads', chat.list);
+router.post('/threads', chat.createThread);
+router.get('/threads/:threadId/messages', chat.read);
+router.post('/threads/:threadId/messages', chat.send);
+module.exports = router;

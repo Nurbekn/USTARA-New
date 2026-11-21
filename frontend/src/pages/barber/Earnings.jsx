@@ -1,226 +1,38 @@
-import { useState } from "react";
-import PageHeader from "./components/PageHeader";
-import { STATUS, addDays, toISODate, useBarber } from "./data/store";
-import {
-  SHORT_MONTHS,
-  SHORT_WEEKDAYS,
-  formatMoney,
-  groupDigits,
-  shortMoney,
-} from "./data/format";
-
-const VIEWS = [
-  { id: "day", label: "Kunlik" },
-  { id: "week", label: "Haftalik" },
-  { id: "year", label: "Yillik" },
-];
-
-// Sums price of completed bookings between two ISO dates (inclusive).
-// ISO dates compare correctly as plain strings.
-const inRange = (list, from, to) =>
-  list.filter((b) => b.date >= from && b.date <= to);
-const sum = (list) => list.reduce((total, b) => total + b.price, 0);
-
-// Builds the chart buckets + the "current" and "previous" period for a view
-function buildReport(view, done) {
-  const now = new Date();
-  const buckets = [];
-  let current;
-  let previous;
-  let periodName;
-
-  if (view === "day") {
-    // Last 7 days
-    for (let i = 6; i >= 0; i--) {
-      const d = addDays(-i, now);
-      const iso = toISODate(d);
-      buckets.push({ label: SHORT_WEEKDAYS[d.getDay()], from: iso, to: iso });
-    }
-    current = buckets[6];
-    previous = buckets[5];
-    periodName = "Bugun";
-  } else if (view === "week") {
-    // Last 8 weeks, Monday–Sunday
-    const toMonday = now.getDay() === 0 ? -6 : 1 - now.getDay();
-    for (let k = -7; k <= 0; k++) {
-      const start = addDays(toMonday + k * 7, now);
-      const end = addDays(toMonday + k * 7 + 6, now);
-      buckets.push({
-        label: `${start.getDate()}.${String(start.getMonth() + 1).padStart(2, "0")}`,
-        from: toISODate(start),
-        to: toISODate(end),
-      });
-    }
-    current = buckets[7];
-    previous = buckets[6];
-    periodName = "Shu hafta";
-  } else {
-    // Last 12 months
-    for (let m = -11; m <= 0; m++) {
-      const first = new Date(now.getFullYear(), now.getMonth() + m, 1);
-      const last = new Date(now.getFullYear(), now.getMonth() + m + 1, 0);
-      buckets.push({
-        label: SHORT_MONTHS[first.getMonth()],
-        from: toISODate(first),
-        to: toISODate(last),
-      });
-    }
-    current = { from: buckets[0].from, to: buckets[11].to };
-    const prevFirst = new Date(now.getFullYear() - 1, now.getMonth() - 11, 1);
-    const prevLast = new Date(now.getFullYear() - 1, now.getMonth() + 1, 0);
-    previous = { from: toISODate(prevFirst), to: toISODate(prevLast) };
-    periodName = "Oxirgi 12 oy";
-  }
-
-  const withValue = buckets.map((b) => ({
-    ...b,
-    value: sum(inRange(done, b.from, b.to)),
-  }));
-  const currentList = inRange(done, current.from, current.to);
-  const previousTotal = sum(inRange(done, previous.from, previous.to));
-
-  return {
-    buckets: withValue,
-    periodName,
-    list: currentList,
-    total: sum(currentList),
-    previousTotal,
-  };
-}
-
+import { useLocation } from "react-router-dom";
+import { readSiteLocale } from "../../utils/siteLocale.js";
+import { barberInsightsText } from "./barberInsightsLocaleV147.js";
+import { useEffect, useState } from 'react';
+import PageHeader from './components/PageHeader';
+import { request } from '../../api/client';
+import { getSession } from '../auth/utils/session';
+import { formatMoney } from './data/format';
+import { earningsSeries } from './data/earnings';
 export default function Earnings() {
-  const { bookings } = useBarber();
-  const [view, setView] = useState("day");
-  const [picked, setPicked] = useState(null); // tapped bar index
-
-  const done = bookings.filter((b) => b.status === STATUS.COMPLETED);
-  const report = buildReport(view, done);
-
-  const selected =
-    picked ?? (view === "year" ? null : report.buckets.length - 1);
-  const max = Math.max(...report.buckets.map((b) => b.value), 1);
-
-  // Change vs previous period (hidden when there is nothing to compare)
-  const change = report.previousTotal
-    ? Math.round(
-        ((report.total - report.previousTotal) / report.previousTotal) * 100,
-      )
-    : null;
-
-  // Income per service in the current period
-  const byService = Object.values(
-    report.list.reduce((acc, b) => {
-      acc[b.service] ??= { name: b.service, count: 0, total: 0 };
-      acc[b.service].count += 1;
-      acc[b.service].total += b.price;
-      return acc;
-    }, {}),
-  ).sort((a, b) => b.total - a.total);
-
-  const average = report.list.length ? report.total / report.list.length : 0;
-
-  return (
-    <div className="bx-page">
-      <PageHeader
-        back
-        title="Daromad"
-        subtitle="Faqat bajarilgan bronlar hisoblanadi"
-      />
-
-      <div className="bx-seg" role="tablist">
-        {VIEWS.map((v) => (
-          <button
-            key={v.id}
-            type="button"
-            role="tab"
-            aria-selected={view === v.id}
-            className={view === v.id ? "is-active" : ""}
-            onClick={() => {
-              setView(v.id);
-              setPicked(null);
-            }}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
-
-      <section className="bx-card bx-earn-main">
-        <span className="bx-eyebrow">{report.periodName}</span>
-        <strong>{formatMoney(report.total)}</strong>
-        {change !== null && (
-          <span className={`bx-change ${change >= 0 ? "up" : "down"}`}>
-            {change >= 0 ? "▲" : "▼"} {Math.abs(change)}% oldingi davrga
-            nisbatan
-          </span>
-        )}
-      </section>
-
-      <section className="bx-card">
-        <p className="bx-chart-info">
-          {selected !== null
-            ? `${report.buckets[selected].label}: ${formatMoney(report.buckets[selected].value)}`
-            : "Ustunni bosing"}
-        </p>
-        <div className="bx-chart" role="list">
-          {report.buckets.map((b, i) => (
-            <button
-              key={b.from}
-              type="button"
-              role="listitem"
-              className={`bx-bar ${selected === i ? "is-active" : ""}`}
-              onClick={() => setPicked(i)}
-              aria-label={`${b.label}: ${formatMoney(b.value)}`}
-            >
-              <em>{b.value ? shortMoney(b.value) : ""}</em>
-              <span
-                style={{ height: `${Math.max((b.value / max) * 100, 3)}%` }}
-              />
-              <small>{b.label}</small>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <div className="bx-stats">
-        <div className="bx-stat">
-          <span>Mijozlar</span>
-          <strong>{report.list.length}</strong>
-        </div>
-        <div className="bx-stat">
-          <span>O'rtacha chek</span>
-          <strong>{groupDigits(average)}</strong>
-        </div>
-      </div>
-
-      <section>
-        <div className="bx-sec-title">
-          <h2>Xizmatlar bo'yicha</h2>
-        </div>
-        {byService.length === 0 ? (
-          <p className="bx-empty-line">Bu davrda daromad yo'q</p>
-        ) : (
-          <div className="bx-card bx-breakdown">
-            {byService.map((s) => (
-              <div key={s.name}>
-                <div className="bx-breakdown-row">
-                  <span>
-                    {s.name} <small className="bx-muted">× {s.count}</small>
-                  </span>
-                  <b>{formatMoney(s.total)}</b>
-                </div>
-                <div className="bx-meter">
-                  <i
-                    style={{
-                      width: `${(s.total / byService[0].total) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
-  );
+  const lang=readSiteLocale(useLocation().search);
+  const tr=barberInsightsText(lang);
+  const [state, setState] = useState({ status: 'loading', rows: [] });
+  const [days, setDays] = useState(7);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    request('GET', '/api/barbers/earnings', { token: getSession()?.token, signal: controller.signal }).then(data => {
+      if (!Array.isArray(data?.rows) || data.estimateOnly !== true || data.paymentVerified !== false) throw Error(tr('Hisobot noto‘g‘ri qaytdi.'));
+      if (!controller.signal.aborted) setState({ status: 'ready', rows: data.rows, now: data.serverNow, basis: data.basis });
+    }).catch(e => { if (!controller.signal.aborted) setState({ status: 'error', rows: [], error: e.message }); });
+    return () => controller.abort();
+  }, [attempt]);
+  const series = earningsSeries(state.rows, days, state.now ? new Date(state.now) : new Date());
+  const total = series.reduce((n, day) => n + day.amount, 0), count = series.reduce((n, day) => n + day.count, 0);
+  const max = Math.max(...series.map(day => day.amount), 1);
+  const services = Object.entries(state.rows.filter(row => row.day >= series[0].date).reduce((all, row) => ({ ...all, [row.service]: (all[row.service] || 0) + Number(row.amount) }), {})).sort((a,b) => b[1] - a[1]);
+  return <div className="bx-page bx-earnings"><PageHeader back title={tr("Daromad")} subtitle={tr("Yakunlangan xizmatlar hisoboti")}/>
+    {state.status === 'loading' ? <p role="status">{tr("Hisobot yuklanmoqda…")}</p> : state.status === 'error' ? <div role="alert" className="bx-error"><p>{state.error}</p><button className="bx-btn" onClick={() => setAttempt(n => n + 1)}>{tr("Qayta urinish")}</button></div> : <>
+      <div className="bx-earn-period" role="group" aria-label={tr("Hisobot davri")}>{[7,30].map(value => <button key={value} type="button" className="bx-chip" aria-pressed={days === value} onClick={() => setDays(value)}>{tr('Oxirgi {count} kun',{count:value})}</button>)}</div>
+      <section className="bx-card bx-earn-total"><span>{tr("Hisoblangan daromad")} {tr('(taxminiy)')}</span><strong>{formatMoney(total)}</strong><p className="bx-muted">{tr('Bu faqat xizmat narxlari asosidagi taxmin. To‘lov qabul qilingani tasdiqlanmagan.')}</p><p className="bx-muted">{state.basis === 'booking_snapshot' ? tr('Bron vaqtida saqlangan narx bo‘yicha') : state.basis === 'mixed_snapshot_and_current_price' ? tr('Eski bronlar joriy xizmat narxida hisoblangan') : tr('Joriy xizmat narxi bo‘yicha')}</p><div><span>{tr('{count} ta yakunlangan bron',{count})}</span><span>{tr('O‘rtacha: {price}',{price:formatMoney(count ? total / count : 0)})}</span></div></section>
+      <section className="bx-card"><h2>{tr("Kunlik daromad")}</h2><div className="bx-income-bars" role="img" aria-label={tr('{count} kunlik daromad: {price}',{count:days,price:formatMoney(total)})}>
+        {series.map((day, index) => <div className="bx-income-day" key={day.date} title={`${day.date}: ${formatMoney(day.amount)}`}><span className="bx-income-track"><i style={{ height: `${Math.max(2, day.amount / max * 100)}%`, opacity: day.amount ? 1 : .18 }}/></span><small>{days === 7 || index % 5 === 0 || index === series.length - 1 ? Number(day.date.slice(-2)) : "\u00a0"}</small></div>)}
+      </div>{total === 0 && <p className="bx-muted">{tr("Hali yakunlangan pullik xizmat yo‘q. Daromadingiz shu yerda ko‘rinadi.")}</p>}</section>
+      <section className="bx-card"><h2>{tr("Xizmatlar bo‘yicha")}</h2><div className="bx-income-breakdown"><div className="bx-income-ring" style={{ '--share': `${total ? (services[0]?.[1] || 0) / total * 100 : 0}%` }}><div><strong>{count}</strong><small>{tr("bron")}</small></div></div><div className="bx-income-legend">{services.length ? services.map(([name,amount]) => <div key={name}><span>{name}</span><strong>{formatMoney(amount)}</strong></div>) : <div><span>{tr("Yakunlangan xizmatlar")}</span><strong>{formatMoney(0)}</strong></div>}</div></div></section>
+    </>}
+  </div>;
 }

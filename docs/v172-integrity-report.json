@@ -1,0 +1,81 @@
+{
+  "version": "v172",
+  "sourceArchive": "USTARA-v171-185-Barber-Certificates-and-Seven-Team-Decisions.zip",
+  "sourceArchiveSha256": "17f1307275c30c8833470c9adb8aff0be36496c35edd1cd869ef09253856df11",
+  "sourceArchiveFiles": 1325,
+  "sourceFilesPreserved": 1325,
+  "sourceFilesDeleted": 0,
+  "originalSqlFilesUnchanged": 56,
+  "sourceRegistrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "sourceRegistryUnchanged": true,
+  "existingFilesModified": [
+    "USTARA-New/.github/workflows/v55-verify.yml",
+    "USTARA-New/backend/database/bootstrap/verify.sql",
+    "USTARA-New/backend/database/bootstrap.sql",
+    "USTARA-New/backend/scripts/v108-day-close-db-check.js",
+    "USTARA-New/backend/scripts/v112-schedule-db-check.js",
+    "USTARA-New/backend/scripts/v40-staging.js",
+    "USTARA-New/backend/scripts/v41-readiness.js",
+    "USTARA-New/backend/scripts/v55-release-gate.js",
+    "USTARA-New/backend/scripts/v66-db-readiness.js",
+    "USTARA-New/backend/scripts/v97-queue-readiness.js",
+    "USTARA-New/backend/server.js",
+    "USTARA-New/backend/test/audit-phase1.unit.test.js",
+    "USTARA-New/backend/test/bootstrap-plan.unit.test.js",
+    "USTARA-New/backend/test/smartBookingV30.unit.test.js",
+    "USTARA-New/backend/test/v112ScheduleDbReadiness.unit.test.js",
+    "USTARA-New/backend/test/v39QueueDelivery.unit.test.js",
+    "USTARA-New/backend/test/v41Readiness.unit.test.js",
+    "USTARA-New/backend/test/v42MigrationLedger.unit.test.js",
+    "USTARA-New/backend/test/v66IntegrationReadiness.unit.test.js",
+    "USTARA-New/backend/test/v67DecisionIntegrity.unit.test.js",
+    "USTARA-New/backend/test/v97QueueReadiness.unit.test.js",
+    "USTARA-New/backend/test/walkinQueue.unit.test.js",
+    "USTARA-New/frontend/src/App.jsx",
+    "USTARA-New/frontend/src/pages/barber/Profile.jsx",
+    "USTARA-New/frontend/src/pages/user/barber/BarberPublicProfile.jsx",
+    "USTARA-New/scripts/v67-migration-audit.cjs"
+  ],
+  "newFilesBeforeManifest": [
+    "USTARA-New/backend/database/migrations/20261226_single_address_barber_shops.sql",
+    "USTARA-New/backend/routes/shops.js",
+    "USTARA-New/backend/scripts/v172-seven-shop-decisions.mjs",
+    "USTARA-New/backend/services/singleAddressShopV172.js",
+    "USTARA-New/backend/test/v172SevenShopDecisions.unit.test.js",
+    "USTARA-New/backend/test/v172SingleAddressShop.unit.test.js",
+    "USTARA-New/docs/v172-seven-shop-decisions.md",
+    "USTARA-New/frontend/src/pages/shops/PublishedShopLinkV172.jsx",
+    "USTARA-New/frontend/src/pages/shops/ShopEditV172.jsx",
+    "USTARA-New/frontend/src/pages/shops/ShopPublicV172.jsx",
+    "USTARA-New/frontend/src/pages/shops/shopLocaleV172.js",
+    "USTARA-New/frontend/src/pages/shops/shopV172.css",
+    "USTARA-New/frontend/test/v172Shops.test.js"
+  ],
+  "auditIndexed": 123,
+  "auditRemaining": 62,
+  "forwardSqlMigrations": 55,
+  "rollbackSqlFiles": 2,
+  "unitTests": {
+    "frontend": {
+      "pass": 1666,
+      "total": 1666
+    },
+    "backend": {
+      "pass": 1636,
+      "total": 1665,
+      "fail": 29
+    },
+    "targetedNew": {
+      "pass": 13,
+      "total": 13
+    }
+  },
+  "integrationTests": {
+    "postgresql": "NOT_RUN",
+    "browser": "NOT_RUN",
+    "telegram": "NOT_RUN",
+    "productionBuild": "NOT_RUN"
+  },
+  "productionReady": false,
+  "sqlApplied": false
+}

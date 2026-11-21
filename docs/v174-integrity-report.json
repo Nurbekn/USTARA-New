@@ -1,0 +1,44 @@
+{
+  "version": "v174",
+  "sourceVersion": "v173",
+  "oldFiles": 1350,
+  "oldFilesPreserved": true,
+  "missingFiles": [],
+  "changedExistingFiles": [
+    "USTARA-New/frontend/src/layouts/UserLayout.css",
+    "USTARA-New/frontend/src/layouts/UserLayout.jsx",
+    "USTARA-New/frontend/test/v141SiteShellLanguages.test.js"
+  ],
+  "addedFilesBeforeIntegrityReport": [
+    "USTARA-New/backend/scripts/v174-seven-notification-privacy-decisions.mjs",
+    "USTARA-New/backend/test/v174SevenNotificationPrivacyDecisions.unit.test.js",
+    "USTARA-New/docs/v174-source-audit.json",
+    "USTARA-New/frontend/src/pages/user/bookings/smartNotificationCenterV174.js",
+    "USTARA-New/frontend/test/v174SmartNotificationCenter.test.js"
+  ],
+  "protectedFilesUnchanged": 66,
+  "protectedChanges": [],
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "auditIndexed": 137,
+  "auditNotYetIndexed": 48,
+  "tests": {
+    "frontend": {
+      "passed": 1676,
+      "failed": 0
+    },
+    "backend": {
+      "passed": 1650,
+      "failed": 29,
+      "previousFailuresUnchanged": true
+    },
+    "targeted": {
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "realPostgreSQL": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionBuild": "NOT_RUN",
+  "liveTelegram": "NOT_RUN",
+  "productionReady": false
+}

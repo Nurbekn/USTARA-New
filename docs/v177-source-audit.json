@@ -1,0 +1,131 @@
+{
+  "version": "v177",
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "totalDecisions": 185,
+  "reviewedDecisions": 7,
+  "previouslyIndexed": 151,
+  "indexedNew": 7,
+  "indexedTotal": 158,
+  "notYetIndexed": 27,
+  "sourcePartiallyImplemented": 5,
+  "requirementsNotImplemented": 1,
+  "explicitlyCancelled": 1,
+  "decisions": [
+    {
+      "id": 151,
+      "decision": "Smart Complaint Flow",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/socialReportReceiptsV177.js",
+        "backend/routes/social.js",
+        "frontend/src/pages/user/social/MyReportsV177.jsx",
+        "frontend/src/pages/user/Social.jsx"
+      ],
+      "tests": [
+        "backend/test/v177SocialReportReceipts.unit.test.js",
+        "frontend/test/v177SocialReportReceipts.test.js"
+      ],
+      "missingImplementation": [
+        "Users can submit social post complaints and read up to 50 own submission receipts with server-only authorization. Admin adjudication, durable audit after post removal, appeals and real database/browser E2E do not exist; receipt is NOT a moderation outcome."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 152,
+      "decision": "Safe No-Show tasdiqlash",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/barber/data/noShowConfirmationV105.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "frontend/test/v105SafeNoShowConfirmation.test.js"
+      ],
+      "missingImplementation": [
+        "Queue no-show confirmation checks current caller/state; broader booking no-show policy and real PostgreSQL parallel transitions are unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 153,
+      "decision": "Safe Day Closing",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/walkinQueueController.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "frontend/test/v106DayCloseReadiness.test.js",
+        "backend/test/v107SafeDayClose.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Queue close/reopen with preview and blockers exists; real PostgreSQL races and production calendar edge cases remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 154,
+      "decision": "Narx darhol kuchga kiradi, kelajak scheduler YO‘Q",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "backend/controllers/servicesController.js",
+        "backend/services/bookingSelection.js"
+      ],
+      "tests": [
+        "backend/test/bookingPriceSnapshot.unit.test.js"
+      ],
+      "missingImplementation": [
+        "Service edits update current price; old booking snapshots are intended to remain stable. No future-dated price scheduler was introduced; real PostgreSQL booking-edit races remain unverified."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 155,
+      "decision": "Egasi va ruxsatli menejer profilni tahrirlaydi",
+      "originalStatus": "Tekshiruv kerak",
+      "sourceStatus": "NOT_IMPLEMENTED",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "A real multi-staff shop, owner/manager grants, scope-checked shop editing and Admin-approved ownership transfer have not been implemented. Current self-owned single-address shop editing is NOT manager access."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 156,
+      "decision": "Ko‘chish uchun maxsus workflow BEKOR",
+      "originalStatus": "Bekor qilingan yoki keyinga qoldirilgan",
+      "sourceStatus": "CANCELLED_BY_USER",
+      "code": [],
+      "tests": [],
+      "missingImplementation": [
+        "Explicitly cancelled by the final decision. No special relocation workflow should be built or counted as a missing feature."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 157,
+      "decision": "Xizmat tugadi uchun oddiy Ha Yo‘q tasdig‘i",
+      "originalStatus": "Qisman dalil bor, to‘liq tekshirilmagan",
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "code": [
+        "frontend/src/pages/barber/data/serviceFinishConfirmationV100.js",
+        "frontend/src/pages/barber/Queue.jsx"
+      ],
+      "tests": [
+        "frontend/test/v100ServiceFinishConfirmation.test.js"
+      ],
+      "missingImplementation": [
+        "Simple Yes/No flow exists and irreversible service completion remains server-authoritative. Real browser E2E and concurrent status transitions remain unverified; no Undo engine is desired."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "productionReady": false
+}

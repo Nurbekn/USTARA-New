@@ -1,3 +1,7 @@
+import { customerActivityText,hasCustomerActivityTranslation } from './customerActivityLocaleV148.js';
+import {socialQueueText} from './social/socialQueueLocaleV149.js';
+import { readSiteLocale, siteLocalePath } from '../../utils/siteLocale.js';
+import { authorName } from "../../utils/profileName.js";
 import PageLoading from "../../components/Loading";
 import { Avatar } from "../../components/Avatar";
 import ArrowIcon from "../../components/ArrowIcon";
@@ -7,6 +11,8 @@ import Sheet from "../../components/Sheet";
 import { getSession } from "../auth/utils/session";
 import Icon from "../../components/Icon";
 import PostCard from "./social/PostCard";
+import MyReportsV177 from "./social/MyReportsV177.jsx";
+import { socialReportReceiptsTextV177 } from "./social/socialReportReceiptsV177.js";
 import Composer from "./social/Composer";
 import {
   TABS,
@@ -21,6 +27,12 @@ import {
   reportSocialPost,
   searchPosts,
   sendSocialComment,
+  changeSocialComment,
+  sortPinnedCommentsV167,
+  setSocialFollow,
+  setSocialLike,
+  loadPostComments,
+  setSocialSave,
   shareUrl,
 } from "./social/model";
 import "./Social.css";
@@ -33,17 +45,19 @@ export default function Social({
 }) {
   const { profile } = useOutletContext();
   const [params, setParams] = useSearchParams();
+  const lang = readSiteLocale(params);
+  const baseTr = customerActivityText(lang);
+  const detailTr = socialQueueText(lang);
+  const tr = source => hasCustomerActivityTranslation(lang,source) ? baseTr(source) : detailTr(source);
   const tab = Object.hasOwn(TABS, params.get("tab"))
     ? params.get("tab")
     : "feed";
   const [request, setRequest] = useState({
     status: "loading",
     data: emptySocial,
+    error: "",
   });
   const [retry, setRetry] = useState(0);
-  const [likes, setLikes] = useState({});
-  const [saves, setSaves] = useState({});
-  const [follows, setFollows] = useState({});
   const [modal, setModal] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -51,7 +65,10 @@ export default function Social({
   const [drafts, setDrafts] = useState({});
   const [reason, setReason] = useState("");
   const [reportText, setReportText] = useState("");
+  const [showMyReportsV177, setShowMyReportsV177] = useState(false);
   const [manualShare, setManualShare] = useState("");
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [editing, setEditing] = useState(null);
   const operation = useRef(null);
   useEffect(() => {
     const controller = new AbortController();
@@ -60,10 +77,10 @@ export default function Social({
       .then(() => loadCatalog({ signal: controller.signal }))
       .then(normalizeSocial)
       .then((data) => {
-        if (active) setRequest({ status: "ready", data });
+        if (active) setRequest({ status: "ready", data, error: "" });
       })
-      .catch(() => {
-        if (active) setRequest({ status: "error", data: emptySocial });
+      .catch((error) => {
+        if (active) setRequest({ status: "error", data: emptySocial, error: error.message });
       });
     return () => {
       active = false;
@@ -74,16 +91,9 @@ export default function Social({
   const { data, status } = request;
   const query = params.get("q") || "";
   const category = params.get("category") || "";
-  const saved = (p) =>
-    Object.hasOwn(saves, p.id)
-      ? saves[p.id]
-      : p.saved === true ||
-        data.savedPostIds.some((id) => String(id) === String(p.id));
-  const followed = (p) =>
-    follows[authorKey(p.author)] ??
-    data.following.includes(authorKey(p.author));
-  const liked = (p) =>
-    Object.hasOwn(likes, p.id) ? likes[p.id] : !!p.likedByMe;
+  const saved = (p) => p.saved === true || data.savedPostIds.some((id) => String(id) === String(p.id));
+  const followed = (p) => data.following.includes(authorKey(p.author));
+  const liked = (p) => !!p.likedByMe;
   let posts = data.posts;
   if (tab === "following") posts = posts.filter(followed);
   if (tab === "saved") posts = posts.filter(saved);
@@ -111,12 +121,24 @@ export default function Social({
     );
     setParams(next, { replace: true });
   }
+  async function showComments(postId) {
+    open("comments", postId);
+    setCommentsLoading(true);
+    try {
+      const comments = await loadPostComments(postId);
+      setRequest(previous => ({ ...previous, data: { ...previous.data, posts: previous.data.posts.map(post =>
+        String(post.id) === String(postId) ? { ...post, comments } : post) } }));
+    } catch (cause) {
+      setError(cause.message || "Izohlarni yuklab bo‘lmadi.");
+    } finally { setCommentsLoading(false); }
+  }
   function open(type, postId) {
     if (type === "create" && role !== "barber") return;
     setError("");
     setReason("");
     setReportText("");
     setManualShare("");
+    setEditing(null);
     setModal({ type, postId });
   }
   function close() {
@@ -134,7 +156,7 @@ export default function Social({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: post.author.name || "USTARA",
+          title: authorName(post.author) || "USTARA",
           text: post.caption || "",
           url,
         });
@@ -146,7 +168,7 @@ export default function Social({
     try {
       if (!navigator.clipboard?.writeText) throw new Error();
       await navigator.clipboard.writeText(url);
-      setNotice("Post havolasi nusxalandi.");
+      setNotice(tr("Post havolasi nusxalandi."));
     } catch {
       open("share", post.id);
       setManualShare(url);
@@ -158,7 +180,7 @@ export default function Social({
     const text = (drafts[selected.id] || "").trim();
     if (modal.type === "comments" && !text) return;
     if (modal.type === "report" && !reason) {
-      setError("Shikoyat sababini tanlang.");
+      setError(tr("Shikoyat sababini tanlang."));
       return;
     }
     const controller = new AbortController();
@@ -211,7 +233,7 @@ export default function Social({
         if (response?.accepted !== true)
           throw new Error("Server shikoyatni tasdiqlamadi.");
         if (!controller.signal.aborted) {
-          setNotice("Shikoyat qabul qilindi.");
+          setNotice(tr("Shikoyat qabul qilindi."));
           setModal(null);
         }
       }
@@ -225,46 +247,109 @@ export default function Social({
       }
     }
   }
+  async function togglePost(post, field) {
+    if (operation.current) return;
+    const before = field === "likedByMe" ? !!post.likedByMe : saved(post);
+    const next = !before;
+    const controller = new AbortController();
+    operation.current = controller;
+    setBusy(true);
+    setNotice("");
+    try {
+      const response = field === "likedByMe"
+        ? await setSocialLike(post.id, next, { signal: controller.signal })
+        : await setSocialSave(post.id, next, { signal: controller.signal });
+      if (response?.[field === "likedByMe" ? "liked" : "saved"] !== next) throw new Error("Server amalni tasdiqlamadi.");
+      if (controller.signal.aborted) return;
+      setRequest((previous) => ({ ...previous, data: {
+        ...previous.data,
+        savedPostIds: field === "saved" ? (next
+          ? [...previous.data.savedPostIds.filter((id) => String(id) !== String(post.id)), post.id]
+          : previous.data.savedPostIds.filter((id) => String(id) !== String(post.id))) : previous.data.savedPostIds,
+        posts: previous.data.posts.map((item) => String(item.id) === String(post.id)
+          ? { ...item, ...(field === "likedByMe" ? { likedByMe: next, likeCount: knownCount(response.likeCount) ? response.likeCount : item.likeCount } : { saved: next }) }
+          : item),
+      } }));
+    } catch (cause) {
+      if (!controller.signal.aborted) setNotice(cause.message || "Amalni saqlab bo‘lmadi.");
+    } finally {
+      if (!controller.signal.aborted) { operation.current = null; setBusy(false); }
+    }
+  }
+  async function toggleFollow(post) {
+    if (operation.current || role !== "customer") return;
+    const key = authorKey(post.author);
+    const followingNow = data.following.includes(key);
+    const controller = new AbortController();
+    operation.current = controller;
+    setBusy(true);
+    try {
+      const response = await setSocialFollow(post.author.id, !followingNow, { signal: controller.signal });
+      if (response?.following !== !followingNow) throw new Error("Server obunani tasdiqlamadi.");
+      if (!controller.signal.aborted) setRequest((previous) => ({ ...previous, data: {
+        ...previous.data,
+        following: followingNow
+          ? previous.data.following.filter((item) => item !== key)
+          : [...previous.data.following, key],
+      } }));
+    } catch (cause) {
+      if (!controller.signal.aborted) setNotice(cause.message || "Obuna holatini saqlab bo‘lmadi.");
+    } finally {
+      if (!controller.signal.aborted) { operation.current = null; setBusy(false); }
+    }
+  }
+  async function editComment(comment, remove = false) {
+    if (operation.current) return;
+    const controller = new AbortController(); operation.current = controller; setBusy(true); setError('');
+    try {
+      const result = await changeSocialComment(selected.id, comment.id, remove ? null : editing.text, { signal: controller.signal });
+      if (!controller.signal.aborted) {
+        setRequest(previous => ({ ...previous, data: { ...previous.data, posts: previous.data.posts.map(post => post.id !== selected.id ? post : {
+          ...post, commentCount: result.commentCount, comments: remove ? post.comments.filter(item => item.id !== comment.id) : post.comments.map(item => item.id === comment.id ? { ...item, text: result.text } : item),
+        }) } })); setEditing(null);
+      }
+    } catch (cause) { if (!controller.signal.aborted) setError(cause.message || 'Izoh yangilanmadi.'); }
+    finally { if (!controller.signal.aborted) { operation.current = null; setBusy(false); } }
+  }
   function renderPost(p) {
     return (
       <PostCard
         key={p.id}
         post={p}
+        lang={lang}
         services={data.services}
-        allowFollow={
+        allowFollow={role === "customer" &&
           !(
             data.currentUserId != null &&
             String(data.currentUserId) === String(p.author.id) &&
             p.author.role === role
           )
         }
+        mutationsAvailable={!busy}
         liked={liked(p)}
         saved={!!saved(p)}
         followed={!!followed(p)}
-        onLike={() => setLikes((v) => ({ ...v, [p.id]: !liked(p) }))}
-        onSave={() => {
-          setSaves((v) => ({ ...v, [p.id]: !saved(p) }));
-          setNotice(saved(p) ? "Post saqlanganlardan olib tashlandi." : "Post vaqtinchalik saqlandi.");
-        }}
-        onFollow={() => setFollows((v) => ({ ...v, [authorKey(p.author)]: !followed(p) }))}
-        onComments={() => open("comments", p.id)}
+        onLike={() => void togglePost(p, "likedByMe")}
+        onSave={() => void togglePost(p, "saved")}
+        onFollow={() => void toggleFollow(p)}
+        onComments={() => void showComments(p.id)}
         onShare={() => share(p)}
         onReport={() => open("report", p.id)}
       />
     );
   }
   const titles = {
-    create: "Post yaratish",
-    comments: "Izohlar",
-    report: "Post haqida shikoyat",
-    share: "Postni ulashish",
+    create: tr("Post yaratish"),
+    comments: tr("Izohlar"),
+    report: tr("Post haqida shikoyat"),
+    share: tr("Postni ulashish"),
   };
   return (
     <section className="so-page" aria-busy={status === "loading"}>
       <header className="so-heading">
         <div>
-          <h1>Lenta</h1>
-          <p>Ustalar ishlari va yangi soch turmaklari.</p>
+          <h1>{tr("Ilhom")}</h1>
+          <p>{tr("Sartaroshlar ishlari va yangi soch turmaklari.")}</p>
         </div>
         {role === "barber" && (
           <button
@@ -272,11 +357,13 @@ export default function Social({
             className="so-button so-primary"
             onClick={() => open("create")}
           >
-            ＋ Post yaratish
+            ＋ {tr("Post yaratish")}
           </button>
         )}
       </header>
-      <nav className="so-tabs" aria-label="Lenta bo‘limlari">
+      <div className="so-report-access-v177"><button type="button" className="so-text-button" onClick={() => setShowMyReportsV177(value => !value)}>{(socialReportReceiptsTextV177[lang] || socialReportReceiptsTextV177.uz).open}</button></div>
+      {showMyReportsV177 && <MyReportsV177 lang={lang} onClose={() => setShowMyReportsV177(false)} />}
+      <nav className="so-tabs" aria-label={tr("Ilhom bo‘limlari")}>
         {Object.entries(TABS).map(([key, label]) => (
           <button
             type="button"
@@ -284,7 +371,7 @@ export default function Social({
             aria-pressed={tab === key}
             onClick={() => update({ tab: key, post: null, author: null })}
           >
-            {label}
+            {tr(label)}
           </button>
         ))}
       </nav>
@@ -297,18 +384,18 @@ export default function Social({
           type="button"
           onClick={() => update({ post: null, author: null })}
         >
-          <ArrowIcon direction="left" /> Barcha postlar
+          <ArrowIcon direction="left" /> {tr("Barcha postlar")}
         </button>
       )}
       {status === "loading" ? (
-        <PageLoading label="Postlar yuklanmoqda…" />
+        <PageLoading label={tr("Postlar yuklanmoqda…")} />
       ) : status === "error" ? (
         <Empty
-          title="Lentani yuklab bo‘lmadi"
-          text="Qayta urinib ko‘ring. Muammo davom etsa, biroz kuting."
+          title={tr("Ilhomni yuklab bo‘lmadi")}
+          text={request.error || tr("Ijtimoiy ilhom API hozircha mavjud emas.")}
           action={
             <button className="so-button" type="button" onClick={reload}>
-              Qayta urinish
+              {tr("Qayta urinish")}
             </button>
           }
           error
@@ -321,14 +408,14 @@ export default function Social({
               type="search"
               value={query}
               onChange={(e) => update({ q: e.target.value })}
-              placeholder="Uslub, xizmat yoki muallif"
-              aria-label="Postlarni qidirish"
+              placeholder={tr("Uslub, xizmat yoki muallif")}
+              aria-label={tr("Postlarni qidirish")}
             />
             {query && (
               <button
                 className="so-icon-button"
                 type="button"
-                aria-label="Qidiruvni tozalash"
+                aria-label={tr("Qidiruvni tozalash")}
                 onClick={() => update({ q: null })}
               >
                 <Icon name="close" size={18} />
@@ -339,7 +426,7 @@ export default function Social({
             <div
               className="so-categories"
               role="group"
-              aria-label="Soch turmagi kategoriyasi"
+              aria-label={tr("Soch turmagi kategoriyasi")}
             >
               <button
                 type="button"
@@ -362,28 +449,28 @@ export default function Social({
               ))}
             </div>
           )}
-          <div className="so-feed">
+          <div className="so-feed" aria-live="polite">
             {posts.length ? (
               posts.map(renderPost)
             ) : (
               <Empty
                 title={
                   params.get("post")
-                    ? "Post topilmadi"
+                    ? tr("Post topilmadi")
                     : tab === "following"
-                      ? "Obunalaringiz shu yerda ko‘rinadi"
+                      ? tr("Obunalaringiz shu yerda ko‘rinadi")
                       : tab === "saved"
-                        ? "Saqlangan postlar yo‘q"
+                        ? tr("Saqlangan postlar yo‘q")
                         : (query || category)
-                          ? "Mos postlar topilmadi"
-                          : "Lenta hali bo‘sh"
+                          ? tr("Mos postlar topilmadi")
+                          : tr("Ilhom hali bo‘sh")
                 }
                 text={
                   tab === "following"
-                    ? "Ustalarni kuzating va yangi ishlarini shu yerda ko‘ring."
+                    ? tr("Sartaroshlarni kuzating va yangi ishlarini shu yerda ko‘ring.")
                     : tab === "saved"
-                      ? "Yoqtirgan postlaringizdagi saqlash belgisini bosing."
-                      : "Ma’lumotlar qo‘shilgach, soch turmaklari va ustalar ishlari shu yerda ko‘rinadi."
+                      ? tr("Yoqtirgan postlaringizdagi saqlash belgisini bosing.")
+                      : tr("Ma’lumotlar qo‘shilgach, soch turmaklari va sartaroshlar ishlari shu yerda ko‘rinadi.")
                 }
                 action={
                   ["following", "saved"].includes(tab) ? (
@@ -394,7 +481,7 @@ export default function Social({
                         update({ tab: "feed", post: null, author: null, q: null, category: null })
                       }
                     >
-                      Lentaga qaytish
+                      Ilhomga qaytish
                     </button>
                   ) : (query || category) ? (
                     <button
@@ -407,7 +494,7 @@ export default function Social({
                       Qidiruvni tozalash
                     </button>
                   ) : (
-                    <Link className="so-button" to="/user/explore">
+                    <Link className="so-button" to={siteLocalePath("/user/explore", lang)}>
                       Barber va salonlarni topish
                     </Link>
                   )
@@ -422,7 +509,7 @@ export default function Social({
       >
         <Sheet
           open={!!modal}
-          title={titles[modal?.type] || "Lenta"}
+          title={titles[modal?.type] || tr("Ilhom")}
           onClose={close}
         >
           {role === "barber" && modal?.type === "create" && (
@@ -430,6 +517,7 @@ export default function Social({
               profile={profile}
               services={data.services}
               role={role}
+              lang={lang}
               publish={publishPost}
               onBusy={setBusy}
               onPublished={(value) => {
@@ -449,26 +537,30 @@ export default function Social({
                 }));
                 setBusy(false);
                 setModal(null);
-                setNotice("Post server tomonidan saqlandi.");
+                setNotice(tr("Post server tomonidan saqlandi."));
               }}
             />
           )}
           {modal?.type === "comments" && selected && (
             <div className="so-comments">
-              {selected.comments?.length ? (
+              {commentsLoading && <p className="so-hint" role="status">{tr("Izohlar yuklanmoqda…")}</p>}
+              {!commentsLoading && selected.comments?.length ? (
                 <ul>
-                  {selected.comments.map((c) => (
+                  {sortPinnedCommentsV167(selected.comments).map((c) => (
                     <li key={c.id}>
                       <Avatar className="up-user-avatar"
                         photo={c.author?.avatarPhoto}
-                        name={c.author?.name}
+                        name={authorName(c.author)}
                         size={32}
                       />
                       <div>
                         <strong>
-                          {c.author?.name || "Muallif nomi ko‘rsatilmagan"}
+                          {authorName(c.author) || "Muallif nomi ko‘rsatilmagan"}
                         </strong>
-                        <p>{c.text}</p>
+                        {editing?.id === c.id ? <div className="so-comment-edit"><textarea maxLength={500} aria-label={tr("Izohni tahrirlash")} value={editing.text} disabled={busy} onChange={event => setEditing({ ...editing, text: event.target.value })}/><button type="button" disabled={busy || !editing.text.trim()} onClick={() => editComment(c)}>{tr('Saqlash')}</button><button type="button" disabled={busy} onClick={() => setEditing(null)}>{tr('Bekor qilish')}</button></div> : <p>{c.text}</p>}
+                        {c.pinned === true && <span className="so-comment-pin" aria-label="Pinned comment">{({uz:'📌 Pinlangan izoh',ru:'📌 Закреплённый комментарий',en:'📌 Pinned comment'})[lang] || '📌 Pinlangan izoh'}</span>}
+                        {c.mine && editing?.id !== c.id && <div className="so-comment-tools"><button type="button" disabled={busy} onClick={() => setEditing({ id: c.id, text: c.text })}>{tr('Tahrirlash')}</button><button type="button" disabled={busy} onClick={() => setEditing({ id: c.id, text: c.text, deleting: true })}>{tr('O‘chirish')}</button></div>}
+                        {editing?.id === c.id && editing.deleting && <div className="so-comment-tools"><button type="button" disabled={busy} onClick={() => editComment(c, true)}>{tr('O‘chirishni tasdiqlash')}</button></div>}
                         <time dateTime={c.createdAt}>
                           {postTime(c.createdAt)}
                         </time>
@@ -476,17 +568,17 @@ export default function Social({
                     </li>
                   ))}
                 </ul>
-              ) : (
+              ) : !commentsLoading ? (
                 <p className="so-hint">
                   {knownCount(selected.commentCount) &&
                   selected.commentCount > 0
-                    ? "Izohlar matni hali yuklanmagan."
-                    : "Hali izoh yo‘q."}
+                    ? tr("Izohlar matni hali yuklanmagan.")
+                    : tr("Hali izoh yo‘q.")}
                 </p>
-              )}
+              ) : null}
               <form onSubmit={submitAction}>
                 <label className="so-field">
-                  Izohingiz
+                  {tr("Izohingiz")}
                   <textarea
                     rows={3}
                     maxLength={500}
@@ -498,13 +590,10 @@ export default function Social({
                         [selected.id]: e.target.value,
                       }))
                     }
-                    placeholder="Fikringizni yozing…"
+                    placeholder={tr("Fikringizni yozing…")}
                   />
                 </label>
-                <p className="so-hint">
-                  Yuborilmagan matn Social ochiq turgan vaqt davomida qoralamada
-                  qoladi.
-                </p>
+
                 {error && (
                   <p className="so-error" role="alert">
                     {error}
@@ -515,7 +604,7 @@ export default function Social({
                   type="submit"
                   disabled={busy || !drafts[selected.id]?.trim()}
                 >
-                  {busy ? "Yuborilmoqda…" : "Izoh yuborish"}
+                  {busy ? tr("Yuborilmoqda…") : tr("Izoh yuborish")}
                 </button>
               </form>
             </div>
@@ -523,28 +612,27 @@ export default function Social({
           {modal?.type === "report" && (
             <form className="so-report" onSubmit={submitAction}>
               <p className="so-hint">
-                Shikoyat sababini tanlang. U faqat server tasdiqlagandan keyin
-                yuborilgan hisoblanadi.
+                {tr("Shikoyat sababini tanlang. U faqat server tasdiqlagandan keyin yuborilgan hisoblanadi.")}
               </p>
               <label className="so-field">
-                Sabab
+                {tr("Sabab")}
                 <select
                   value={reason}
                   disabled={busy}
                   onChange={(e) => setReason(e.target.value)}
                 >
-                  <option value="">Tanlang</option>
-                  <option value="spam">Spam</option>
-                  <option value="inappropriate">Nomaqbul kontent</option>
-                  <option value="copyright">Mualliflik huquqi</option>
-                  <option value="other">Boshqa sabab</option>
+                  <option value="">{tr("Tanlang")}</option>
+                  <option value="spam">{tr("Spam")}</option>
+                  <option value="inappropriate">{tr("Nomaqbul kontent")}</option>
+                  <option value="misleading">{(socialReportReceiptsTextV177[lang] || socialReportReceiptsTextV177.uz).reasons.misleading}</option>
+                  <option value="other">{tr("Boshqa sabab")}</option>
                 </select>
               </label>
               <label className="so-field">
-                Qo‘shimcha izoh
+                {tr("Qo‘shimcha izoh")}
                 <textarea
                   rows={3}
-                  maxLength={1000}
+                  maxLength={500}
                   value={reportText}
                   disabled={busy}
                   onChange={(e) => setReportText(e.target.value)}
@@ -560,21 +648,21 @@ export default function Social({
                 type="submit"
                 disabled={busy || !reason}
               >
-                {busy ? "Yuborilmoqda…" : "Shikoyat yuborish"}
+                {busy ? tr("Yuborilmoqda…") : tr("Shikoyat yuborish")}
               </button>
             </form>
           )}
+          {modal?.type === "share" && selected?.author?.role === "barber" && <Link to={siteLocalePath(`/user/chat?barber=${selected.author.id}&post=${selected.id}`, lang)}>{({uz:"Postni chatda ulashish",ru:"Отправить пост в чат",en:"Share post in chat"})[lang]}</Link>}
           {modal?.type === "share" && (
             <label className="so-field">
-              Havolani nusxalang
+              {tr("Havolani nusxalang")}
               <input
                 readOnly
                 value={manualShare}
                 onFocus={(e) => e.target.select()}
               />
               <span className="so-hint">
-                Brauzer avtomatik nusxalashga ruxsat bermadi. Havolani belgilab
-                nusxalang.
+                {tr("Brauzer avtomatik nusxalashga ruxsat bermadi. Havolani belgilab nusxalang.")}
               </span>
             </label>
           )}

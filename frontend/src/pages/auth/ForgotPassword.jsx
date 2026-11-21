@@ -2,30 +2,36 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import ArrowIcon from "../../components/ArrowIcon";
 import { AuthLayout, PhoneField } from "./components/AuthParts";
+import TelegramOtpNotice from "./components/TelegramOtpNotice";
 import PasswordField from "./components/PasswordField";
-import { createPasswordRecord, savePasswordRecord, validPassword } from "./credentials";
-import { clearSession, getAccount, getSession } from "./utils/session";
+import { registrationPasswordError, REGISTRATION_PASSWORD_HINT } from "./utils/registration";
+import { resetRequest, resetError, resetDeadlines, validResetToken } from "./utils/passwordReset";
+import { clearSession, getSession } from "./utils/session";
 import { formatPhone } from "./utils/phone";
 import "./auth-ui.css";
+import { readSiteLocale, siteLocalePath } from "../../utils/siteLocale.js";
+import { v144InnerUi } from "./innerLocaleV144.js";
 
-// TODO: replace the local challenge with server-issued SMS verification and reset tokens.
-const TEST_CODE = "12345";
-const CODE_LENGTH = TEST_CODE.length;
-const TITLES = { phone: "Parolni tiklash", code: "Tasdiqlash kodi", password: "Yangi parol", done: "Parol yangilandi" };
+// Reset credentials live only in memory; refresh safely restarts the flow.
+const CODE_LENGTH = 5;
 
 export default function ForgotPassword() {
   const location = useLocation();
+  const lang = readSiteLocale(location.search);
+  const ui = v144InnerUi(lang).forgot;
   const [phone, setPhone] = useState(() => formatPhone(typeof location.state?.phone === "string" ? location.state.phone : ""));
   const [step, setStep] = useState("phone");
   const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [errors, setErrors] = useState({});
-  const [seconds, setSeconds] = useState(60);
-  const [resendCycle, setResendCycle] = useState(0);
-  const [expired, setExpired] = useState(false);
+  const [deadlines, setDeadlines] = useState({ resendAt: 0, otpExpiresAt: 0, resetExpiresAt: 0 });
+  const [now, setNow] = useState(Date.now);
+  const seconds = Math.max(0, Math.ceil((deadlines.resendAt - now) / 1000));
+  const expired = step === "code" && now >= deadlines.otpExpiresAt;
+  const resetExpired = step === "password" && now >= deadlines.resetExpiresAt;
   const [busy, setBusy] = useState(false);
-  const verifiedPhone = useRef(null);
+  const credentials = useRef({});
   const submitting = useRef(false);
   const inputs = useRef([]);
   const heading = useRef(null);
@@ -34,39 +40,34 @@ export default function ForgotPassword() {
 
   useEffect(() => { heading.current?.focus(); }, [step]);
   useEffect(() => {
-    if (step !== "code") return;
-    const deadline = Date.now() + 60000;
-    const refresh = () => setSeconds(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    if (!["code", "password"].includes(step)) return;
+    const refresh = () => setNow(Date.now());
     const interval = window.setInterval(refresh, 1000);
-    const expiration = window.setTimeout(() => setExpired(true), 300000);
     document.addEventListener("visibilitychange", refresh);
-    return () => {
-      window.clearInterval(interval);
-      window.clearTimeout(expiration);
-      document.removeEventListener("visibilitychange", refresh);
-    };
-  }, [step, resendCycle]);
+    return () => { window.clearInterval(interval); document.removeEventListener("visibilitychange", refresh); };
+  }, [step]);
+  useEffect(() => () => { credentials.current = {}; }, []);
 
   function changeStep(next) {
     setErrors({});
     setStep(next);
   }
 
-  function requestCode(event) {
+  async function requestCode(event) {
     event.preventDefault();
+    if (submitting.current) return;
     if (phone.replace(/\D/g, "").length !== 9) {
-      setErrors({ phone: "Telefon raqamni to‘liq kiriting (9 ta raqam)." });
-      return;
+      setErrors({ phone: ui.phoneError }); return;
     }
-    if (getAccount()?.phone !== fullPhone) {
-      setErrors({ phone: "Bu raqamga tegishli hisob topilmadi. Ro‘yxatdan o‘tgan raqamingizni kiriting." });
-      return;
-    }
-    verifiedPhone.current = null;
-    setCode(Array(CODE_LENGTH).fill(""));
-    setSeconds(60);
-    setExpired(false);
-    changeStep("code");
+    submitting.current = true; setBusy(true); setErrors({});
+    try {
+      const data = await resetRequest("start", { phone: fullPhone });
+      if (!validResetToken(data.challengeToken)) throw new Error(ui.challengeError);
+      credentials.current = { phone: fullPhone, challengeToken: data.challengeToken };
+      setDeadlines({ ...resetDeadlines(data), resetExpiresAt: 0 }); setNow(Date.now());
+      setCode(Array(CODE_LENGTH).fill("")); changeStep("code");
+    } catch (error) { setErrors({ phone: resetError(error) }); }
+    finally { submitting.current = false; setBusy(false); }
   }
 
   function enterCode(index, text) {
@@ -82,48 +83,62 @@ export default function ForgotPassword() {
     inputs.current[Math.min(start + digits.length, CODE_LENGTH - 1)]?.focus();
   }
 
-  function verifyCode(event) {
+  async function verifyCode(event) {
     event.preventDefault();
-    if (expired) return setErrors({ code: "Kod muddati tugadi. Qayta kod so‘rang." });
-    if (code.join("") !== TEST_CODE) return setErrors({ code: "Kod noto‘g‘ri. Qayta tekshiring." });
-    if (getAccount()?.phone !== fullPhone) return setErrors({ code: "Hisob o‘zgargan. Telefon raqamingizni qayta kiriting." });
-    verifiedPhone.current = fullPhone;
-    changeStep("password");
+    if (submitting.current) return;
+    if (expired) return setErrors({ code: ui.expiredCode });
+    if (code.length !== CODE_LENGTH || !code.every((digit) => /^\d$/.test(digit))) {
+      return setErrors({ code: ui.codeError });
+    }
+    submitting.current = true; setBusy(true); setErrors({});
+    try {
+      const data = await resetRequest("verify", { challengeToken: credentials.current.challengeToken, otp: code.join("") });
+      const resetExpiresAt = Date.parse(data.resetExpiresAt);
+      if (!validResetToken(data.resetToken) || !Number.isFinite(resetExpiresAt)) throw new Error(ui.tokenError);
+      credentials.current = { phone: fullPhone, resetToken: data.resetToken };
+      setDeadlines((previous) => ({ ...previous, resetExpiresAt })); setNow(Date.now());
+      setCode(Array(CODE_LENGTH).fill("")); changeStep("password");
+    } catch (error) { setErrors({ code: resetError(error) }); }
+    finally { submitting.current = false; setBusy(false); }
   }
 
-  function resend() {
-    if (seconds > 0) return;
-    setCode(Array(CODE_LENGTH).fill(""));
-    setErrors({});
-    setSeconds(60);
-    setExpired(false);
-    setResendCycle((cycle) => cycle + 1);
-    inputs.current[0]?.focus();
+  async function resend() {
+    if (seconds > 0 || submitting.current) return;
+    submitting.current = true; setBusy(true); setErrors({});
+    try {
+      const data = await resetRequest("resend", { challengeToken: credentials.current.challengeToken });
+      setDeadlines((previous) => ({ ...previous, ...resetDeadlines(data) })); setNow(Date.now());
+      setCode(Array(CODE_LENGTH).fill("")); inputs.current[0]?.focus();
+    } catch (error) {
+      if (Number.isFinite(error.retryAfter)) setDeadlines((previous) => ({ ...previous, resendAt: Date.now() + error.retryAfter * 1000 }));
+      setErrors({ code: resetError(error) });
+    } finally { submitting.current = false; setBusy(false); }
   }
 
   async function savePassword(event) {
     event.preventDefault();
     if (submitting.current) return;
     const next = {};
-    if (!validPassword(password)) next.password = "Kamida 8 ta raqam va 1 ta lotin harfi kiriting. Bo‘sh joy ishlatmang.";
-    if (!confirmation || confirmation !== password) next.confirmation = "Parollar mos emas. Qayta tekshiring.";
-    if (verifiedPhone.current !== fullPhone || getAccount()?.phone !== fullPhone) next.submit = "Avval telefon raqamingizni tasdiqlang.";
+    const passwordIssue = registrationPasswordError(password);
+    if (passwordIssue) next.password = passwordIssue;
+    if (!confirmation || confirmation !== password) next.confirmation = ui.passwordMismatch;
+    if (credentials.current.phone !== fullPhone || !credentials.current.resetToken || resetExpired) next.submit = ui.resetExpired;
     setErrors(next);
     if (Object.keys(next).length) return;
     submitting.current = true;
     setBusy(true);
     try {
-      const record = await createPasswordRecord(password);
-      if (getAccount()?.phone !== fullPhone) throw new Error("Account changed");
-      savePasswordRecord(fullPhone, record);
-      if (getSession()?.phone === fullPhone) clearSession();
-      verifiedPhone.current = null;
+      await resetRequest("complete", { resetToken: credentials.current.resetToken, password });
+      credentials.current = {};
+      // The server has already revoked old JWTs. A browser-storage failure
+      // must not turn a completed reset into a retry with a consumed token.
+      try { if (getSession()?.phone === fullPhone) clearSession(); } catch { /* Server-side revocation remains authoritative. */ }
       setPassword("");
       setConfirmation("");
       setCode(Array(CODE_LENGTH).fill(""));
       changeStep("done");
-    } catch {
-      setErrors({ submit: "Parolni saqlab bo‘lmadi. Qayta urinib ko‘ring." });
+    } catch (error) {
+      setErrors({ submit: resetError(error) });
     } finally {
       submitting.current = false;
       setBusy(false);
@@ -134,55 +149,60 @@ export default function ForgotPassword() {
     <>
     <AuthLayout className={`au-page--entry au-page--recovery${step === "code" ? " au-page--otp" : ""}`}>
       <div className="au-recovery-back">
-        {step === "phone" || step === "done" ? <Link to="/login" className="au-link-back"><ArrowIcon direction="left" /> Kirishga qaytish</Link> : <button type="button" className="au-link-back" disabled={busy} onClick={() => { verifiedPhone.current = null; setPassword(""); setConfirmation(""); changeStep("phone"); }}><ArrowIcon direction="left" /> Orqaga</button>}
+        {step === "phone" || step === "done" ? <Link to={siteLocalePath("/login", lang)} className="au-link-back"><ArrowIcon direction="left" /> {ui.backLogin}</Link> : <button type="button" className="au-link-back" disabled={busy} onClick={() => { credentials.current = {}; setPassword(""); setConfirmation(""); changeStep("phone"); }}><ArrowIcon direction="left" /> {ui.back}</button>}
       </div>
-      <h1 className="au-title" tabIndex={-1} ref={heading}>{TITLES[step]}</h1>
+      <h1 className="au-title" tabIndex={-1} ref={heading}>{ui.titles[step]}</h1>
       {step === "phone" && <>
-        <p className="au-sub">Hisobingizga bog‘langan telefon raqamni kiriting.</p>
-        <form className="au-form" onSubmit={requestCode} noValidate>
+        <p className="au-sub">{ui.phoneIntro}</p>
+        <TelegramOtpNotice />
+        <form className="au-form" onSubmit={requestCode} noValidate aria-busy={busy}>
+          <fieldset className="au-registration-fields" disabled={busy}>
           <PhoneField value={phone} error={errors.phone} onChange={(value) => { setPhone(value); setErrors({}); }} />
-          <button type="submit" className="au-btn">Kod olish <ArrowIcon /></button>
+          </fieldset>
+          <button type="submit" className="au-btn" disabled={busy}>{busy ? ui.sending : ui.send} <ArrowIcon /></button>
         </form>
       </>}
       {step === "code" && <>
-        <p className="au-sub" id="reset-code-description"><b>+998 {phone}</b> uchun 5 xonali test kodini kiriting. SMS hozircha yuborilmaydi.</p>
-        <form className="au-otp-form" onSubmit={verifyCode} noValidate>
-          <div className={`au-otp${errors.code ? " is-error" : ""}`} role="group" aria-label="Tasdiqlash kodi">
-            {code.map((digit, index) => <input key={index} ref={(element) => { inputs.current[index] = element; }} value={digit} className={digit ? "is-filled" : ""} type="text" inputMode="numeric" autoComplete={index === 0 ? "one-time-code" : "off"} maxLength={CODE_LENGTH} aria-label={`${index + 1}-raqam`} aria-invalid={!!errors.code} aria-describedby={`reset-code-description${errors.code ? " reset-code-error" : ""}`} onChange={(event) => enterCode(index, event.target.value)} onPaste={(event) => { event.preventDefault(); enterCode(index, event.clipboardData.getData("text")); }} onFocus={(event) => event.target.select()} onKeyDown={(event) => {
+        <p className="au-sub" id="reset-code-description"><b>+998 {phone}</b> {ui.codeIntro}</p>
+        <form className="au-otp-form" onSubmit={verifyCode} noValidate aria-busy={busy}>
+          <div className={`au-otp${errors.code ? " is-error" : ""}`} role="group" aria-label={ui.codeLabel}>
+            {code.map((digit, index) => <input key={index} ref={(element) => { inputs.current[index] = element; }} value={digit} disabled={busy} className={digit ? "is-filled" : ""} type="text" inputMode="numeric" autoComplete={index === 0 ? "one-time-code" : "off"} maxLength={CODE_LENGTH} aria-label={`${index + 1}-${ui.digit}`} aria-invalid={!!errors.code} aria-describedby={`reset-code-description${errors.code ? " reset-code-error" : ""}`} onChange={(event) => enterCode(index, event.target.value)} onPaste={(event) => { event.preventDefault(); enterCode(index, event.clipboardData.getData("text")); }} onFocus={(event) => event.target.select()} onKeyDown={(event) => {
               if (event.key === "Backspace" && !digit && index > 0) { event.preventDefault(); setCode((previous) => previous.map((value, position) => position === index - 1 ? "" : value)); setErrors({}); inputs.current[index - 1]?.focus(); }
               if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); inputs.current[Math.max(0, Math.min(CODE_LENGTH - 1, index + (event.key === "ArrowLeft" ? -1 : 1)))]?.focus(); }
             }} />)}
           </div>
+          {expired && !errors.code && <p className="au-error au-center" role="status">{ui.expired}</p>}
           {errors.code && <p className="au-error au-center" id="reset-code-error" role="alert">{errors.code}</p>}
-          <button type="submit" className="au-btn" disabled={code.some((digit) => !digit)}>Tasdiqlash <ArrowIcon /></button>
+          <button type="submit" className="au-btn" disabled={busy || expired || code.some((digit) => !digit)}>{ui.verify} <ArrowIcon /></button>
         </form>
         <div className="au-foot">
-          <button type="button" className="au-text-btn" disabled={seconds > 0} onClick={resend}>{seconds > 0 ? `Qayta yuborish (${seconds}s)` : "Qayta yuborish"}</button>
-          <button type="button" className="au-text-btn au-otp-help" onClick={() => helpDialog.current?.showModal()} aria-haspopup="dialog">Kod kelmadimi?</button>
+          <button type="button" className="au-text-btn" disabled={busy || seconds > 0} onClick={resend}>{seconds > 0 ? `${ui.resend} (${seconds}s)` : ui.resend}</button>
+          <button type="button" className="au-text-btn au-otp-help" onClick={() => helpDialog.current?.showModal()} aria-haspopup="dialog">{ui.noCode}</button>
         </div>
       </>}
       {step === "password" && <>
-        <p className="au-sub">Yangi parolingizni yarating va takrorlang.</p>
+        <p className="au-sub">{ui.passwordIntro}</p>
+        {resetExpired && <p className="au-error" role="alert">{ui.resetExpiredHelp}</p>}
         <form className="au-form" onSubmit={savePassword} noValidate aria-busy={busy}>
           <fieldset className="au-registration-fields" disabled={busy}>
-            <PasswordField signup value={password} error={errors.password} onChange={(value) => { setPassword(value); setErrors({}); }} />
-            <PasswordField confirmation value={confirmation} error={errors.confirmation} matchState={confirmation ? password === confirmation ? "match" : "mismatch" : null} onChange={(value) => { setConfirmation(value); setErrors({}); }} />
+            <PasswordField signup maxLength={128} hint={lang === "uz" ? REGISTRATION_PASSWORD_HINT : ui.passwordPolicy} value={password} error={errors.password} onChange={(value) => { setPassword(value); setErrors({}); }} />
+            <PasswordField confirmation maxLength={128} value={confirmation} error={errors.confirmation} matchState={confirmation ? password === confirmation ? "match" : "mismatch" : null} onChange={(value) => { setConfirmation(value); setErrors({}); }} />
           </fieldset>
           {errors.submit && <p className="au-error" role="alert">{errors.submit}</p>}
-          <button type="submit" className="au-btn" disabled={busy}>{busy ? "Saqlanmoqda…" : "Parolni saqlash"}</button>
+          <button type="submit" className="au-btn" disabled={busy || resetExpired}>{busy ? ui.saving : ui.save}</button>
         </form>
       </>}
       {step === "done" && <>
-        <p className="au-sub" role="status">Endi yangi parolingiz bilan hisobingizga kirishingiz mumkin.</p>
-        <Link to="/login" state={{ phone, passwordReset: true }} className="au-btn">Kirish <ArrowIcon /></Link>
+        <p className="au-sub" role="status">{ui.doneIntro}</p>
+        <Link to={siteLocalePath("/login", lang)} state={{ phone, passwordReset: true }} className="au-btn">{ui.login} <ArrowIcon /></Link>
       </>}
     </AuthLayout>
     <dialog ref={helpDialog} className="au-help-dialog" aria-labelledby="reset-help-title">
-      <h2 id="reset-help-title">Kod kelmadimi?</h2>
-      <p>Hozir sinov rejimi ishlayapti, SMS yuborilmaydi. Davom etish uchun quyidagi kodni kiriting.</p>
-      <p className="au-help-code" aria-label={`Sinov kodi: ${TEST_CODE}`}>{TEST_CODE}</p>
-      <p>Raqam xato bo‘lsa, «Orqaga» tugmasi orqali uni tuzating.</p>
-      <form method="dialog"><button type="submit" className="au-btn">Tushunarli</button></form>
+      <h2 id="reset-help-title">{ui.noCode}</h2>
+      <p>{ui.helpIntro}</p>
+      <p>{ui.helpBack}</p>
+      <p><Link to={siteLocalePath("/account-recovery", lang)}>{ui.accountRecovery}</Link></p>
+      <form method="dialog"><button type="submit" className="au-btn">{ui.understood}</button></form>
     </dialog>
     </>
   );

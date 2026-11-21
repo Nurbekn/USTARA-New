@@ -1,2 +1,15 @@
 frontend/node_modules/
 frontend/dist/
+
+# Database exports and local integration snapshots may contain private data.
+/backups/
+/backend/database/backups/
+
+# Secrets / dependencies / build artifacts
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules/
+**/dist/
+**/.DS_Store
+*.log

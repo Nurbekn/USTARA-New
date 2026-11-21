@@ -1,0 +1,148 @@
+{
+  "version": "v168",
+  "totalDecisions": 185,
+  "registrySha256": "bc068b273558e8c692d84a2a00faddc23699d7d122a9bb21036c6642e7a4aa71",
+  "reviewedDecisions": 7,
+  "previousSourceTraces": 89,
+  "alreadyIndexed": [],
+  "newSourceTraces": 7,
+  "uniqueSourceTraces": 96,
+  "notYetTraced": 89,
+  "decisions": [
+    {
+      "id": 88,
+      "decision": "Mijoz bron izohi va ilova rasmi",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/bookingsController.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "frontend/test/createBooking.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Booking creation is present, but persisted customer note/photo upload, validation, consent and secure retention NOT IMPLEMENTED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 89,
+      "decision": "Smart Review kriteriyalar va moderatsiya",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/reviewsController.js",
+        "frontend/src/pages/barber/Reviews.jsx"
+      ],
+      "tests": [
+        "backend/test/v168ReviewSources.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Completed-booking 1–5 ratings exist; structured criteria, fraud controls, review appeals and moderation workflow NOT IMPLEMENTED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 90,
+      "decision": "Advanced Break Manager",
+      "originalStatus": "Qisman: v19 ko‘p interval va takrorlanuvchi Break Manager",
+      "code": [
+        "backend/controllers/breakRulesController.js",
+        "frontend/src/pages/barber/Schedule.jsx"
+      ],
+      "tests": [
+        "backend/test/breakRules.unit.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Weekly/dated breaks exist; live DB race and scheduling edge E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 91,
+      "decision": "Portfolio tartibi va 6 ta pinned ish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "backend/controllers/portfolioFeaturedV168.js",
+        "backend/controllers/socialController.js",
+        "frontend/src/pages/barber/Portfolio.jsx"
+      ],
+      "tests": [
+        "backend/test/v168PortfolioFeatured.unit.test.js",
+        "frontend/test/v168FeaturedPortfolio.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Server feature cap 6, ownership and public-first sort added. Manual drag/drop reorder, real PostgreSQL concurrency and browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 92,
+      "decision": "7 kunlik Smart Availability Explorer",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/barber/weeklyAvailability.js",
+        "frontend/src/pages/user/barber/InlineBooking.jsx"
+      ],
+      "tests": [
+        "frontend/test/v117WeeklyAvailability.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Seven-day read-only availability exists but each slot must be requoted; real schedule DB and full browser E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 93,
+      "decision": "Profilni mijoz ko‘rinishida tekshirish",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/barber/components/PublicProfilePreviewCard.jsx",
+        "frontend/src/pages/barber/Portfolio.jsx"
+      ],
+      "tests": [
+        "frontend/test/v130ProfileIssueExperience.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Barber preview card exists; guaranteed exact customer-route pixel parity NOT VERIFIED."
+      ],
+      "productionVerified": false
+    },
+    {
+      "id": 94,
+      "decision": "Adolatli Smart Ranking",
+      "originalStatus": "Tekshiruv kerak",
+      "code": [
+        "frontend/src/pages/user/explore/catalog.js",
+        "frontend/src/pages/user/explore/homeModel.js"
+      ],
+      "tests": [
+        "frontend/test/v121ExploreSortProfile.test.js"
+      ],
+      "sourceStatus": "PARTIAL_SOURCE_GAP",
+      "missingImplementation": [
+        "Deterministic relevance/distance and followed-first sorting exist; fairness assessment, sponsor separation audit and ranking bias E2E NOT VERIFIED."
+      ],
+      "productionVerified": false
+    }
+  ],
+  "originalCounts": {
+    "verificationNeeded": 130,
+    "partialEvidence": 47,
+    "deferredOrCancelled": 7,
+    "blockedOrUnknown": 1,
+    "verifiedComplete": 0
+  },
+  "postgresE2E": "NOT_RUN",
+  "browserE2E": "NOT_RUN",
+  "bookingPhotoNote": "NOT_IMPLEMENTED",
+  "structuredReviews": "NOT_IMPLEMENTED",
+  "rankingFairness": "NOT_VERIFIED",
+  "productionReady": false,
+  "releaseReadiness": "NOT_VERIFIED"
+}

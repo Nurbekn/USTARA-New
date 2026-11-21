@@ -1,37 +1,57 @@
-// Coordinates post metadata and media; UI stays independent of persistence details.
-import { addPost, removePost } from "./store.js";
-import { saveVideo, loadVideo, deleteVideo } from "./portfolioMedia.js";
+import { request } from "../../../api/client.js";
+import { getSession } from "../../auth/utils/session.js";
+import { refreshBarberData } from "./store.js";
+
+function barberSession() {
+  const session = getSession();
+  if (session?.role !== "barber" || !session.token) throw new Error("Sartarosh hisobi orqali qayta kiring.");
+  return session;
+}
+
+async function sendMedia(file, token) {
+  const result = await request("POST", "/api/media", {
+    token, body: file, rawBody: true,
+  });
+  if (!Number.isSafeInteger(result?.id)) throw new Error("Server media faylni saqlaganini tasdiqlamadi.");
+  return result;
+}
 
 export async function publishPortfolioPost({ image, videoFile, caption, service }) {
-  let videoId;
-  if (videoFile) {
-    videoId = globalThis.crypto?.randomUUID?.() ?? `video-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    await saveVideo(videoId, videoFile);
-  }
-  const media = videoId ? { mediaType: "video", videoId } : { mediaType: "image", image };
-  if (!addPost({ ...media, caption, service })) {
-    if (videoId) {
-      try {
-        await deleteVideo(videoId);
-      } catch {
-        throw new Error("Post saqlanmadi. Video faylini tozalash ham bajarilmadi. Brauzer xotirasini tekshiring va qayta urinib ko'ring.");
-      }
-    }
-    throw new Error("Post saqlanmadi. localStorage to'lgan yoki saqlash bloklangan. Eski postlarni o'chiring va qayta urinib ko'ring.");
-  }
+  const session = barberSession();
+  const file = videoFile || await fetch(image).then((response) => response.blob());
+  const media = await sendMedia(file, session.token);
+  const serviceId = session.profileId
+    ? (await request("GET", `/api/services?barber_id=${session.profileId}`, { token: session.token }))
+      .find((item) => item.name === service)?.id ?? null
+    : null;
+  const result = await request("POST", "/api/social/posts", {
+    token: session.token,
+    body: { caption, kind: "standard", serviceId, mediaIds: [media.id] },
+  });
+  if (!result?.post?.id) throw new Error("Server post saqlanganini tasdiqlamadi.");
+  if (!(await refreshBarberData())) throw new Error("Post saqlandi, ammo portfolio yangilanmadi.");
+  return result.post;
 }
 
 export async function deletePortfolioPost(post) {
-  const blob = post.videoId ? await loadVideo(post.videoId) : null;
-  if (post.videoId) await deleteVideo(post.videoId);
-  if (!removePost(post.id)) {
-    if (blob) {
-      try {
-        await saveVideo(post.videoId, blob);
-      } catch {
-        throw new Error("Post ma'lumotlari o'chirilmadi, lekin video faylini tiklab bo'lmadi. Brauzer xotirasini tekshiring.");
-      }
-    }
-    throw new Error("Post o'chirilmadi. Brauzer xotirasiga yozib bo'lmadi. Qayta urinib ko'ring.");
-  }
+  const session = barberSession();
+  const id = typeof post === "object" ? post?.id : post;
+  if (!Number.isSafeInteger(Number(id)) || Number(id) <= 0) throw new Error("Post topilmadi.");
+  await request("DELETE", `/api/social/posts/${Number(id)}`, { token: session.token });
+  if (!(await refreshBarberData())) throw new Error("Post o‘chirildi, ammo portfolio yangilanmadi.");
+}
+
+// #91: API is authoritative; never mutate the local list until DB confirmation.
+export async function setPortfolioFeatured(post, featured) {
+  const session=barberSession();
+  const id=typeof post==='object'?post?.id:post;
+  if(!Number.isSafeInteger(Number(id)) || Number(id)<=0 || typeof featured!=='boolean')
+    throw new Error('Post yoki belgilash qiymati noto‘g‘ri.');
+  const result=await request('PUT',`/api/social/posts/${Number(id)}/featured`, {
+    token:session.token, body:{featured},
+  });
+  if(result?.postId!==Number(id) || result.featured!==featured)
+    throw new Error('Server belgilangan postni tasdiqlamadi.');
+  if(!(await refreshBarberData())) throw new Error('Belgi saqlandi, ammo portfolio yangilanmadi.');
+  return result;
 }
