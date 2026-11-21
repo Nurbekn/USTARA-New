@@ -1,3 +1,5 @@
+BEGIN;
+
 -- v169 / decision #101. A notice records customer intent; never moves an appointment.
 -- One immutable notice per booking prevents duplicate submissions on retries.
 CREATE TABLE IF NOT EXISTS booking_late_notices (
@@ -5,3 +7,8 @@ CREATE TABLE IF NOT EXISTS booking_late_notices (
   minutes_late SMALLINT NOT NULL CHECK (minutes_late IN (5,10,15,20,30)),
   created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
+
+INSERT INTO ustara_schema_migrations(version)
+VALUES ('20261223_booking_late_notices');
+
+COMMIT;

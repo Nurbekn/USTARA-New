@@ -1,3 +1,5 @@
+BEGIN;
+
 -- #102: customer arrival request and explicit acceptance by the booking's barber.
 -- Check-in is informational and MUST NOT update bookings.status or booking_time.
 CREATE TABLE IF NOT EXISTS booking_checkins (
@@ -23,3 +25,8 @@ CREATE TRIGGER booking_checkins_clear_on_reschedule
 AFTER UPDATE OF booking_time ON bookings
 FOR EACH ROW WHEN (OLD.booking_time IS DISTINCT FROM NEW.booking_time)
 EXECUTE FUNCTION ustara_invalidate_checkin_on_reschedule();
+
+INSERT INTO ustara_schema_migrations(version)
+VALUES ('20261224_booking_customer_checkins');
+
+COMMIT;

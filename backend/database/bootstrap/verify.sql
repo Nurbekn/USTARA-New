@@ -186,7 +186,7 @@ BEGIN
      OR (SELECT count(*) FROM smart_booking_admin_settings)<>1
   THEN RAISE EXCEPTION 'Fresh bootstrap: Smart Booking enabled singleton missing'; END IF;
   FOREACH object_name IN ARRAY expected_tables LOOP
-    IF object_name IN ('admin_accounts','ustara_schema_migrations','smart_booking_admin_settings') THEN CONTINUE; END IF;
+    IF object_name IN ('admin_accounts','ustara_schema_migrations','smart_booking_admin_settings','walkin_qr_settings') THEN CONTINUE; END IF;
     EXECUTE format('SELECT count(*) FROM %I.%I',schema_name,object_name) INTO row_count;
     IF row_count<>0 THEN RAISE EXCEPTION 'Fresh bootstrap: unexpected data in %',object_name; END IF;
   END LOOP;
